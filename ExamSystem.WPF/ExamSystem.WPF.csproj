@@ -6,6 +6,9 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>false</UseWindowsForms>
     <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <AssemblyName>ExamSystem.WPF</AssemblyName>
+    <RootNamespace>ExamSystem.WPF</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,12 +18,24 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.17" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../ExamSystem.Domain/ExamSystem.Domain.csproj" />
     <ProjectReference Include="../ExamSystem.Services/ExamSystem.Services.csproj" />
     <ProjectReference Include="../ExamSystem.Infrastructure/ExamSystem.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="Views\*.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\*.xaml.cs">
+      <DependentUpon>%(Filename).xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
