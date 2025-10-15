@@ -1,0 +1,246 @@
+<UserControl x:Class="ExamSystem.WPF.Views.UserManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ExamSystem.WPF.Views"
+             xmlns:vm="clr-namespace:ExamSystem.WPF.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/CommonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.DataContext>
+            <vm:UserManagementViewModel/>
+        </Grid.DataContext>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="20,15">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="👥" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="用户管理" Style="{StaticResource TitleTextStyle}" Foreground="White"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 工具栏 -->
+        <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 搜索和筛选 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBox x:Name="SearchTextBox" 
+                             Style="{StaticResource SearchTextBoxStyle}"
+                             Width="300" 
+                             Margin="0,0,15,0"/>
+                    
+                    <ComboBox x:Name="RoleFilterComboBox" 
+                              Style="{StaticResource ModernComboBoxStyle}"
+                              Width="120" 
+                              Margin="0,0,15,0">
+                        <ComboBoxItem Content="全部角色" IsSelected="True"/>
+                        <ComboBoxItem Content="管理员"/>
+                        <ComboBoxItem Content="教师"/>
+                        <ComboBoxItem Content="学生"/>
+                    </ComboBox>
+                    
+                    <ComboBox x:Name="StatusFilterComboBox" 
+                              Style="{StaticResource ModernComboBoxStyle}"
+                              Width="120" 
+                              Margin="0,0,15,0">
+                        <ComboBoxItem Content="全部状态" IsSelected="True"/>
+                        <ComboBoxItem Content="启用"/>
+                        <ComboBoxItem Content="禁用"/>
+                    </ComboBox>
+                    
+                    <Button x:Name="SearchButton" 
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Content="🔍 搜索" 
+                            Click="SearchButton_Click"/>
+                </StackPanel>
+
+                <!-- 操作按钮 -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="AddUserButton" 
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Content="➕ 添加用户" 
+                            Margin="0,0,10,0"
+                            Click="AddUserButton_Click"/>
+                    <Button x:Name="ImportUsersButton" 
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Content="📥 批量导入" 
+                            Margin="0,0,10,0"
+                            Click="ImportUsersButton_Click"/>
+                    <Button x:Name="ExportUsersButton" 
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Content="📤 导出用户" 
+                            Click="ExportUsersButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 用户列表 -->
+        <DataGrid x:Name="UsersDataGrid" 
+                  Grid.Row="2" 
+                  Style="{StaticResource ModernDataGridStyle}"
+                  Margin="20"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  SelectionMode="Single"
+                  SelectionChanged="UsersDataGrid_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="用户ID" Binding="{Binding Id}" Width="80" IsReadOnly="True"/>
+                <DataGridTextColumn Header="用户名" Binding="{Binding Username}" Width="120" IsReadOnly="True"/>
+                <DataGridTextColumn Header="姓名" Binding="{Binding FullName}" Width="120" IsReadOnly="True"/>
+                <DataGridTextColumn Header="邮箱" Binding="{Binding Email}" Width="200" IsReadOnly="True"/>
+                <DataGridTextColumn Header="角色" Binding="{Binding RoleDisplay}" Width="100" IsReadOnly="True"/>
+                <DataGridTextColumn Header="创建时间" Binding="{Binding CreatedAt, StringFormat=yyyy-MM-dd HH:mm}" Width="140" IsReadOnly="True"/>
+                <DataGridTextColumn Header="最后登录" Binding="{Binding LastLoginAt, StringFormat=yyyy-MM-dd HH:mm}" Width="140" IsReadOnly="True"/>
+                
+                <DataGridTemplateColumn Header="状态" Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding StatusColor}" 
+                                    CornerRadius="10" 
+                                    Padding="8,4">
+                                <TextBlock Text="{Binding StatusDisplay}" 
+                                           Foreground="White" 
+                                           FontSize="11" 
+                                           HorizontalAlignment="Center"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn Header="操作" Width="200">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="✏️" 
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Width="30" Height="30" 
+                                        Margin="2"
+                                        ToolTip="编辑用户"
+                                        Click="EditUserButton_Click"
+                                        Tag="{Binding}"/>
+                                <Button Content="🔒" 
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Width="30" Height="30" 
+                                        Margin="2"
+                                        ToolTip="重置密码"
+                                        Click="ResetPasswordButton_Click"
+                                        Tag="{Binding}"/>
+                                <Button Content="{Binding StatusToggleIcon}" 
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Width="30" Height="30" 
+                                        Margin="2"
+                                        ToolTip="{Binding StatusToggleTooltip}"
+                                        Click="ToggleStatusButton_Click"
+                                        Tag="{Binding}"/>
+                                <Button Content="🗑️" 
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Width="30" Height="30" 
+                                        Margin="2"
+                                        ToolTip="删除用户"
+                                        Click="DeleteUserButton_Click"
+                                        Tag="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- 分页控件 -->
+        <Border Grid.Row="3" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 统计信息 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="共 " Style="{StaticResource BodyTextStyle}"/>
+                    <TextBlock x:Name="TotalCountTextBlock" Text="0" Style="{StaticResource BodyTextStyle}" FontWeight="Bold"/>
+                    <TextBlock Text=" 个用户，当前显示第 " Style="{StaticResource BodyTextStyle}"/>
+                    <TextBlock x:Name="CurrentPageTextBlock" Text="1" Style="{StaticResource BodyTextStyle}" FontWeight="Bold"/>
+                    <TextBlock Text=" 页，共 " Style="{StaticResource BodyTextStyle}"/>
+                    <TextBlock x:Name="TotalPagesTextBlock" Text="1" Style="{StaticResource BodyTextStyle}" FontWeight="Bold"/>
+                    <TextBlock Text=" 页" Style="{StaticResource BodyTextStyle}"/>
+                </StackPanel>
+
+                <!-- 分页按钮 -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="FirstPageButton" 
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Content="⏮️" 
+                            Width="35" Height="35" 
+                            Margin="2"
+                            ToolTip="首页"
+                            Click="FirstPageButton_Click"/>
+                    <Button x:Name="PreviousPageButton" 
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Content="⏪" 
+                            Width="35" Height="35" 
+                            Margin="2"
+                            ToolTip="上一页"
+                            Click="PreviousPageButton_Click"/>
+                    <TextBox x:Name="PageNumberTextBox" 
+                             Style="{StaticResource ModernTextBoxStyle}"
+                             Width="50" Height="35" 
+                             Margin="5,2"
+                             TextAlignment="Center"
+                             KeyDown="PageNumberTextBox_KeyDown"/>
+                    <Button x:Name="NextPageButton" 
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Content="⏩" 
+                            Width="35" Height="35" 
+                            Margin="2"
+                            ToolTip="下一页"
+                            Click="NextPageButton_Click"/>
+                    <Button x:Name="LastPageButton" 
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Content="⏭️" 
+                            Width="35" Height="35" 
+                            Margin="2"
+                            ToolTip="末页"
+                            Click="LastPageButton_Click"/>
+                    
+                    <ComboBox x:Name="PageSizeComboBox" 
+                              Style="{StaticResource ModernComboBoxStyle}"
+                              Width="80" 
+                              Margin="10,2,0,2"
+                              SelectionChanged="PageSizeComboBox_SelectionChanged">
+                        <ComboBoxItem Content="10" IsSelected="True"/>
+                        <ComboBoxItem Content="20"/>
+                        <ComboBoxItem Content="50"/>
+                        <ComboBoxItem Content="100"/>
+                    </ComboBox>
+                    <TextBlock Text="条/页" 
+                               Style="{StaticResource BodyTextStyle}" 
+                               VerticalAlignment="Center" 
+                               Margin="5,0,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

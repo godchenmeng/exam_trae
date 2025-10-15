@@ -58,6 +58,22 @@
                     Style="{StaticResource ModernTabControl}"
                     Margin="16">
             
+            <!-- 仪表板 -->
+            <TabItem Header="仪表板" Style="{StaticResource ModernTabItem}" IsSelected="True">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🏠" 
+                                      FontSize="16" 
+                                      VerticalAlignment="Center" 
+                                      Margin="0,0,4,0"/>
+                            <TextBlock Text="仪表板" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <Frame Name="DashboardFrame" NavigationUIVisibility="Hidden"/>
+            </TabItem>
+            
             <!-- 题库管理 -->
             <TabItem Header="题库管理" Style="{StaticResource ModernTabItem}">
                 <TabItem.HeaderTemplate>
@@ -120,6 +136,38 @@
                     </DataTemplate>
                 </TabItem.HeaderTemplate>
                 <Frame Name="ExamResultFrame" NavigationUIVisibility="Hidden"/>
+            </TabItem>
+
+            <!-- 统计报表 -->
+            <TabItem Header="统计报表" Style="{StaticResource ModernTabItem}">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📈" 
+                                      FontSize="16" 
+                                      VerticalAlignment="Center" 
+                                      Margin="0,0,4,0"/>
+                            <TextBlock Text="统计报表" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <Frame Name="StatisticsFrame" NavigationUIVisibility="Hidden"/>
+            </TabItem>
+
+            <!-- 用户管理 -->
+            <TabItem Header="用户管理" Style="{StaticResource ModernTabItem}">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👥" 
+                                      FontSize="16" 
+                                      VerticalAlignment="Center" 
+                                      Margin="0,0,4,0"/>
+                            <TextBlock Text="用户管理" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <Frame Name="UserManagementFrame" NavigationUIVisibility="Hidden"/>
             </TabItem>
         </TabControl>
 

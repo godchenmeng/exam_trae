@@ -1,0 +1,228 @@
+<UserControl x:Class="ExamSystem.WPF.Views.StatisticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ExamSystem.WPF.Views"
+             xmlns:vm="clr-namespace:ExamSystem.WPF.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1200">
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/CommonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.DataContext>
+            <vm:StatisticsViewModel/>
+        </Grid.DataContext>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="20,15">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="📊" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="统计报表" Style="{StaticResource TitleTextStyle}" Foreground="White"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 筛选工具栏 -->
+        <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 筛选条件 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="考试时间：" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <DatePicker x:Name="StartDatePicker" 
+                                Width="120" 
+                                Margin="0,0,10,0"/>
+                    <TextBlock Text="至" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <DatePicker x:Name="EndDatePicker" 
+                                Width="120" 
+                                Margin="0,0,20,0"/>
+                    
+                    <TextBlock Text="试卷：" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <ComboBox x:Name="ExamPaperComboBox" 
+                              Style="{StaticResource ModernComboBoxStyle}"
+                              Width="200" 
+                              Margin="0,0,20,0">
+                        <ComboBoxItem Content="全部试卷" IsSelected="True"/>
+                    </ComboBox>
+                    
+                    <TextBlock Text="班级：" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <ComboBox x:Name="ClassComboBox" 
+                              Style="{StaticResource ModernComboBoxStyle}"
+                              Width="150" 
+                              Margin="0,0,15,0">
+                        <ComboBoxItem Content="全部班级" IsSelected="True"/>
+                    </ComboBox>
+                    
+                    <Button x:Name="QueryButton" 
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Content="🔍 查询" 
+                            Click="QueryButton_Click"/>
+                </StackPanel>
+
+                <!-- 导出按钮 -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="ExportExcelButton" 
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Content="📊 导出Excel" 
+                            Margin="0,0,10,0"
+                            Click="ExportExcelButton_Click"/>
+                    <Button x:Name="ExportPdfButton" 
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Content="📄 导出PDF" 
+                            Click="ExportPdfButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 统计内容 -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20">
+                
+                <!-- 概览统计卡片 -->
+                <TextBlock Text="📈 考试概览" Style="{StaticResource SubtitleTextStyle}" Margin="0,0,0,15"/>
+                <UniformGrid Columns="4" Margin="0,0,0,30">
+                    <!-- 参考人数 -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,10,0">
+                        <StackPanel>
+                            <TextBlock Text="👥" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                            <TextBlock x:Name="TotalStudentsTextBlock" Text="0" Style="{StaticResource TitleTextStyle}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="参考人数" Style="{StaticResource BodyTextStyle}" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- 平均分 -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,10,0">
+                        <StackPanel>
+                            <TextBlock Text="📊" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                            <TextBlock x:Name="AverageScoreTextBlock" Text="0.0" Style="{StaticResource TitleTextStyle}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="平均分" Style="{StaticResource BodyTextStyle}" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- 及格率 -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,10,0">
+                        <StackPanel>
+                            <TextBlock Text="✅" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                            <TextBlock x:Name="PassRateTextBlock" Text="0%" Style="{StaticResource TitleTextStyle}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="及格率" Style="{StaticResource BodyTextStyle}" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- 优秀率 -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="🏆" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                            <TextBlock x:Name="ExcellentRateTextBlock" Text="0%" Style="{StaticResource TitleTextStyle}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="优秀率" Style="{StaticResource BodyTextStyle}" HorizontalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <!-- 分数分布图表 -->
+                <TextBlock Text="📊 分数分布" Style="{StaticResource SubtitleTextStyle}" Margin="0,0,0,15"/>
+                <Border Style="{StaticResource CardStyle}" Height="300" Margin="0,0,0,30">
+                    <Grid>
+                        <TextBlock Text="分数分布图表区域" 
+                                   Style="{StaticResource BodyTextStyle}" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
+                        <!-- TODO: 集成图表控件 -->
+                    </Grid>
+                </Border>
+
+                <!-- 题目分析 -->
+                <TextBlock Text="🔍 题目分析" Style="{StaticResource SubtitleTextStyle}" Margin="0,0,0,15"/>
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,30">
+                    <DataGrid x:Name="QuestionAnalysisDataGrid" 
+                              Style="{StaticResource ModernDataGridStyle}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              MaxHeight="400">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="题目编号" Binding="{Binding QuestionNumber}" Width="80"/>
+                            <DataGridTextColumn Header="题目类型" Binding="{Binding QuestionType}" Width="100"/>
+                            <DataGridTextColumn Header="题目内容" Binding="{Binding QuestionContent}" Width="300"/>
+                            <DataGridTextColumn Header="正确率" Binding="{Binding CorrectRate}" Width="80"/>
+                            <DataGridTextColumn Header="难度系数" Binding="{Binding DifficultyCoefficient}" Width="80"/>
+                            <DataGridTextColumn Header="区分度" Binding="{Binding Discrimination}" Width="80"/>
+                            
+                            <DataGridTemplateColumn Header="难度等级" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{Binding DifficultyColor}" 
+                                                CornerRadius="10" 
+                                                Padding="8,4">
+                                            <TextBlock Text="{Binding DifficultyLevel}" 
+                                                       Foreground="White" 
+                                                       FontSize="11" 
+                                                       HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <!-- 学生成绩排名 -->
+                <TextBlock Text="🏅 成绩排名" Style="{StaticResource SubtitleTextStyle}" Margin="0,0,0,15"/>
+                <Border Style="{StaticResource CardStyle}">
+                    <DataGrid x:Name="StudentRankingDataGrid" 
+                              Style="{StaticResource ModernDataGridStyle}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              MaxHeight="400">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="排名" Binding="{Binding Rank}" Width="60"/>
+                            <DataGridTextColumn Header="学号" Binding="{Binding StudentId}" Width="100"/>
+                            <DataGridTextColumn Header="姓名" Binding="{Binding StudentName}" Width="120"/>
+                            <DataGridTextColumn Header="班级" Binding="{Binding ClassName}" Width="100"/>
+                            <DataGridTextColumn Header="总分" Binding="{Binding TotalScore}" Width="80"/>
+                            <DataGridTextColumn Header="客观题得分" Binding="{Binding ObjectiveScore}" Width="100"/>
+                            <DataGridTextColumn Header="主观题得分" Binding="{Binding SubjectiveScore}" Width="100"/>
+                            <DataGridTextColumn Header="考试时长" Binding="{Binding ExamDuration}" Width="100"/>
+                            <DataGridTextColumn Header="提交时间" Binding="{Binding SubmitTime, StringFormat=yyyy-MM-dd HH:mm}" Width="140"/>
+                            
+                            <DataGridTemplateColumn Header="等级" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{Binding GradeColor}" 
+                                                CornerRadius="10" 
+                                                Padding="8,4">
+                                            <TextBlock Text="{Binding Grade}" 
+                                                       Foreground="White" 
+                                                       FontSize="11" 
+                                                       HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

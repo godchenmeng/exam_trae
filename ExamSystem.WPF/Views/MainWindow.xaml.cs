@@ -26,6 +26,10 @@ namespace ExamSystem.WPF.Views
         {
             try
             {
+                // 加载仪表板
+                var dashboardView = _serviceProvider.GetRequiredService<DashboardView>();
+                DashboardFrame.Content = dashboardView;
+
                 // 加载各个页面
                 var questionBankView = _serviceProvider.GetRequiredService<QuestionBankView>();
                 QuestionBankFrame.Content = questionBankView;
@@ -38,6 +42,14 @@ namespace ExamSystem.WPF.Views
 
                 var examResultView = _serviceProvider.GetRequiredService<ExamResultView>();
                 ExamResultFrame.Content = examResultView;
+
+                // 加载统计报表
+                var statisticsView = _serviceProvider.GetRequiredService<StatisticsView>();
+                StatisticsFrame.Content = statisticsView;
+
+                // 加载用户管理
+                var userManagementView = _serviceProvider.GetRequiredService<UserManagementView>();
+                UserManagementFrame.Content = userManagementView;
 
                 _logger.LogInformation("所有页面加载完成");
             }
