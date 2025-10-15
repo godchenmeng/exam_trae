@@ -1,6 +1,5 @@
 using ExamSystem.Domain.Entities;
 using ExamSystem.Services.Interfaces;
-using ExamSystem.UI.ViewModels;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
