@@ -1,179 +1,175 @@
-# ExamSystem.WPF - 在线考试系统 WPF 版本
+# ExamSystem.WPF
 
-## 📋 项目概述
+## 项目概述
 
-这是在线考试系统的 WPF (Windows Presentation Foundation) 版本，提供了完整的桌面应用程序界面。
+ExamSystem.WPF 是在线考试系统的 WPF 桌面客户端版本，提供了完整的考试管理功能，包括题库管理、试卷管理、考试管理和考试结果分析。
 
-## 🏗️ 项目结构
+## 项目结构
 
 ```
 ExamSystem.WPF/
 ├── App.xaml                    # 应用程序入口
-├── App.xaml.cs                 # 应用程序逻辑和依赖注入配置
+├── App.xaml.cs                 # 应用程序代码
 ├── ExamSystem.WPF.csproj       # 项目文件
 ├── README.md                   # 项目说明
-├── Converters/                 # 数据转换器
-│   └── Converters.cs
-├── Styles/                     # 样式文件
-│   └── CommonStyles.xaml       # 通用样式定义
-├── ViewModels/                 # 视图模型 (MVVM模式)
-│   ├── ExamViewModel.cs
-│   ├── ExamPaperViewModel.cs
-│   ├── ExamPaperEditViewModel.cs
-│   ├── ExamPreviewViewModel.cs
-│   ├── ExamResultViewModel.cs
-│   ├── PaperQuestionManageViewModel.cs
-│   ├── QuestionBankViewModel.cs
-│   ├── QuestionBankEditViewModel.cs
-│   └── QuestionEditViewModel.cs
-└── Views/                      # 视图文件
-    ├── MainWindow.xaml         # 主窗口
-    ├── MainWindow.xaml.cs
-    ├── ExamView.xaml
-    ├── ExamPaperView.xaml
-    ├── ExamResultView.xaml
-    ├── QuestionBankView.xaml
-    └── [其他对话框和视图文件]
+├── Views/
+│   └── MainWindow.xaml         # 主窗口界面
+│   └── MainWindow.xaml.cs      # 主窗口代码
+├── ViewModels/                 # 视图模型
+│   └── ExamViewModel.cs        # 考试视图模型
+├── Converters/                 # 值转换器
+└── Styles/
+    └── CommonStyles.xaml       # 通用样式
 ```
 
-## 🎯 主要功能
+## 主要功能
 
-### 1. 题库管理
+### 1. 题库管理 📖
 - 题目的增删改查
-- 题目分类和难度管理
+- 支持多种题型（单选、多选、判断、填空、简答）
+- 题目分类和标签管理
 - 题目导入导出功能
 
-### 2. 试卷管理
+### 2. 试卷管理 📄
 - 试卷创建和编辑
-- 题目组卷功能
-- 试卷预览和发布
+- 自动组卷和手动组卷
+- 试卷预览和打印
+- 试卷模板管理
 
-### 3. 考试管理
-- 考试进行界面
-- 计时功能
-- 答题记录
+### 3. 考试管理 ✏️
+- 考试安排和配置
+- 实时考试监控
+- 考试时间控制
+- 防作弊措施
 
-### 4. 考试结果
-- 成绩统计
-- 答题分析
-- 结果导出
+### 4. 考试结果 📊
+- 成绩统计和分析
+- 答题情况详细报告
+- 成绩导出功能
+- 图表可视化展示
 
-## 🛠️ 技术栈
+## 技术栈
 
 - **.NET 5.0** - 目标框架
-- **WPF** - UI框架
-- **Material Design in XAML** - UI设计库
+- **WPF** - 用户界面框架
+- **MVVM** - 架构模式
 - **Entity Framework Core** - 数据访问
+- **SQLite** - 数据库
 - **Microsoft.Extensions.DependencyInjection** - 依赖注入
 - **Microsoft.Extensions.Logging** - 日志记录
+- **Microsoft.Xaml.Behaviors.Wpf** - XAML 行为
 
-## 📦 NuGet 包依赖
+## NuGet 依赖包
 
 ```xml
-<PackageReference Include="MaterialDesignThemes" Version="4.6.1" />
-<PackageReference Include="MaterialDesignColors" Version="2.0.7" />
+<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.17" />
 <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
 <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
-<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.17" />
+<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
 ```
 
-## 🚀 运行要求
+## 运行要求
 
-### 系统要求
-- **Windows 10** 或更高版本
-- **.NET 5.0 Runtime** 或 **.NET 5.0 SDK**
+- **操作系统**: Windows 10 或更高版本
+- **.NET 运行时**: .NET 5.0 Desktop Runtime
+- **内存**: 最少 4GB RAM
+- **存储**: 至少 100MB 可用空间
 
-### 开发环境
-- **Visual Studio 2019/2022** (推荐)
-- **Visual Studio Code** + C# 扩展
-- **JetBrains Rider**
+## 编译和发布
 
-## 📝 编译和运行
-
-### 在 Windows 上编译
+### 开发环境编译
 ```bash
 # 还原 NuGet 包
-dotnet restore ExamSystem.WPF/ExamSystem.WPF.csproj
+dotnet restore
 
 # 编译项目
-dotnet build ExamSystem.WPF/ExamSystem.WPF.csproj
+dotnet build
 
-# 运行应用程序
-dotnet run --project ExamSystem.WPF/ExamSystem.WPF.csproj
+# 运行项目
+dotnet run
 ```
 
 ### 发布应用程序
 ```bash
 # 发布为独立应用程序
-dotnet publish ExamSystem.WPF/ExamSystem.WPF.csproj -c Release -r win-x64 --self-contained true
+dotnet publish -c Release -r win-x64 --self-contained true
 
 # 发布为框架依赖应用程序
-dotnet publish ExamSystem.WPF/ExamSystem.WPF.csproj -c Release -r win-x64 --self-contained false
+dotnet publish -c Release -r win-x64 --self-contained false
 ```
 
-## ⚠️ 重要说明
+## 重要说明
 
-### macOS/Linux 兼容性
-**WPF 是 Windows 专用框架**，无法在 macOS 或 Linux 上运行。如果需要跨平台支持，请使用：
-- **ExamSystem.UI** (Avalonia UI) - 已包含在解决方案中
-- **.NET MAUI** - 可考虑未来迁移
-- **Blazor** - Web 应用程序版本
+⚠️ **平台限制**: 此项目使用 WPF 框架，仅支持 Windows 平台。在 macOS 或 Linux 系统上无法编译和运行。
 
-### 当前状态
-- ✅ 项目结构已完成
-- ✅ 依赖注入配置已完成
-- ✅ 基础 UI 框架已搭建
-- ⚠️ 需要在 Windows 环境中进行测试和调试
-- ⚠️ 部分 ViewModels 和 Views 需要进一步完善
+如果需要跨平台支持，请考虑使用：
+- **Avalonia UI** - 跨平台 .NET UI 框架
+- **MAUI** - Microsoft 的跨平台应用程序框架
+- **Blazor** - Web 应用程序框架
 
-## 🔧 配置说明
+## 配置说明
 
 ### 数据库配置
-应用程序使用 SQLite 数据库，连接字符串在 `App.xaml.cs` 中配置：
-```csharp
-services.AddDbContext<ExamDbContext>(options =>
-    options.UseSqlite("Data Source=exam_system.db"));
-```
+应用程序使用 SQLite 数据库，数据库文件将在首次运行时自动创建在应用程序目录下。
 
-### 依赖注入
-所有服务和 ViewModels 都通过依赖注入容器管理，配置在 `App.xaml.cs` 的 `CreateHostBuilder` 方法中。
+### 日志配置
+应用程序使用 Microsoft.Extensions.Logging 进行日志记录，日志级别可以通过配置文件调整。
 
-## 🎨 UI 设计
+## UI 设计
 
-### Material Design
-使用 Material Design in XAML 库提供现代化的 UI 设计：
-- 统一的颜色主题
-- 响应式动画效果
-- 标准化的控件样式
+### 设计原则
+- **简洁明了**: 界面简洁，操作直观
+- **响应式设计**: 适应不同屏幕尺寸
+- **一致性**: 统一的视觉风格和交互模式
+- **可访问性**: 支持键盘导航和屏幕阅读器
 
-### 自定义样式
-`Styles/CommonStyles.xaml` 包含了应用程序的自定义样式定义，确保 UI 的一致性。
+### 颜色方案
+- **主色调**: #2196F3 (蓝色)
+- **辅助色**: #FF4081 (粉色)
+- **背景色**: #F5F5F5 (浅灰)
+- **表面色**: #FFFFFF (白色)
+- **文本色**: #212121 (深灰)
 
-## 📚 开发指南
+### 字体
+- **主字体**: Microsoft YaHei UI
+- **字体大小**: 14px (基础)
+
+## 开发指南
 
 ### MVVM 模式
-项目严格遵循 MVVM (Model-View-ViewModel) 设计模式：
-- **Model**: Domain 层的实体类
-- **View**: XAML 文件定义的用户界面
-- **ViewModel**: 业务逻辑和数据绑定
+项目采用 MVVM (Model-View-ViewModel) 架构模式：
+- **Model**: 数据模型和业务逻辑
+- **View**: XAML 界面文件
+- **ViewModel**: 视图逻辑和数据绑定
 
-### 添加新功能
-1. 在 `ViewModels` 文件夹中创建对应的 ViewModel
-2. 在 `Views` 文件夹中创建对应的 View
-3. 在 `App.xaml.cs` 中注册新的服务和 ViewModel
-4. 更新主窗口的导航逻辑
+### 依赖注入
+使用 Microsoft.Extensions.DependencyInjection 进行依赖注入，所有服务都在 `App.xaml.cs` 中注册。
 
-## 🤝 贡献指南
+### 样式管理
+所有通用样式定义在 `Styles/CommonStyles.xaml` 中，包括：
+- 按钮样式
+- 文本框样式
+- 数据网格样式
+- 颜色资源
+
+## 贡献指南
 
 1. Fork 项目
-2. 创建功能分支
-3. 提交更改
-4. 推送到分支
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 创建 Pull Request
 
-## 📄 许可证
+## 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](../LICENSE) 文件了解详情。
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 联系方式
+
+如有问题或建议，请通过以下方式联系：
+- 创建 Issue
+- 发送邮件到项目维护者
+
+---
+
+**注意**: 由于 WPF 的平台限制，此项目仅能在 Windows 环境下开发和运行。
