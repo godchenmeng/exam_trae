@@ -1,0 +1,17 @@
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/obj/Debug/net5.0/ExamSystem.Services.csproj.AssemblyReference.cache
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/obj/Debug/net5.0/ExamSystem.Services.GeneratedMSBuildEditorConfig.editorconfig
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/obj/Debug/net5.0/ExamSystem.Services.AssemblyInfoInputs.cache
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/obj/Debug/net5.0/ExamSystem.Services.AssemblyInfo.cs
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/obj/Debug/net5.0/ExamSystem.Services.csproj.CoreCompileInputs.cache
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/bin/Debug/net5.0/ExamSystem.Services.deps.json
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/bin/Debug/net5.0/ExamSystem.Services.dll
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/bin/Debug/net5.0/ref/ExamSystem.Services.dll
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/bin/Debug/net5.0/ExamSystem.Services.pdb
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/bin/Debug/net5.0/ExamSystem.Domain.dll
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/bin/Debug/net5.0/ExamSystem.Infrastructure.dll
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/bin/Debug/net5.0/ExamSystem.Domain.pdb
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/bin/Debug/net5.0/ExamSystem.Infrastructure.pdb
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/obj/Debug/net5.0/ExamSystem.Services.csproj.CopyComplete
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/obj/Debug/net5.0/ExamSystem.Services.dll
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/obj/Debug/net5.0/ref/ExamSystem.Services.dll
+/Users/chenmeng/c#/exam_trae/ExamSystem.Services/obj/Debug/net5.0/ExamSystem.Services.pdb

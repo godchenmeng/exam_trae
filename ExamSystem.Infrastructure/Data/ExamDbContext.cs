@@ -1,0 +1,171 @@
+using System;
+using ExamSystem.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace ExamSystem.Data
+{
+    public class ExamDbContext : DbContext
+    {
+        public ExamDbContext(DbContextOptions<ExamDbContext> options) : base(options)
+        {
+        }
+
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<QuestionBank> QuestionBanks { get; set; } = null!;
+        public DbSet<Question> Questions { get; set; } = null!;
+        public DbSet<QuestionOption> QuestionOptions { get; set; } = null!;
+        public DbSet<ExamPaper> ExamPapers { get; set; } = null!;
+        public DbSet<PaperQuestion> PaperQuestions { get; set; } = null!;
+        public DbSet<ExamRecord> ExamRecords { get; set; } = null!;
+        public DbSet<AnswerRecord> AnswerRecords { get; set; } = null!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // 配置User实体
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.UserId);
+                entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.RealName).HasMaxLength(100);
+                entity.Property(e => e.Email).HasMaxLength(200);
+                entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.Role).IsRequired();
+                entity.Property(e => e.IsActive).IsRequired();
+                entity.Property(e => e.CreatedAt).IsRequired();
+
+                // 创建索引
+                entity.HasIndex(e => e.Username).IsUnique();
+                entity.HasIndex(e => e.Email).IsUnique();
+            });
+
+            // 配置题库表
+            modelBuilder.Entity<QuestionBank>(entity =>
+            {
+                entity.HasKey(e => e.BankId);
+                entity.HasOne(e => e.Creator)
+                      .WithMany(e => e.CreatedQuestionBanks)
+                      .HasForeignKey(e => e.CreatorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 配置题目表
+            modelBuilder.Entity<Question>(entity =>
+            {
+                entity.HasKey(e => e.QuestionId);
+                entity.Property(e => e.QuestionType).HasConversion<int>();
+                entity.Property(e => e.Difficulty).HasConversion<int>();
+                entity.HasOne(e => e.QuestionBank)
+                      .WithMany(e => e.Questions)
+                      .HasForeignKey(e => e.BankId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // 配置题目选项表
+            modelBuilder.Entity<QuestionOption>(entity =>
+            {
+                entity.HasKey(e => e.OptionId);
+                entity.HasOne(e => e.Question)
+                      .WithMany(e => e.Options)
+                      .HasForeignKey(e => e.QuestionId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // 配置试卷表
+            modelBuilder.Entity<ExamPaper>(entity =>
+            {
+                entity.HasKey(e => e.PaperId);
+                entity.HasOne(e => e.Creator)
+                      .WithMany(e => e.CreatedExamPapers)
+                      .HasForeignKey(e => e.CreatorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 配置试卷题目关联表
+            modelBuilder.Entity<PaperQuestion>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.ExamPaper)
+                      .WithMany(e => e.PaperQuestions)
+                      .HasForeignKey(e => e.PaperId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Question)
+                      .WithMany(e => e.PaperQuestions)
+                      .HasForeignKey(e => e.QuestionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 配置考试记录表
+            modelBuilder.Entity<ExamRecord>(entity =>
+            {
+                entity.HasKey(e => e.RecordId);
+                entity.Property(e => e.Status).HasConversion<int>();
+                entity.HasOne(e => e.User)
+                      .WithMany(e => e.ExamRecords)
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.ExamPaper)
+                      .WithMany(e => e.ExamRecords)
+                      .HasForeignKey(e => e.PaperId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Grader)
+                      .WithMany()
+                      .HasForeignKey(e => e.GraderId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // 配置答题记录表
+            modelBuilder.Entity<AnswerRecord>(entity =>
+            {
+                entity.HasKey(e => e.AnswerId);
+                entity.HasOne(e => e.ExamRecord)
+                      .WithMany(e => e.AnswerRecords)
+                      .HasForeignKey(e => e.RecordId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Question)
+                      .WithMany(e => e.AnswerRecords)
+                      .HasForeignKey(e => e.QuestionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Grader)
+                      .WithMany()
+                      .HasForeignKey(e => e.GraderId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // 种子数据
+            SeedData(modelBuilder);
+        }
+
+    private void SeedData(ModelBuilder modelBuilder)
+    {
+        // 创建默认管理员用户
+        modelBuilder.Entity<User>().HasData(
+            new User
+            {
+                UserId = 1,
+                Username = "admin",
+                PasswordHash = "admin123", // 临时使用明文，实际应用中需要哈希
+                RealName = "系统管理员",
+                Role = Domain.Enums.UserRole.Admin,
+                Email = "admin@exam.com",
+                IsActive = true,
+                CreatedAt = DateTime.Now
+            }
+        );
+
+        // 创建默认题库
+        modelBuilder.Entity<QuestionBank>().HasData(
+            new QuestionBank
+            {
+                BankId = 1,
+                Name = "默认题库",
+                Description = "系统默认题库",
+                CreatorId = 1,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            }
+        );
+    }
+    }
+}

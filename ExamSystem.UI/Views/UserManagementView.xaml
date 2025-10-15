@@ -1,0 +1,442 @@
+<UserControl x:Class="ExamSystem.UI.Views.UserManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:ExamSystem.UI.ViewModels"
+             xmlns:enums="clr-namespace:ExamSystem.Domain.Enums;assembly=ExamSystem.Domain">
+
+    <UserControl.DataContext>
+        <viewmodels:UserManagementViewModel/>
+    </UserControl.DataContext>
+
+    <materialDesign:DialogHost Identifier="UserManagementDialog">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 页面标题 -->
+            <TextBlock Grid.Row="0"
+                      Text="用户管理"
+                      Style="{StaticResource TitleTextStyle}"
+                      Margin="0,0,0,20"/>
+
+            <!-- 搜索和操作栏 -->
+            <materialDesign:Card Grid.Row="1" 
+                               Margin="0,0,0,16"
+                               Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 搜索条件 -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 搜索文本 -->
+                        <TextBox Grid.Column="0"
+                                Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                materialDesign:HintAssist.Hint="搜索用户名、姓名或邮箱"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                Margin="0,0,8,0">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding SearchCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <!-- 角色筛选 -->
+                        <ComboBox Grid.Column="1"
+                                 SelectedItem="{Binding SelectedRole}"
+                                 ItemsSource="{Binding UserRoles}"
+                                 materialDesign:HintAssist.Hint="角色筛选"
+                                 Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                 Margin="4,0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0}">
+                                                <Binding Path="."/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <!-- 状态筛选 -->
+                        <ComboBox Grid.Column="2"
+                                 SelectedItem="{Binding SelectedStatus}"
+                                 materialDesign:HintAssist.Hint="状态筛选"
+                                 Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                 Margin="4,0,8,0">
+                            <ComboBoxItem Content="全部" Tag="{x:Null}"/>
+                            <ComboBoxItem Content="启用" Tag="True"/>
+                            <ComboBoxItem Content="禁用" Tag="False"/>
+                        </ComboBox>
+
+                        <!-- 搜索按钮 -->
+                        <StackPanel Grid.Column="3" 
+                                   Orientation="Horizontal">
+                            <Button Command="{Binding SearchCommand}"
+                                   Style="{StaticResource MaterialDesignRaisedButton}"
+                                   Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Magnify" 
+                                                           Width="16" Height="16"
+                                                           Margin="0,0,4,0"/>
+                                    <TextBlock Text="搜索"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Command="{Binding ClearSearchCommand}"
+                                   Style="{StaticResource MaterialDesignOutlinedButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Refresh" 
+                                                           Width="16" Height="16"
+                                                           Margin="0,0,4,0"/>
+                                    <TextBlock Text="重置"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 操作按钮 -->
+                    <StackPanel Grid.Row="1" 
+                               Orientation="Horizontal" 
+                               Margin="0,16,0,0">
+                        
+                        <Button Command="{Binding OpenAddUserDialogCommand}"
+                               Style="{StaticResource PrimaryButtonStyle}"
+                               Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Plus" 
+                                                       Width="16" Height="16"
+                                                       Margin="0,0,4,0"/>
+                                <TextBlock Text="添加用户"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Command="{Binding ExportUsersCommand}"
+                               Style="{StaticResource SecondaryButtonStyle}"
+                               Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Export" 
+                                                       Width="16" Height="16"
+                                                       Margin="0,0,4,0"/>
+                                <TextBlock Text="导出"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Command="{Binding ImportUsersCommand}"
+                               Style="{StaticResource SecondaryButtonStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Import" 
+                                                       Width="16" Height="16"
+                                                       Margin="0,0,4,0"/>
+                                <TextBlock Text="导入"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:Card>
+
+            <!-- 用户列表 -->
+            <materialDesign:Card Grid.Row="2">
+                <DataGrid ItemsSource="{Binding UsersView}"
+                         SelectedItem="{Binding SelectedUser}"
+                         Style="{StaticResource ModernDataGridStyle}"
+                         AutoGenerateColumns="False"
+                         IsReadOnly="True"
+                         SelectionMode="Single">
+                    
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="用户名" 
+                                          Binding="{Binding Username}" 
+                                          Width="120"/>
+                        
+                        <DataGridTextColumn Header="真实姓名" 
+                                          Binding="{Binding RealName}" 
+                                          Width="120"/>
+                        
+                        <DataGridTextColumn Header="邮箱" 
+                                          Binding="{Binding Email}" 
+                                          Width="200"/>
+                        
+                        <DataGridTemplateColumn Header="角色" Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource AccentBrush}"
+                                           CornerRadius="12"
+                                           Padding="8,4">
+                                        <TextBlock Text="{Binding Role}"
+                                                  Foreground="White"
+                                                  FontSize="12"
+                                                  HorizontalAlignment="Center"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        
+                        <DataGridTemplateColumn Header="状态" Width="80">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Padding="8,4" CornerRadius="12">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                        <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                        <Setter Property="Background" Value="{StaticResource ErrorBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Foreground="White" 
+                                                  FontSize="12" 
+                                                  HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                            <Setter Property="Text" Value="启用"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                            <Setter Property="Text" Value="禁用"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        
+                        <DataGridTemplateColumn Header="锁定状态" Width="80">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <materialDesign:PackIcon Width="16" Height="16">
+                                        <materialDesign:PackIcon.Style>
+                                            <Style TargetType="materialDesign:PackIcon">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                        <Setter Property="Kind" Value="Lock"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource ErrorBrush}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsLocked}" Value="False">
+                                                        <Setter Property="Kind" Value="LockOpen"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </materialDesign:PackIcon.Style>
+                                    </materialDesign:PackIcon>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        
+                        <DataGridTextColumn Header="创建时间" 
+                                          Binding="{Binding CreatedAt, StringFormat='yyyy-MM-dd HH:mm'}" 
+                                          Width="140"/>
+                        
+                        <DataGridTextColumn Header="最后登录" 
+                                          Binding="{Binding LastLoginTime, StringFormat='yyyy-MM-dd HH:mm'}" 
+                                          Width="140"/>
+                        
+                        <DataGridTemplateColumn Header="操作" Width="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Command="{Binding DataContext.OpenEditUserDialogCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                               Style="{StaticResource MaterialDesignFlatButton}"
+                                               Padding="4"
+                                               Margin="2,0"
+                                               ToolTip="编辑">
+                                            <materialDesign:PackIcon Kind="Edit" Width="16" Height="16"/>
+                                        </Button>
+                                        
+                                        <Button Command="{Binding DataContext.ToggleUserStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                               Style="{StaticResource MaterialDesignFlatButton}"
+                                               Padding="4"
+                                               Margin="2,0">
+                                            <Button.ToolTip>
+                                                <TextBlock>
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                                    <Setter Property="Text" Value="禁用"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                                    <Setter Property="Text" Value="启用"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Button.ToolTip>
+                                            <materialDesign:PackIcon Width="16" Height="16">
+                                                <materialDesign:PackIcon.Style>
+                                                    <Style TargetType="materialDesign:PackIcon">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                                <Setter Property="Kind" Value="AccountOff"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                                <Setter Property="Kind" Value="AccountCheck"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </materialDesign:PackIcon.Style>
+                                            </materialDesign:PackIcon>
+                                        </Button>
+                                        
+                                        <Button Command="{Binding DataContext.UnlockUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                               Style="{StaticResource MaterialDesignFlatButton}"
+                                               Padding="4"
+                                               Margin="2,0"
+                                               ToolTip="解锁"
+                                               Visibility="{Binding IsLocked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <materialDesign:PackIcon Kind="LockOpen" Width="16" Height="16"/>
+                                        </Button>
+                                        
+                                        <Button Command="{Binding DataContext.ResetPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                               Style="{StaticResource MaterialDesignFlatButton}"
+                                               Padding="4"
+                                               Margin="2,0"
+                                               ToolTip="重置密码">
+                                            <materialDesign:PackIcon Kind="KeyVariant" Width="16" Height="16"/>
+                                        </Button>
+                                        
+                                        <Button Command="{Binding DataContext.DeleteUserCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                               Style="{StaticResource MaterialDesignFlatButton}"
+                                               Padding="4"
+                                               Margin="2,0"
+                                               ToolTip="删除">
+                                            <materialDesign:PackIcon Kind="Delete" Width="16" Height="16" Foreground="{StaticResource ErrorBrush}"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </materialDesign:Card>
+
+            <!-- 分页控件 -->
+            <materialDesign:Card Grid.Row="3" 
+                               Margin="0,16,0,0"
+                               Padding="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 统计信息 -->
+                    <TextBlock Grid.Column="0"
+                              VerticalAlignment="Center">
+                        <Run Text="共"/>
+                        <Run Text="{Binding TotalCount}" FontWeight="Bold"/>
+                        <Run Text="条记录，第"/>
+                        <Run Text="{Binding CurrentPage}" FontWeight="Bold"/>
+                        <Run Text="/"/>
+                        <Run Text="{Binding TotalPages}" FontWeight="Bold"/>
+                        <Run Text="页"/>
+                    </TextBlock>
+
+                    <!-- 分页按钮 -->
+                    <StackPanel Grid.Column="1" 
+                               Orientation="Horizontal">
+                        <Button Command="{Binding PreviousPageCommand}"
+                               Style="{StaticResource MaterialDesignFlatButton}"
+                               IsEnabled="{Binding CurrentPage, Converter={StaticResource GreaterThanConverter}, ConverterParameter=1}">
+                            <materialDesign:PackIcon Kind="ChevronLeft"/>
+                        </Button>
+
+                        <TextBlock Text="{Binding CurrentPage}"
+                                  VerticalAlignment="Center"
+                                  Margin="8,0"/>
+
+                        <Button Command="{Binding NextPageCommand}"
+                               Style="{StaticResource MaterialDesignFlatButton}"
+                               IsEnabled="{Binding CurrentPage, Converter={StaticResource LessThanConverter}, ConverterParameter={Binding TotalPages}}">
+                            <materialDesign:PackIcon Kind="ChevronRight"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:Card>
+        </Grid>
+
+        <!-- 添加用户对话框 -->
+        <materialDesign:DialogHost.DialogContent>
+            <Border Background="{StaticResource SurfaceBrush}"
+                   CornerRadius="8"
+                   MinWidth="400"
+                   MaxWidth="500"
+                   Visibility="{Binding IsAddUserDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Margin="24">
+                    <TextBlock Text="添加用户"
+                              Style="{StaticResource SubtitleTextStyle}"
+                              Margin="0,0,0,20"/>
+
+                    <TextBox Text="{Binding NewUser.Username}"
+                            materialDesign:HintAssist.Hint="用户名"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                            Margin="0,0,0,16"/>
+
+                    <TextBox Text="{Binding NewUser.RealName}"
+                            materialDesign:HintAssist.Hint="真实姓名"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                            Margin="0,0,0,16"/>
+
+                    <TextBox Text="{Binding NewUser.Email}"
+                            materialDesign:HintAssist.Hint="邮箱"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                            Margin="0,0,0,16"/>
+
+                    <ComboBox SelectedItem="{Binding NewUser.Role}"
+                             ItemsSource="{Binding UserRoles}"
+                             materialDesign:HintAssist.Hint="角色"
+                             Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                             Margin="0,0,0,16"/>
+
+                    <PasswordBox x:Name="NewPasswordBox"
+                                materialDesign:HintAssist.Hint="密码"
+                                Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                                Margin="0,0,0,16"/>
+
+                    <PasswordBox x:Name="ConfirmPasswordBox"
+                                materialDesign:HintAssist.Hint="确认密码"
+                                Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                                Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" 
+                               HorizontalAlignment="Right">
+                        <Button Content="取消"
+                               Command="{Binding CloseAddUserDialogCommand}"
+                               Style="{StaticResource MaterialDesignFlatButton}"
+                               Margin="0,0,8,0"/>
+                        
+                        <Button Content="添加"
+                               Command="{Binding AddUserCommand}"
+                               Style="{StaticResource PrimaryButtonStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </materialDesign:DialogHost.DialogContent>
+    </materialDesign:DialogHost>
+</UserControl>

@@ -1,0 +1,231 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ExamSystem.UI.ViewModels"
+        x:Class="ExamSystem.UI.Views.MainWindow"
+        Title="在线考试系统"
+        Width="1200"
+        Height="800"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Icon="/Assets/icon.ico">
+
+    <Design.DataContext>
+        <vm:MainViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶部导航栏 -->
+        <Border Grid.Row="0" Background="#2196F3" BorderBrush="#1976D2" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 左侧标题 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                    <TextBlock Text="📚" FontSize="24" Foreground="White" VerticalAlignment="Center"/>
+                    <TextBlock Text="在线考试系统" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               Foreground="White" 
+                               VerticalAlignment="Center" 
+                               Margin="10,0,0,0"/>
+                    <TextBlock Text="{Binding CurrentPageTitle}" 
+                               FontSize="16" 
+                               Foreground="#E3F2FD" 
+                               VerticalAlignment="Center" 
+                               Margin="20,0,0,0"/>
+                </StackPanel>
+
+                <!-- 右侧用户信息 -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                    <TextBlock Text="{Binding CurrentUserInfo}" 
+                               Foreground="White" 
+                               VerticalAlignment="Center" 
+                               Margin="0,0,15,0"/>
+                    
+                    <Button Content="修改密码" 
+                            Command="{Binding ChangePasswordCommand}"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="1"
+                            BorderBrush="White"
+                            Padding="10,5"
+                            Margin="5,0"/>
+                    
+                    <Button Content="关于" 
+                            Command="{Binding AboutCommand}"
+                            Background="Transparent"
+                            Foreground="White"
+                            BorderThickness="1"
+                            BorderBrush="White"
+                            Padding="10,5"
+                            Margin="5,0"/>
+                    
+                    <Button Content="退出" 
+                            Command="{Binding LogoutCommand}"
+                            Background="#F44336"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Padding="10,5"
+                            Margin="5,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 主内容区域 -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左侧导航菜单 -->
+            <Border Grid.Column="0" Background="#F8F9FA" BorderBrush="#DEE2E6" BorderThickness="0,0,1,0">
+                <ScrollViewer>
+                    <StackPanel Margin="10">
+                        <!-- 仪表板 -->
+                        <Button Content="📊 仪表板"
+                                Command="{Binding NavigateToDashboardCommand}"
+                                Classes="nav-button"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="15,12"
+                                Margin="0,5"
+                                Background="Transparent"
+                                BorderThickness="0"/>
+
+                        <!-- 用户管理 (仅管理员可见) -->
+                        <Button Content="👥 用户管理"
+                                Command="{Binding NavigateToUserManagementCommand}"
+                                Classes="nav-button"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="15,12"
+                                Margin="0,5"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                IsVisible="{Binding IsAdmin}"/>
+
+                        <!-- 题库管理 (管理员和教师可见) -->
+                        <Button Content="📝 题库管理"
+                                Command="{Binding NavigateToQuestionBankCommand}"
+                                Classes="nav-button"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="15,12"
+                                Margin="0,5"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                IsVisible="{Binding IsTeacher}"/>
+
+                        <!-- 试卷管理 (管理员和教师可见) -->
+                        <Button Content="📄 试卷管理"
+                                Command="{Binding NavigateToExamPaperCommand}"
+                                Classes="nav-button"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="15,12"
+                                Margin="0,5"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                IsVisible="{Binding IsTeacher}"/>
+
+                        <!-- 考试管理 (管理员和教师可见) -->
+                        <Button Content="🎯 考试管理"
+                                Command="{Binding NavigateToExamManagementCommand}"
+                                Classes="nav-button"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="15,12"
+                                Margin="0,5"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                IsVisible="{Binding IsTeacher}"/>
+
+                        <!-- 成绩管理 -->
+                        <Button Content="📈 成绩管理"
+                                Command="{Binding NavigateToGradeManagementCommand}"
+                                Classes="nav-button"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="15,12"
+                                Margin="0,5"
+                                Background="Transparent"
+                                BorderThickness="0"/>
+
+                        <!-- 我的考试 (学生可见) -->
+                        <Button Content="✏️ 我的考试"
+                                Command="{Binding NavigateToMyExamsCommand}"
+                                Classes="nav-button"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="15,12"
+                                Margin="0,5"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                IsVisible="{Binding !IsTeacher}"/>
+
+                        <!-- 系统设置 (仅管理员可见) -->
+                        <Button Content="⚙️ 系统设置"
+                                Command="{Binding NavigateToSettingsCommand}"
+                                Classes="nav-button"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="15,12"
+                                Margin="0,5"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                IsVisible="{Binding IsAdmin}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- 右侧内容区域 -->
+            <Border Grid.Column="1" Background="White">
+                <ContentControl Content="{Binding CurrentPageContent}"/>
+            </Border>
+        </Grid>
+
+        <!-- 底部状态栏 -->
+        <Border Grid.Row="2" Background="#F8F9FA" BorderBrush="#DEE2E6" BorderThickness="0,1,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" 
+                           Text="就绪" 
+                           VerticalAlignment="Center" 
+                           Margin="10,0"
+                           FontSize="12"
+                           Foreground="#6C757D"/>
+
+                <TextBlock Grid.Column="1" 
+                           Text="{Binding CurrentDateTime}" 
+                           VerticalAlignment="Center" 
+                           Margin="10,0"
+                           FontSize="12"
+                           Foreground="#6C757D"/>
+            </Grid>
+        </Border>
+    </Grid>
+
+    <Window.Styles>
+        <Style Selector="Button.nav-button:pointerover">
+            <Setter Property="Background" Value="#E3F2FD"/>
+        </Style>
+        
+        <Style Selector="Button.nav-button:pressed">
+            <Setter Property="Background" Value="#BBDEFB"/>
+        </Style>
+    </Window.Styles>
+</Window>

@@ -1,0 +1,98 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ExamSystem.UI.ViewModels"
+        x:Class="ExamSystem.UI.Views.LoginWindow"
+        Title="考试系统 - 登录"
+        Width="400"
+        Height="500"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Icon="/Assets/icon.ico">
+
+    <Design.DataContext>
+        <vm:LoginViewModel/>
+    </Design.DataContext>
+
+    <Grid Background="#F8F9FA">
+        <Border Classes="card" 
+                Width="350" 
+                Height="400"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+            <StackPanel Spacing="20">
+                <!-- 标题 -->
+                <StackPanel HorizontalAlignment="Center" Spacing="10">
+                    <TextBlock Text="📚" FontSize="48" HorizontalAlignment="Center"/>
+                    <TextBlock Text="在线考试系统" 
+                               FontSize="24" 
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Foreground="#2196F3"/>
+                    <TextBlock Text="请登录您的账户" 
+                               FontSize="14" 
+                               HorizontalAlignment="Center"
+                               Foreground="#6C757D"/>
+                </StackPanel>
+
+                <!-- 登录表单 -->
+                <StackPanel Spacing="15">
+                    <!-- 用户名 -->
+                    <StackPanel>
+                        <TextBlock Text="用户名" FontWeight="Medium" Margin="0,0,0,5"/>
+                        <TextBox Classes="form-control"
+                                 Text="{Binding Username}"
+                                 Watermark="请输入用户名"
+                                 Height="40"/>
+                    </StackPanel>
+
+                    <!-- 密码 -->
+                    <StackPanel>
+                        <TextBlock Text="密码" FontWeight="Medium" Margin="0,0,0,5"/>
+                        <TextBox Classes="form-control"
+                                 Text="{Binding Password}"
+                                 Watermark="请输入密码"
+                                 PasswordChar="*"
+                                 Height="40"/>
+                    </StackPanel>
+
+                    <!-- 错误信息 -->
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="Red"
+                               FontSize="12"
+                               IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                               TextWrapping="Wrap"/>
+
+                    <!-- 登录按钮 -->
+                    <Button Classes="primary"
+                            Content="登录"
+                            Command="{Binding LoginCommand}"
+                            IsEnabled="{Binding !IsLoading}"
+                            Height="45"
+                            FontSize="16"
+                            FontWeight="Medium"/>
+
+                    <!-- 加载指示器 -->
+                    <StackPanel Orientation="Horizontal" 
+                                HorizontalAlignment="Center"
+                                IsVisible="{Binding IsLoading}">
+                        <TextBlock Text="正在登录..." 
+                                   Foreground="#6C757D"
+                                   FontSize="12"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- 底部信息 -->
+                <StackPanel HorizontalAlignment="Center" Spacing="5">
+                    <TextBlock Text="默认管理员账户：admin / admin123" 
+                               FontSize="11" 
+                               Foreground="#6C757D"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="默认教师账户：teacher / teacher123" 
+                               FontSize="11" 
+                               Foreground="#6C757D"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

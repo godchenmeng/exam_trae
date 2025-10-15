@@ -1,0 +1,130 @@
+<Window x:Class="ExamSystem.WPF.Views.QuestionBankEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="{Binding DialogTitle}" 
+        Height="400" 
+        Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    
+    <Window.Resources>
+        <!-- 样式定义 -->
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+        </Style>
+        
+        <Style x:Key="TextBoxStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="BorderBrush" Value="#BDC3C7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        
+        <Style x:Key="ButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="20,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
+            <Setter Property="Background" Value="#95A5A6"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题 -->
+        <TextBlock Grid.Row="0" 
+                   Text="{Binding DialogTitle}" 
+                   FontSize="18" 
+                   FontWeight="Bold" 
+                   Foreground="#2C3E50"
+                   Margin="0,0,0,20"/>
+
+        <!-- 表单内容 -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- 题库名称 -->
+                <TextBlock Text="题库名称 *" Style="{StaticResource LabelStyle}"/>
+                <TextBox Text="{Binding QuestionBank.Name, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource TextBoxStyle}"
+                         MaxLength="100"/>
+
+                <!-- 题库描述 -->
+                <TextBlock Text="题库描述" Style="{StaticResource LabelStyle}"/>
+                <TextBox Text="{Binding QuestionBank.Description, UpdateSourceTrigger=PropertyChanged}" 
+                         Style="{StaticResource TextBoxStyle}"
+                         Height="80"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         MaxLength="500"/>
+
+                <!-- 是否启用 -->
+                <CheckBox Content="启用题库" 
+                          IsChecked="{Binding QuestionBank.IsActive}"
+                          Margin="0,10,0,15"
+                          FontSize="14"/>
+
+                <!-- 验证错误信息 -->
+                <TextBlock Text="{Binding ValidationMessage}" 
+                           Foreground="Red"
+                           FontSize="12"
+                           Margin="0,0,0,10"
+                           Visibility="{Binding HasValidationError, Converter={x:Static local:Converters.BooleanToVisibilityConverter}}"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- 按钮区域 -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,0">
+            <Button Content="取消" 
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Click="CancelButton_Click"/>
+            <Button Content="{Binding SaveButtonText}" 
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding SaveCommand}"
+                    IsDefault="True"/>
+        </StackPanel>
+    </Grid>
+</Window>
