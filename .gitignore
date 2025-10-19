@@ -1,0 +1,25 @@
+<<<<<<< Updated upstream
+
+/.vs
+/ExamSystem.Domain/obj
+/ExamSystem.Domain/obj
+/ExamSystem.Services/obj
+/ExamSystem.UI/obj
+=======
+﻿################################################################################
+# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+################################################################################
+
+/.vs/ExamSystem/CopilotIndices/17.14.1231.31060
+/ExamSystem.Domain/obj/ExamSystem.Domain.csproj.nuget.dgspec.json
+/ExamSystem.Domain/obj/ExamSystem.Domain.csproj.nuget.g.props
+/.vs
+/ExamSystem.Domain/obj
+/ExamSystem.Domain/obj
+/ExamSystem.Domain/obj
+/ExamSystem.Domain/obj
+/ExamSystem.Services/obj
+>>>>>>> Stashed changes
+/ExamSystem.Domain/obj
+/.vscode
+errors.txt

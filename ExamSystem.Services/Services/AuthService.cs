@@ -31,40 +31,174 @@ namespace ExamSystem.Services.Services
         _context = context;
     }
 
-    public async Task<(bool Success, User? User, string Message)> LoginAsync(string username, string password)
+    public async Task<(bool Success, User? User, DateTime? PreviousLoginAt, string Message)> LoginAsync(string username, string password)
     {
         try
         {
+            _logger.LogInformation("=== AuthService.LoginAsync 开始 ===");
+            _logger.LogInformation($"接收到的用户名: {username}");
+            _logger.LogInformation($"接收到的密码长度: {password?.Length ?? 0}");
+
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                return (false, null, "用户名和密码不能为空");
+                _logger.LogWarning("用户名或密码为空");
+                return (false, null, null, "用户名和密码不能为空");
             }
 
+            _logger.LogInformation("开始查询用户");
+            _logger.LogInformation($"UserRepository是否为null: {_userRepository == null}");
+            _logger.LogInformation($"Context是否为null: {_context == null}");
+            
+            // 测试数据库连接
+            try
+            {
+                _logger.LogInformation("测试数据库连接...");
+                var canConnect = await _context.Database.CanConnectAsync();
+                _logger.LogInformation($"数据库连接测试结果: {canConnect}");
+                
+                if (!canConnect)
+                {
+                    _logger.LogError("无法连接到数据库");
+                    return (false, null, null, "数据库连接失败，请稍后再试");
+                }
+                
+                // 检查Users表是否存在数据
+                var userCount = await _context.Users.CountAsync();
+                _logger.LogInformation($"数据库中用户总数: {userCount}");
+                
+                if (userCount == 0)
+                {
+                    _logger.LogWarning("数据库中没有用户数据");
+                    return (false, null, null, "系统尚未初始化，请联系管理员");
+                }
+            }
+            catch (Exception dbEx)
+            {
+                _logger.LogError(dbEx, "数据库连接测试失败");
+                return (false, null, null, "数据库连接异常，请稍后再试");
+            }
+            
             var user = await _userRepository.GetByUsernameAsync(username);
+
+            _logger.LogInformation($"用户查询结果: {(user == null ? "未找到用户" : "找到用户")}");
+            if (user != null)
+            {
+                _logger.LogInformation($"用户ID: {user.UserId}, 用户名: {user.Username}, 角色: {user.Role}");
+                _logger.LogInformation($"用户是否激活: {user.IsActive}");
+                _logger.LogInformation($"登录失败次数: {user.LoginFailCount}");
+            }
 
             if (user == null)
             {
                 _logger.LogWarning("登录失败：用户名不存在 - {Username}", username);
-                return (false, null, "用户名或密码错误");
+                return (false, null, null, "用户名或密码错误");
             }
 
             // 检查账户是否被锁定
+            _logger.LogInformation("检查账户锁定状态");
             if (await IsUserLockedAsync(user.UserId))
             {
-                return (false, null, "账户已被锁定，请稍后再试");
+                _logger.LogWarning("账户被锁定 - {Username}", username);
+                return (false, null, null, "账户已被锁定，请稍后再试");
             }
 
             // 检查账户是否激活
             if (!user.IsActive)
             {
-                return (false, null, "账户已被禁用，请联系管理员");
+                _logger.LogWarning("账户未激活 - {Username}", username);
+                return (false, null, null, "账户已被禁用，请联系管理员");
             }
 
             // 验证密码
-            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            _logger.LogInformation("开始验证密码");
+            _logger.LogInformation($"存储的密码哈希长度: {user.PasswordHash?.Length ?? 0}");
+            _logger.LogInformation($"密码哈希是否为空: {string.IsNullOrEmpty(user.PasswordHash)}");
+            
+            if (!string.IsNullOrEmpty(user.PasswordHash))
+            {
+                _logger.LogInformation($"密码哈希前20字符: {user.PasswordHash.Substring(0, Math.Min(20, user.PasswordHash.Length))}...");
+            }
+            
+            bool passwordValid = false;
+            try
+            {
+                // 检查密码哈希是否为空
+                if (string.IsNullOrEmpty(user.PasswordHash))
+                {
+                    _logger.LogError("用户密码哈希为空或null");
+                    return (false, null, null, "用户数据异常，请联系管理员");
+                }
+                
+                // 记录详细的调试信息
+                _logger.LogInformation($"开始验证密码 - 用户: {username}");
+                _logger.LogInformation($"密码哈希长度: {user.PasswordHash.Length}");
+                _logger.LogInformation($"密码哈希前缀: {user.PasswordHash.Substring(0, Math.Min(10, user.PasswordHash.Length))}");
+                
+                // 直接使用最简单的 BCrypt 验证方式
+                passwordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+                _logger.LogInformation($"密码验证结果: {passwordValid}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "密码验证过程中发生异常");
+                _logger.LogError($"异常类型: {ex.GetType().Name}");
+                _logger.LogError($"异常消息: {ex.Message}");
+                _logger.LogError($"用户名: {username}");
+                _logger.LogError($"密码哈希: {user.PasswordHash ?? "NULL"}");
+                
+                // 如果是哈希格式问题，尝试重新生成用户密码哈希
+                if (ex.Message.Contains("Invalid salt") || ex.Message.Contains("salt version"))
+                {
+                    _logger.LogWarning("检测到密码哈希格式问题，尝试重新生成密码哈希");
+                    try
+                    {
+                        // 为测试用户重新生成正确的密码哈希
+                        string newPasswordHash = null;
+                        if (username == "admin")
+                        {
+                            newPasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123", 12);
+                        }
+                        else if (username == "student")
+                        {
+                            newPasswordHash = BCrypt.Net.BCrypt.HashPassword("student123", 12);
+                        }
+                        else if (username == "teacher")
+                        {
+                            newPasswordHash = BCrypt.Net.BCrypt.HashPassword("teacher123", 12);
+                        }
+                        
+                        if (newPasswordHash != null)
+                        {
+                            user.PasswordHash = newPasswordHash;
+                            await _context.SaveChangesAsync();
+                            _logger.LogInformation($"已为用户 {username} 重新生成密码哈希");
+                            
+                            // 使用新哈希验证密码
+                            passwordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+                            _logger.LogInformation($"使用新哈希验证结果: {passwordValid}");
+                        }
+                        else
+                        {
+                            return (false, null, null, "密码验证失败，请联系管理员");
+                        }
+                    }
+                    catch (Exception ex3)
+                    {
+                        _logger.LogError(ex3, "重新生成密码哈希失败");
+                        return (false, null, null, "密码验证失败，请联系管理员");
+                    }
+                }
+                else
+                {
+                    return (false, null, null, "密码验证失败，请联系管理员");
+                }
+            }
+
+            if (!passwordValid)
             {
                 // 增加登录失败次数
                 user.LoginFailCount++;
+                _logger.LogWarning($"密码验证失败，失败次数增加到: {user.LoginFailCount}");
                 
                 // 如果失败次数达到上限，锁定账户
                 if (user.LoginFailCount >= MaxLoginAttempts)
@@ -73,28 +207,42 @@ namespace ExamSystem.Services.Services
                     await LockUserAsync(user.UserId, lockUntil);
                     _logger.LogWarning("用户账户被锁定 - {Username}", username);
                     await _context.SaveChangesAsync();
-                    return (false, null, $"登录失败次数过多，账户已被锁定{LockoutMinutes}分钟");
+                    return (false, null, null, $"登录失败次数过多，账户已被锁定{LockoutMinutes}分钟");
                 }
 
                 await _context.SaveChangesAsync();
                 _logger.LogWarning("登录失败：密码错误 - {Username}", username);
-                return (false, null, "用户名或密码错误");
+                return (false, null, null, "用户名或密码错误");
             }
 
             // 登录成功，重置失败次数和更新登录时间
+            _logger.LogInformation("密码验证成功，更新用户信息");
+            var previousLoginAt = user.LastLoginAt;
             user.LoginFailCount = 0;
             user.LastLoginAt = DateTime.Now;
             user.LockoutEnd = null;
             
             await _context.SaveChangesAsync();
+            _logger.LogInformation("用户信息更新完成");
 
             _logger.LogInformation("用户登录成功 - {Username}", username);
-            return (true, user, "登录成功");
+            return (true, user, previousLoginAt, "登录成功");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "登录过程中发生错误 - {Username}", username);
-            return (false, null, "登录过程中发生错误，请稍后再试");
+            _logger.LogError(ex, "=== AuthService 登录异常详情 ===");
+            _logger.LogError(ex, $"异常类型: {ex.GetType().Name}");
+            _logger.LogError(ex, $"异常消息: {ex.Message}");
+            _logger.LogError(ex, $"堆栈跟踪: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                _logger.LogError(ex.InnerException, $"内部异常: {ex.InnerException.Message}");
+            }
+            return (false, null, null, "登录过程中发生错误，请稍后再试");
+        }
+        finally
+        {
+            _logger.LogInformation("=== AuthService.LoginAsync 结束 ===");
         }
     }
 

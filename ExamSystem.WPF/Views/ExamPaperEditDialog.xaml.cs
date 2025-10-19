@@ -1,5 +1,8 @@
 using ExamSystem.WPF.ViewModels;
+using System;
 using System.Windows;
+using System.Windows.Input;
+using System.Text.RegularExpressions;
 
 namespace ExamSystem.WPF.Views
 {
@@ -43,6 +46,30 @@ namespace ExamSystem.WPF.Views
                 _viewModel.SaveCompleted -= OnSaveCompleted;
             }
             base.OnClosed(e);
+        }
+
+        // 限制文本框仅输入数字（键入和粘贴）
+        private static readonly Regex NumericRegex = new Regex("^[0-9]+$");
+
+        private void NumericOnly_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !NumericRegex.IsMatch(e.Text);
+        }
+
+        private void NumericOnly_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                var text = (string)e.DataObject.GetData(typeof(string));
+                if (!NumericRegex.IsMatch(text))
+                {
+                    e.CancelCommand();
+                }
+            }
+            else
+            {
+                e.CancelCommand();
+            }
         }
     }
 }

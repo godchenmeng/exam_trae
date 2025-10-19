@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Windows.Threading;
 using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
+using ExamSystem.WPF.Commands;
 using Microsoft.Extensions.Logging;
 
 namespace ExamSystem.WPF.ViewModels
@@ -34,12 +36,12 @@ namespace ExamSystem.WPF.ViewModels
             _logger = logger;
             
             // 初始化命令
-            PreviousQuestionCommand = new RelayCommand(PreviousQuestion, CanGoPrevious);
-            NextQuestionCommand = new RelayCommand(NextQuestion, CanGoNext);
+            PreviousQuestionCommand = new RelayCommand(PreviousQuestion, () => CanGoPrevious);
+            NextQuestionCommand = new RelayCommand(NextQuestion, () => CanGoNext);
             NavigateToQuestionCommand = new RelayCommand<int>(NavigateToQuestion);
             SelectSingleOptionCommand = new RelayCommand<QuestionOptionViewModel>(SelectSingleOption);
             SelectMultipleOptionCommand = new RelayCommand<QuestionOptionViewModel>(SelectMultipleOption);
-            SelectTrueFalseCommand = new RelayCommand<bool>(SelectTrueFalse);
+            SelectTrueFalseCommand = new RelayCommand<bool?>(SelectTrueFalse);
             SaveAnswerCommand = new RelayCommand(async () => await SaveCurrentAnswerAsync());
             SubmitExamCommand = new RelayCommand(async () => await SubmitExamAsync());
             SaveCurrentAnswerCommand = new RelayCommand(async () => await SaveCurrentAnswerAsync());
@@ -57,7 +59,7 @@ namespace ExamSystem.WPF.ViewModels
 
         #region Properties
 
-        public string ExamPaperName => _examRecord?.ExamPaper?.PaperName ?? "";
+        public string ExamPaperName => _examRecord?.ExamPaper?.Name ?? "";
         public decimal TotalScore => _examRecord?.ExamPaper?.TotalScore ?? 0;
         public int CurrentQuestionIndex => _currentQuestionIndex + 1;
         public int TotalQuestions => _answerRecords.Count;
@@ -158,10 +160,7 @@ namespace ExamSystem.WPF.ViewModels
                 InitializeQuestionNavigations();
                 
                 // 设置剩余时间
-                if (_examRecord.RemainingTime.HasValue)
-                {
-                    _remainingSeconds = _examRecord.RemainingTime.Value;
-                }
+                _remainingSeconds = _examRecord.RemainingTime;
                 
                 // 加载第一题
                 LoadQuestion(0);
@@ -198,10 +197,7 @@ namespace ExamSystem.WPF.ViewModels
                 InitializeQuestionNavigations();
                 
                 // 设置剩余时间
-                if (_examRecord.RemainingTime.HasValue)
-                {
-                    _remainingSeconds = _examRecord.RemainingTime.Value;
-                }
+                _remainingSeconds = _examRecord.RemainingTime;
                 
                 // 加载第一题
                 LoadQuestion(0);
@@ -297,7 +293,7 @@ namespace ExamSystem.WPF.ViewModels
                     {
                         OptionId = option.OptionId,
                         Label = option.OptionLabel,
-                        Content = $"{option.OptionLabel}. {option.OptionText}",
+                        Content = $"{option.OptionLabel}. {option.Content}",
                         IsSelected = false
                     });
                 }
@@ -424,7 +420,7 @@ namespace ExamSystem.WPF.ViewModels
                     return string.Join(",", selectedOptions ?? Enumerable.Empty<string>());
 
                 case QuestionType.TrueFalse:
-                    return TrueFalseAnswer?.ToString() ?? "";
+                    return TrueFalseAnswer?.ToString().ToLower() ?? "";
 
                 case QuestionType.FillInBlank:
                     return FillInBlankAnswer ?? "";
@@ -492,7 +488,7 @@ namespace ExamSystem.WPF.ViewModels
 
         private void PreviousQuestion()
         {
-            if (CanGoPrevious())
+            if (CanGoPrevious)
             {
                 // 保存当前答案
                 _ = SaveCurrentAnswerAsync();
@@ -502,7 +498,7 @@ namespace ExamSystem.WPF.ViewModels
 
         private void NextQuestion()
         {
-            if (CanGoNext())
+            if (CanGoNext)
             {
                 // 保存当前答案
                 _ = SaveCurrentAnswerAsync();
@@ -536,7 +532,7 @@ namespace ExamSystem.WPF.ViewModels
             option.IsSelected = !option.IsSelected;
         }
 
-        private void SelectTrueFalse(bool value)
+        private void SelectTrueFalse(bool? value)
         {
             TrueFalseAnswer = value;
             OnPropertyChanged(nameof(TrueFalseAnswer));
@@ -588,7 +584,6 @@ namespace ExamSystem.WPF.ViewModels
         public void Dispose()
         {
             _timer?.Stop();
-            _timer?.Dispose();
         }
 
         #endregion

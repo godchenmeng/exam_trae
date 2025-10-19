@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ExamSystem.WPF.Converters"
+        xmlns:local="clr-namespace:ExamSystem.WPF.Views"
+        xmlns:converters="clr-namespace:ExamSystem.WPF.Converters"
         mc:Ignorable="d"
         Title="试卷编辑"
         Height="600" Width="800"
@@ -105,8 +106,8 @@
         </Style>
 
         <!-- 转换器 -->
-        <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </Window.Resources>
 
     <Grid Margin="30">
@@ -117,7 +118,7 @@
         </Grid.RowDefinitions>
 
         <!-- 标题 -->
-        <TextBlock Grid.Row="0" Text="试卷信息编辑" Style="{StaticResource HeaderTextStyle}"/>
+        <TextBlock Grid.Row="0" Text="试卷信息编辑" Style="{StaticResource TitleText}"/>
 
         <!-- 表单内容 -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -137,30 +138,37 @@
                         </Grid.RowDefinitions>
 
                         <!-- 试卷名称 -->
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="试卷名称*" Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="试卷名称*" Style="{StaticResource FormLabelText}"/>
                         <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,15">
                             <TextBox Text="{Binding ExamPaper.Name, UpdateSourceTrigger=PropertyChanged}" 
-                                     Style="{StaticResource TextBoxStyle}"/>
+                                     Style="{StaticResource ModernTextBox}"/>
                             <TextBlock Text="{Binding ValidationMessages.Name}" 
                                        Style="{StaticResource ErrorTextStyle}"
                                        Visibility="{Binding ValidationMessages.Name, Converter={StaticResource StringToVisibilityConverter}}"/>
                         </StackPanel>
 
                         <!-- 试卷描述 -->
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="试卷描述" Style="{StaticResource LabelStyle}" VerticalAlignment="Top" Margin="0,8,10,0"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="试卷描述" Style="{StaticResource FormLabelText}" VerticalAlignment="Top" Margin="0,8,10,0"/>
                         <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,15">
                             <TextBox Text="{Binding ExamPaper.Description, UpdateSourceTrigger=PropertyChanged}" 
-                                     Style="{StaticResource MultiLineTextBoxStyle}"/>
+                                     Style="{StaticResource ModernTextBox}"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     Height="80"
+                                     VerticalScrollBarVisibility="Auto"/>
                             <TextBlock Text="{Binding ValidationMessages.Description}" 
                                        Style="{StaticResource ErrorTextStyle}"
                                        Visibility="{Binding ValidationMessages.Description, Converter={StaticResource StringToVisibilityConverter}}"/>
                         </StackPanel>
 
                         <!-- 考试时长 -->
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="考试时长(分钟)*" Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="考试时长(分钟)*" Style="{StaticResource FormLabelText}"/>
                         <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,15">
                             <TextBox Text="{Binding ExamPaper.Duration, UpdateSourceTrigger=PropertyChanged}" 
-                                     Style="{StaticResource TextBoxStyle}"/>
+                                     Style="{StaticResource ModernTextBox}"
+                                     PreviewTextInput="NumericOnly_PreviewTextInput"
+                                     DataObject.Pasting="NumericOnly_Pasting"
+                                     MaxLength="4"/>
                             <TextBlock Text="{Binding ValidationMessages.Duration}" 
                                        Style="{StaticResource ErrorTextStyle}"
                                        Visibility="{Binding ValidationMessages.Duration, Converter={StaticResource StringToVisibilityConverter}}"/>
@@ -170,7 +178,10 @@
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="及格分数*" Style="{StaticResource LabelStyle}"/>
                         <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,0,0,15">
                             <TextBox Text="{Binding ExamPaper.PassScore, UpdateSourceTrigger=PropertyChanged}" 
-                                     Style="{StaticResource TextBoxStyle}"/>
+                                     Style="{StaticResource ModernTextBox}"
+                                     PreviewTextInput="NumericOnly_PreviewTextInput"
+                                     DataObject.Pasting="NumericOnly_Pasting"
+                                     MaxLength="4"/>
                             <TextBlock Text="{Binding ValidationMessages.PassScore}" 
                                        Style="{StaticResource ErrorTextStyle}"
                                        Visibility="{Binding ValidationMessages.PassScore, Converter={StaticResource StringToVisibilityConverter}}"/>
@@ -193,28 +204,28 @@
                         </Grid.RowDefinitions>
 
                         <!-- 允许重考 -->
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="允许重考" Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="允许重考" Style="{StaticResource FormLabelText}"/>
                         <CheckBox Grid.Row="0" Grid.Column="1" 
                                   IsChecked="{Binding ExamPaper.AllowRetake}" 
                                   VerticalAlignment="Center"
                                   Margin="0,0,0,15"/>
 
                         <!-- 显示答案 -->
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="考试后显示答案" Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="考试后显示答案" Style="{StaticResource FormLabelText}"/>
                         <CheckBox Grid.Row="1" Grid.Column="1" 
                                   IsChecked="{Binding ExamPaper.ShowAnswerAfterSubmit}" 
                                   VerticalAlignment="Center"
                                   Margin="0,0,0,15"/>
 
                         <!-- 随机题目顺序 -->
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="随机题目顺序" Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="随机题目顺序" Style="{StaticResource FormLabelText}"/>
                         <CheckBox Grid.Row="2" Grid.Column="1" 
                                   IsChecked="{Binding ExamPaper.RandomQuestionOrder}" 
                                   VerticalAlignment="Center"
                                   Margin="0,0,0,15"/>
 
                         <!-- 随机选项顺序 -->
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="随机选项顺序" Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="随机选项顺序" Style="{StaticResource FormLabelText}"/>
                         <CheckBox Grid.Row="3" Grid.Column="1" 
                                   IsChecked="{Binding ExamPaper.RandomOptionOrder}" 
                                   VerticalAlignment="Center"
@@ -235,26 +246,18 @@
                         </Grid.RowDefinitions>
 
                         <!-- 开始时间 -->
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="开始时间" Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="开始时间" Style="{StaticResource FormLabelText}"/>
                         <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,15">
-                            <DatePicker SelectedDate="{Binding ExamPaper.StartTime}" 
-                                        Height="35"
-                                        FontSize="14"
-                                        BorderBrush="#BDC3C7"
-                                        BorderThickness="1"/>
+                            <DatePicker SelectedDate="{Binding ExamPaper.StartTime}"/>
                             <TextBlock Text="{Binding ValidationMessages.StartTime}" 
                                        Style="{StaticResource ErrorTextStyle}"
                                        Visibility="{Binding ValidationMessages.StartTime, Converter={StaticResource StringToVisibilityConverter}}"/>
                         </StackPanel>
 
                         <!-- 结束时间 -->
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="结束时间" Style="{StaticResource LabelStyle}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="结束时间" Style="{StaticResource FormLabelText}"/>
                         <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,15">
-                            <DatePicker SelectedDate="{Binding ExamPaper.EndTime}" 
-                                        Height="35"
-                                        FontSize="14"
-                                        BorderBrush="#BDC3C7"
-                                        BorderThickness="1"/>
+                            <DatePicker SelectedDate="{Binding ExamPaper.EndTime}"/>
                             <TextBlock Text="{Binding ValidationMessages.EndTime}" 
                                        Style="{StaticResource ErrorTextStyle}"
                                        Visibility="{Binding ValidationMessages.EndTime, Converter={StaticResource StringToVisibilityConverter}}"/>
@@ -268,11 +271,11 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
             <Button Content="保存" 
                     Command="{Binding SaveCommand}"
-                    Style="{StaticResource ActionButtonStyle}"
-                    IsEnabled="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"/>
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBooleanConverter}}"/>
             <Button Content="取消" 
                     Click="CancelButton_Click"
-                    Style="{StaticResource CancelButtonStyle}"/>
+                    Style="{StaticResource SecondaryButtonStyle}"/>
         </StackPanel>
 
         <!-- 加载遮罩 -->

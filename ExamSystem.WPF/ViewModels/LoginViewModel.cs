@@ -3,7 +3,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ExamSystem.WPF.Commands;
 using ExamSystem.Services.Interfaces;
+using ExamSystem.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace ExamSystem.WPF.ViewModels
@@ -17,6 +19,12 @@ namespace ExamSystem.WPF.ViewModels
         {
             _authService = authService;
             _logger = logger;
+
+            // 初始化属性
+            _username = string.Empty;
+            _password = string.Empty;
+            _errorMessage = string.Empty;
+            _isLoading = false;
 
             LoginCommand = new RelayCommand(async () => await LoginAsync(), CanLogin);
             CloseCommand = new RelayCommand(Close);
@@ -99,13 +107,30 @@ namespace ExamSystem.WPF.ViewModels
                 IsLoading = true;
                 ErrorMessage = string.Empty;
 
-                _logger.LogInformation($"用户 {Username} 尝试登录");
+                _logger.LogInformation($"=== 开始登录流程 ===");
+                _logger.LogInformation($"用户名: {Username}");
+                _logger.LogInformation($"密码长度: {Password?.Length ?? 0}");
+                _logger.LogInformation($"AuthService是否为null: {_authService == null}");
 
+                if (_authService == null)
+                {
+                    _logger.LogError("AuthService未正确注入");
+                    ErrorMessage = "系统初始化错误，请重启应用程序";
+                    return;
+                }
+
+                _logger.LogInformation("调用AuthService.LoginAsync方法");
                 var result = await _authService.LoginAsync(Username, Password);
 
-                if (result.IsSuccess)
+                _logger.LogInformation($"=== 登录服务返回结果 ===");
+                _logger.LogInformation($"成功: {result.Success}");
+                _logger.LogInformation($"消息: {result.Message}");
+                _logger.LogInformation($"用户对象是否为null: {result.User == null}");
+
+                if (result.Success)
                 {
                     _logger.LogInformation($"用户 {Username} 登录成功");
+                    _logger.LogInformation($"上次登录时间: {(result.PreviousLoginAt.HasValue ? result.PreviousLoginAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : "无记录")}");
                     
                     // 如果选择记住密码，保存凭据
                     if (RememberPassword)
@@ -115,22 +140,31 @@ namespace ExamSystem.WPF.ViewModels
                     }
 
                     // 触发登录成功事件
-                    LoginSuccess?.Invoke(this, new LoginSuccessEventArgs(result.User, result.Token));
+                    _logger.LogInformation("触发登录成功事件");
+                    LoginSuccess?.Invoke(this, new LoginSuccessEventArgs(result.User, "", result.PreviousLoginAt));
                 }
                 else
                 {
-                    ErrorMessage = result.ErrorMessage ?? "登录失败，请检查用户名和密码";
+                    ErrorMessage = result.Message ?? "登录失败，请检查用户名和密码";
                     _logger.LogWarning($"用户 {Username} 登录失败: {ErrorMessage}");
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = "登录时发生错误，请稍后重试";
-                _logger.LogError(ex, $"用户 {Username} 登录时发生异常");
+                ErrorMessage = "登录过程中发生错误，请稍后再试";
+                _logger.LogError(ex, $"=== 登录异常详情 ===");
+                _logger.LogError(ex, $"异常类型: {ex.GetType().Name}");
+                _logger.LogError(ex, $"异常消息: {ex.Message}");
+                _logger.LogError(ex, $"堆栈跟踪: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError(ex.InnerException, $"内部异常: {ex.InnerException.Message}");
+                }
             }
             finally
             {
                 IsLoading = false;
+                _logger.LogInformation("=== 登录流程结束 ===");
             }
         }
 
@@ -178,54 +212,16 @@ namespace ExamSystem.WPF.ViewModels
     // 登录成功事件参数
     public class LoginSuccessEventArgs : EventArgs
     {
-        public object User { get; }
+        public User User { get; }
         public string Token { get; }
+        public DateTime? PreviousLoginAt { get; }
 
-        public LoginSuccessEventArgs(object user, string token)
+        public LoginSuccessEventArgs(User user, string token, DateTime? previousLoginAt)
         {
             User = user;
             Token = token;
+            PreviousLoginAt = previousLoginAt;
         }
     }
 
-    // 增强的RelayCommand，支持CanExecuteChanged事件
-    public class RelayCommand : ICommand
-    {
-        private readonly Func<Task> _executeAsync;
-        private readonly Action _execute;
-        private readonly Func<bool> _canExecute;
-
-        public RelayCommand(Action execute, Func<bool> canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        public RelayCommand(Func<Task> executeAsync, Func<bool> canExecute = null)
-        {
-            _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
-            _canExecute = canExecute;
-        }
-
-        public event EventHandler CanExecuteChanged;
-
-        public bool CanExecute(object parameter) => _canExecute?.Invoke() ?? true;
-
-        public async void Execute(object parameter)
-        {
-            if (_executeAsync != null)
-            {
-                await _executeAsync();
-            }
-            else
-            {
-                _execute();
-            }
-        }
-
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
-    }
 }

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ExamSystem.WPF.Commands;
 using ExamSystem.Domain.Entities;
 using ExamSystem.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,7 @@ namespace ExamSystem.WPF.ViewModels
         private string _validationMessage = string.Empty;
         private bool _hasValidationError;
         private bool _isLoading;
+        private User? _currentUser;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public event EventHandler<bool>? SaveCompleted;
@@ -34,6 +36,33 @@ namespace ExamSystem.WPF.ViewModels
             _questionBank = new QuestionBank();
             
             SaveCommand = new RelayCommand(async () => await SaveAsync(), CanSave);
+        }
+
+        /// <summary>
+        /// 当前用户
+        /// </summary>
+        public User? CurrentUser
+        {
+            get => _currentUser;
+            set => _currentUser = value;
+        }
+
+        /// <summary>
+        /// 设置当前用户
+        /// </summary>
+        /// <param name="user">当前登录用户</param>
+        public void SetCurrentUser(User user)
+        {
+            _logger.LogInformation($"=== QuestionBankEditViewModel.SetCurrentUser ===");
+            _logger.LogInformation($"接收到的用户: {user?.Username} ({user?.Role})");
+            _logger.LogInformation($"用户ID: {user?.UserId}");
+            _logger.LogInformation($"用户对象是否为null: {user == null}");
+            
+            CurrentUser = user;
+            
+            _logger.LogInformation($"设置后的CurrentUser: {CurrentUser?.Username} ({CurrentUser?.Role})");
+            _logger.LogInformation($"CurrentUser是否为null: {CurrentUser == null}");
+            _logger.LogInformation($"QuestionBankEditViewModel: 用户信息设置完成");
         }
 
         /// <summary>
@@ -69,7 +98,7 @@ namespace ExamSystem.WPF.ViewModels
         /// <summary>
         /// 是否为编辑模式
         /// </summary>
-        public bool IsEditMode => QuestionBank.Id > 0;
+        public bool IsEditMode => QuestionBank.BankId > 0;
 
         /// <summary>
         /// 验证错误信息
@@ -140,7 +169,7 @@ namespace ExamSystem.WPF.ViewModels
                 // 创建副本以避免直接修改原对象
                 QuestionBank = new QuestionBank
                 {
-                    Id = questionBank.Id,
+                    BankId = questionBank.BankId,
                     Name = questionBank.Name,
                     Description = questionBank.Description,
                     IsActive = questionBank.IsActive,
@@ -207,7 +236,7 @@ namespace ExamSystem.WPF.ViewModels
 
                 // 检查名称是否重复（编辑时排除自身）
                 var nameExists = await _questionBankService.IsQuestionBankNameExistsAsync(
-                    QuestionBank.Name, IsEditMode ? QuestionBank.Id : null);
+                    QuestionBank.Name, IsEditMode ? QuestionBank.BankId : null);
 
                 if (nameExists)
                 {
@@ -223,14 +252,25 @@ namespace ExamSystem.WPF.ViewModels
                 }
                 else
                 {
+                    // 新建模式，设置CreatorId
+                    if (CurrentUser != null)
+                    {
+                        QuestionBank.CreatorId = CurrentUser.UserId;
+                        _logger.LogInformation($"设置题库创建者ID: {CurrentUser.UserId} ({CurrentUser.Username})");
+                    }
+                    else
+                    {
+                        _logger.LogError("创建题库时CurrentUser为null，使用默认管理员用户ID");
+                        // 使用默认管理员用户ID (1) 作为fallback
+                        QuestionBank.CreatorId = 1;
+                        _logger.LogWarning("使用默认管理员用户ID (1) 作为题库创建者");
+                    }
+                    
                     QuestionBank.CreatedAt = DateTime.Now;
                     QuestionBank.UpdatedAt = DateTime.Now;
-                    var result = await _questionBankService.CreateQuestionBankAsync(QuestionBank);
-                    success = result != null;
-                    if (success && result != null)
-                    {
-                        QuestionBank.Id = result.Id;
-                    }
+                    
+                    _logger.LogInformation($"准备创建题库: Name={QuestionBank.Name}, CreatorId={QuestionBank.CreatorId}");
+                    success = await _questionBankService.CreateQuestionBankAsync(QuestionBank);
                 }
 
                 if (success)
@@ -262,38 +302,4 @@ namespace ExamSystem.WPF.ViewModels
         }
     }
 
-    /// <summary>
-    /// 简单的RelayCommand实现
-    /// </summary>
-    public class RelayCommand : ICommand
-    {
-        private readonly Func<Task> _executeAsync;
-        private readonly Func<bool>? _canExecute;
-
-        public event EventHandler? CanExecuteChanged;
-
-        public RelayCommand(Func<Task> executeAsync, Func<bool>? canExecute = null)
-        {
-            _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
-            _canExecute = canExecute;
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return _canExecute?.Invoke() ?? true;
-        }
-
-        public async void Execute(object? parameter)
-        {
-            if (CanExecute(parameter))
-            {
-                await _executeAsync();
-            }
-        }
-
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
-    }
 }

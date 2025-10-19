@@ -1,8 +1,10 @@
 using ExamSystem.Domain.Entities;
 using ExamSystem.Services.Interfaces;
 using ExamSystem.WPF.Commands;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace ExamSystem.WPF.ViewModels
@@ -85,9 +87,8 @@ namespace ExamSystem.WPF.ViewModels
                 Duration = examPaper.Duration,
                 PassScore = examPaper.PassScore,
                 AllowRetake = examPaper.AllowRetake,
-                ShowAnswerAfterSubmit = examPaper.ShowAnswerAfterSubmit,
-                RandomQuestionOrder = examPaper.RandomQuestionOrder,
-                RandomOptionOrder = examPaper.RandomOptionOrder,
+                AllowViewAnswer = examPaper.AllowViewAnswer,
+                IsRandomOrder = examPaper.IsRandomOrder,
                 StartTime = examPaper.StartTime,
                 EndTime = examPaper.EndTime,
                 Status = examPaper.Status,
@@ -108,9 +109,8 @@ namespace ExamSystem.WPF.ViewModels
                 Duration = 120, // 默认2小时
                 PassScore = 60, // 默认60分及格
                 AllowRetake = false,
-                ShowAnswerAfterSubmit = true,
-                RandomQuestionOrder = false,
-                RandomOptionOrder = false,
+                AllowViewAnswer = true,
+                IsRandomOrder = false,
                 StartTime = DateTime.Now.Date.AddDays(1), // 默认明天开始
                 EndTime = DateTime.Now.Date.AddDays(7), // 默认一周后结束
                 Status = "草稿",
@@ -141,13 +141,12 @@ namespace ExamSystem.WPF.ViewModels
                 if (ExamPaper.PaperId == 0)
                 {
                     // 创建新试卷
-                    var result = await _examPaperService.CreateAsync(ExamPaper);
-                    success = result != null;
+                    success = await _examPaperService.CreateExamPaperAsync(ExamPaper);
                 }
                 else
                 {
                     // 更新现有试卷
-                    success = await _examPaperService.UpdateAsync(ExamPaper);
+                    success = await _examPaperService.UpdateExamPaperAsync(ExamPaper);
                 }
 
                 SaveCompleted?.Invoke(this, success);

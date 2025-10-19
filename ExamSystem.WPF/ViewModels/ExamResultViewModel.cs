@@ -6,9 +6,10 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using ExamSystem.Core.Entities;
-using ExamSystem.Core.Enums;
-using ExamSystem.Core.Services;
+using ExamSystem.WPF.Commands;
+using ExamSystem.Domain.Entities;
+using ExamSystem.Domain.Enums;
+using ExamSystem.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace ExamSystem.WPF.ViewModels
@@ -79,15 +80,22 @@ namespace ExamSystem.WPF.ViewModels
 
         // 考试信息属性
         public string ExamPaperName => ExamPaper?.Name ?? string.Empty;
-        public string ExamDateText => ExamRecord?.StartTime.ToString("yyyy-MM-dd HH:mm:ss") ?? string.Empty;
-        public string TimeSpentText => ExamRecord != null ? FormatTimeSpan(ExamRecord.TimeSpent) : string.Empty;
+        public string ExamDateText => ExamRecord?.StartTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? string.Empty;
+        public string TimeSpentText
+        {
+            get
+            {
+                var span = GetTimeSpent();
+                return span.HasValue ? FormatTimeSpan(span.Value) : string.Empty;
+            }
+        }
         public string TotalScoreText => $"{ExamPaper?.TotalScore ?? 0} 分";
         public string PassScoreText => $"{ExamPaper?.PassScore ?? 0} 分";
         public string ExamStatusText => GetStatusText(ExamRecord?.Status ?? ExamStatus.NotStarted);
         public Brush StatusColor => GetStatusColor(ExamRecord?.Status ?? ExamStatus.NotStarted);
 
         // 成绩属性
-        public string ScoreText => $"{ExamRecord?.Score ?? 0:F1} 分";
+        public string ScoreText => $"{ExamRecord?.TotalScore ?? 0:F1} 分";
         public bool IsPassed => ExamRecord?.IsPassed ?? false;
         public string ResultText => IsPassed ? "通过" : "未通过";
 
@@ -137,7 +145,7 @@ namespace ExamSystem.WPF.ViewModels
                 }
 
                 // 加载试卷信息
-                ExamPaper = await _examPaperService.GetByIdAsync(ExamRecord.ExamPaperId);
+                ExamPaper = await _examPaperService.GetExamPaperByIdAsync(ExamRecord.PaperId);
                 if (ExamPaper == null)
                 {
                     ErrorMessage = "试卷信息不存在";
@@ -179,7 +187,7 @@ namespace ExamSystem.WPF.ViewModels
                 if (ExamRecord == null)
                     return;
 
-                ViewExamPaperRequested?.Invoke(this, ExamRecord.ExamPaperId);
+                ViewExamPaperRequested?.Invoke(this, ExamRecord.PaperId);
             }
             catch (Exception ex)
             {
@@ -195,7 +203,7 @@ namespace ExamSystem.WPF.ViewModels
                 if (ExamRecord == null || !CanRetake)
                     return;
 
-                RetakeExamRequested?.Invoke(this, ExamRecord.ExamPaperId);
+                RetakeExamRequested?.Invoke(this, ExamRecord.PaperId);
             }
             catch (Exception ex)
             {
@@ -258,6 +266,20 @@ namespace ExamSystem.WPF.ViewModels
                 return $"{timeSpan.Minutes}分钟{timeSpan.Seconds}秒";
         }
 
+        private TimeSpan? GetTimeSpent()
+        {
+            if (ExamRecord == null)
+                return null;
+
+            var start = ExamRecord.StartTime;
+            var end = ExamRecord.SubmitTime ?? ExamRecord.EndTime;
+            if (start.HasValue && end.HasValue && end.Value >= start.Value)
+            {
+                return end.Value - start.Value;
+            }
+            return null;
+        }
+
         private void OnAllPropertiesChanged()
         {
             OnPropertyChanged(nameof(HasExamRecord));
@@ -316,10 +338,10 @@ namespace ExamSystem.WPF.ViewModels
         public AnswerRecord AnswerRecord { get; }
         public int QuestionNumber { get; }
 
-        public string QuestionTypeText => GetQuestionTypeText(AnswerRecord.Question?.Type ?? QuestionType.SingleChoice);
+        public string QuestionTypeText => GetQuestionTypeText(AnswerRecord.Question?.QuestionType ?? QuestionType.SingleChoice);
         public string QuestionContent => AnswerRecord.Question?.Content ?? string.Empty;
         public string UserAnswerText => AnswerRecord.UserAnswer ?? "未作答";
-        public string CorrectAnswerText => AnswerRecord.Question?.CorrectAnswer ?? string.Empty;
+        public string CorrectAnswerText => AnswerRecord.Question?.Answer ?? string.Empty;
         public string ScoreText => $"{AnswerRecord.Score:F1}";
         public bool IsCorrect => AnswerRecord.IsCorrect;
         public string ResultText => IsCorrect ? "正确" : "错误";

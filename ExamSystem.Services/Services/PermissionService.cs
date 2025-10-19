@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
+using ExamSystem.Services.Models;
 
 namespace ExamSystem.Services.Services
 {
@@ -15,6 +17,12 @@ namespace ExamSystem.Services.Services
 /// </summary>
 public class PermissionService : IPermissionService
 {
+    private readonly ILogger<PermissionService> _logger;
+
+    public PermissionService(ILogger<PermissionService> logger)
+    {
+        _logger = logger;
+    }
     /// <summary>
     /// 检查用户是否有权限执行指定操作
     /// </summary>
@@ -23,7 +31,7 @@ public class PermissionService : IPermissionService
     /// <returns>是否有权限</returns>
     public bool HasPermission(UserRole userRole, string operation)
     {
-        return operation switch
+        var result = operation switch
         {
             // 用户管理权限
             "CreateUser" => userRole == UserRole.Admin,
@@ -74,9 +82,23 @@ public class PermissionService : IPermissionService
             "SystemSettings" => userRole == UserRole.Admin,
             "ViewLogs" => userRole == UserRole.Admin,
 
+            // 消息通知与学习资源（新增权限点）
+            PermissionKeys.SendNotification => userRole == UserRole.Admin || userRole == UserRole.Teacher,
+            PermissionKeys.ViewNotification => true, // 所有角色可查看通知
+            PermissionKeys.ReceiveNotification => userRole == UserRole.Student,
+            PermissionKeys.UploadResource => userRole == UserRole.Admin || userRole == UserRole.Teacher,
+            PermissionKeys.ManageResource => userRole == UserRole.Admin || userRole == UserRole.Teacher,
+            PermissionKeys.ViewResource => true, // 所有角色可浏览资源
+            PermissionKeys.DownloadResource => userRole == UserRole.Student || userRole == UserRole.Teacher || userRole == UserRole.Admin,
+
             // 默认无权限
             _ => false
         };
+        
+        // 添加调试日志
+        _logger.LogInformation($"PermissionService.HasPermission: Role={userRole}, Operation={operation}, Result={result}");
+        
+        return result;
     }
 
     /// <summary>
@@ -96,6 +118,9 @@ public class PermissionService : IPermissionService
             "GradeManagement" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
             "StatisticsReports" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
             "SystemSettings" => userRole == UserRole.Admin,
+            // 新模块：消息中心与学习资源（所有角色可访问）
+            ModuleKeys.MessageCenter => true,
+            ModuleKeys.LearningResources => true,
             _ => false
         };
     }
@@ -109,20 +134,27 @@ public class PermissionService : IPermissionService
     {
         var permissions = new List<string>();
 
-        // 所有用户的基本权限
+        // 所有用户的基本权限（新增：消息通知与学习资源的浏览权限）
         permissions.AddRange(new[]
         {
             "ViewQuestionBank",
-            "ViewOwnGrades"
+            "ViewOwnGrades",
+            PermissionKeys.ViewNotification,
+            PermissionKeys.ViewResource
         });
 
-        // 学生权限
+        // 学生权限（新增：接收通知、下载资源）
         if (userRole == UserRole.Student)
         {
-            permissions.Add("TakeExam");
+            permissions.AddRange(new[]
+            {
+                "TakeExam",
+                PermissionKeys.ReceiveNotification,
+                PermissionKeys.DownloadResource
+            });
         }
 
-        // 教师权限
+        // 教师权限（新增：发送通知、资源上传/管理、下载资源）
         if (userRole == UserRole.Teacher)
         {
             permissions.AddRange(new[]
@@ -132,11 +164,15 @@ public class PermissionService : IPermissionService
                 "CreateExamPaper", "UpdateExamPaper", "DeleteExamPaper", "ViewExamPaper", "PublishExamPaper",
                 "StartExam", "StopExam", "MonitorExam",
                 "GradeExam", "ViewAllGrades",
-                "ViewStatistics", "ExportStatistics"
+                "ViewStatistics", "ExportStatistics",
+                PermissionKeys.SendNotification,
+                PermissionKeys.UploadResource,
+                PermissionKeys.ManageResource,
+                PermissionKeys.DownloadResource
             });
         }
 
-        // 管理员权限（包含所有权限）
+        // 管理员权限（包含所有权限，新增：消息通知与学习资源相关）
         if (userRole == UserRole.Admin)
         {
             permissions.AddRange(new[]
@@ -148,7 +184,14 @@ public class PermissionService : IPermissionService
                 "StartExam", "StopExam", "MonitorExam", "TakeExam",
                 "GradeExam", "ViewAllGrades",
                 "ViewStatistics", "ExportStatistics",
-                "SystemSettings", "ViewLogs"
+                "SystemSettings", "ViewLogs",
+                PermissionKeys.SendNotification,
+                PermissionKeys.ViewNotification,
+                PermissionKeys.ReceiveNotification,
+                PermissionKeys.UploadResource,
+                PermissionKeys.ManageResource,
+                PermissionKeys.ViewResource,
+                PermissionKeys.DownloadResource
             });
         }
 
@@ -164,7 +207,9 @@ public class PermissionService : IPermissionService
     {
         var modules = new List<string>
         {
-            "ExamManagement" // 所有用户都可以访问考试模块
+            "ExamManagement", // 所有用户都可以访问考试模块
+            ModuleKeys.MessageCenter,
+            ModuleKeys.LearningResources
         };
 
         if (userRole == UserRole.Teacher)

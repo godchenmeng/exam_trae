@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ExamSystem.WPF.Views"
+             xmlns:converters="clr-namespace:ExamSystem.WPF.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1000">
     
@@ -123,6 +125,23 @@
 
                     <!-- 操作按钮 -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button Content="下载模板" 
+                                Command="{Binding DownloadTemplateCommand}"
+                                Style="{StaticResource ButtonStyle}"
+                                Margin="0,0,5,0"
+                                ToolTip="下载题目导入Excel模板"/>
+                        <Button Content="导入题目" 
+                                Command="{Binding ImportQuestionsCommand}"
+                                Style="{StaticResource ButtonStyle}"
+                                Margin="0,0,5,0"
+                                IsEnabled="{Binding CanImportQuestions}"
+                                ToolTip="从Excel文件导入题目"/>
+                        <Button Content="导出题目" 
+                                Command="{Binding ExportQuestionsCommand}"
+                                Style="{StaticResource ButtonStyle}"
+                                Margin="0,0,5,0"
+                                IsEnabled="{Binding CanExportQuestions}"
+                                ToolTip="导出选中题目到Excel文件"/>
                         <Button Content="新建题库" 
                                 Command="{Binding CreateQuestionBankCommand}"
                                 Style="{StaticResource SuccessButtonStyle}"
@@ -182,7 +201,7 @@
                                                   Foreground="#7F8C8D"
                                                   TextWrapping="Wrap"
                                                   Margin="0,5,0,0"
-                                                  Visibility="{Binding Description, Converter={x:Static local:Converters.StringToVisibilityConverter}}"/>
+                                                  Visibility="{Binding Description, Converter={x:Static converters:Converters.StringToVisibilityConverter}}"/>
                                         
                                         <TextBlock Grid.Row="2" 
                                                   FontSize="11" 
@@ -260,9 +279,9 @@
                              RowHeaderWidth="0">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="题目标题" Binding="{Binding Title}" Width="*" MinWidth="200"/>
-                            <DataGridTextColumn Header="题型" Binding="{Binding QuestionType}" Width="80"/>
-                            <DataGridTextColumn Header="难度" Binding="{Binding Difficulty}" Width="60"/>
-                            <DataGridTextColumn Header="分值" Binding="{Binding Points}" Width="60"/>
+                            <DataGridTextColumn Header="题型" Binding="{Binding QuestionType, Converter={StaticResource QuestionTypeConverter}}" Width="80"/>
+                            <DataGridTextColumn Header="难度" Binding="{Binding Difficulty, Converter={StaticResource DifficultyConverter}}" Width="60"/>
+                            <DataGridTextColumn Header="分值" Binding="{Binding Score}" Width="60"/>
                             <DataGridTextColumn Header="创建时间" Binding="{Binding CreatedAt, StringFormat=yyyy-MM-dd}" Width="100"/>
                         </DataGrid.Columns>
                         <DataGrid.RowStyle>
@@ -295,7 +314,7 @@
 
                     <!-- 空状态提示 -->
                     <Border Grid.Row="1" 
-                           Visibility="{Binding IsQuestionBankSelected, Converter={x:Static local:Converters.BooleanToVisibilityConverter}, ConverterParameter=Invert}">
+                           Visibility="{Binding IsQuestionBankSelected, Converter={x:Static converters:Converters.BooleanToVisibilityConverter}, ConverterParameter=Invert}">
                         <TextBlock Text="请选择一个题库查看题目" 
                                   HorizontalAlignment="Center" 
                                   VerticalAlignment="Center"
@@ -322,7 +341,7 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <ProgressBar Width="20" Height="20" 
                                 IsIndeterminate="True"
-                                Visibility="{Binding IsLoading, Converter={x:Static local:Converters.BooleanToVisibilityConverter}}"
+                                Visibility="{Binding IsLoading, Converter={x:Static converters:Converters.BooleanToVisibilityConverter}}"
                                 Margin="0,0,10,0"/>
                     <TextBlock Text="{Binding QuestionBanks.Count, StringFormat='题库数量: {0}'}" 
                               Margin="0,0,20,0"

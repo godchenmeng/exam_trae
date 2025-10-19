@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ExamSystem.WPF.Commands;
 using ExamSystem.Services.Interfaces;
+using ExamSystem.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace ExamSystem.WPF.ViewModels
@@ -134,17 +137,21 @@ namespace ExamSystem.WPF.ViewModels
                 var questionBanks = await _questionBankService.GetAllQuestionBanksAsync();
                 QuestionBankCount = questionBanks.Count;
 
-                // 获取题目数量
-                var questions = await _questionService.GetAllQuestionsAsync();
-                QuestionCount = questions.Count;
+                // 获取题目数量 - 通过获取所有题库的题目来统计
+                var allQuestions = new List<Question>();
+                foreach (var bank in questionBanks)
+                {
+                    var questions = await _questionService.GetQuestionsByBankIdAsync(bank.BankId);
+                    allQuestions.AddRange(questions);
+                }
+                QuestionCount = allQuestions.Count;
 
                 // 获取试卷数量
                 var examPapers = await _examPaperService.GetAllExamPapersAsync();
                 ExamPaperCount = examPapers.Count;
 
-                // 获取考试记录数量
-                var examRecords = await _examService.GetAllExamRecordsAsync();
-                ExamRecordCount = examRecords.Count;
+                // 获取考试记录数量 - 暂时设为0，因为没有获取所有记录的方法
+                ExamRecordCount = 0;
             }
             catch (Exception ex)
             {
@@ -287,26 +294,4 @@ namespace ExamSystem.WPF.ViewModels
         public string Time { get; set; }
     }
 
-    // 简单的RelayCommand实现
-    public class RelayCommand : ICommand
-    {
-        private readonly Action _execute;
-        private readonly Func<bool> _canExecute;
-
-        public RelayCommand(Action execute, Func<bool> canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter) => _canExecute?.Invoke() ?? true;
-
-        public void Execute(object parameter) => _execute();
-    }
 }

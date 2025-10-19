@@ -24,6 +24,20 @@ namespace ExamSystem.WPF.Views
         private int _totalCount = 0;
         private int _totalPages = 0;
 
+        // 无参构造函数，用于 XAML 设计时支持
+        public UserManagementView()
+        {
+            InitializeComponent();
+            
+            _userService = null;
+            _logger = null;
+
+            Users = new ObservableCollection<UserDisplayModel>();
+            UsersDataGrid.ItemsSource = Users;
+
+            Loaded += UserManagementView_Loaded;
+        }
+
         public UserManagementView(IUserService userService, ILogger<UserManagementView> logger)
         {
             InitializeComponent();
@@ -46,6 +60,12 @@ namespace ExamSystem.WPF.Views
         {
             try
             {
+                if (_userService == null)
+                {
+                    _logger?.LogWarning("UserService 未初始化，跳过加载用户列表");
+                    return;
+                }
+
                 var users = await _userService.GetAllUsersAsync();
                 
                 Users.Clear();
@@ -61,7 +81,7 @@ namespace ExamSystem.WPF.Views
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "加载用户列表时发生错误");
+                _logger?.LogError(ex, "加载用户列表时发生错误");
                 MessageBox.Show("加载用户列表时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -97,7 +117,7 @@ namespace ExamSystem.WPF.Views
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "搜索用户时发生错误");
+                _logger?.LogError(ex, "搜索用户时发生错误");
                 MessageBox.Show("搜索用户时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -142,10 +162,10 @@ namespace ExamSystem.WPF.Views
                         MessageBox.Show("密码重置成功！新密码已发送到用户邮箱。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "重置密码时发生错误");
-                        MessageBox.Show("重置密码时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+            {
+                _logger?.LogError(ex, "重置密码时发生错误");
+                MessageBox.Show("重置密码时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
                 }
             }
         }
@@ -165,10 +185,10 @@ namespace ExamSystem.WPF.Views
                         MessageBox.Show($"用户{action}成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (Exception ex)
-                    {
-                        _logger.LogError(ex, $"{action}用户时发生错误");
-                        MessageBox.Show($"{action}用户时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                {
+                    _logger?.LogError(ex, $"{action}用户时发生错误");
+                    MessageBox.Show($"{action}用户时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 }
             }
         }
@@ -187,10 +207,10 @@ namespace ExamSystem.WPF.Views
                         MessageBox.Show("用户删除成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "删除用户时发生错误");
-                        MessageBox.Show("删除用户时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                {
+                    _logger?.LogError(ex, "删除用户时发生错误");
+                    MessageBox.Show("删除用户时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 }
             }
         }
@@ -270,9 +290,9 @@ namespace ExamSystem.WPF.Views
             _user = user;
         }
 
-        public int Id => _user.Id;
+        public int Id => _user.UserId;
         public string Username => _user.Username;
-        public string FullName => _user.FullName;
+        public string FullName => _user.RealName;
         public string Email => _user.Email;
         public UserRole Role => _user.Role;
         public DateTime CreatedAt => _user.CreatedAt;

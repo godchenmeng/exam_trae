@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using ExamSystem.Core.Entities;
-using ExamSystem.Core.Services;
+using ExamSystem.WPF.Commands;
+using ExamSystem.Domain.Entities;
+using ExamSystem.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace ExamSystem.WPF.ViewModels
 {
@@ -60,17 +62,31 @@ namespace ExamSystem.WPF.ViewModels
             set => SetProperty(ref _questions, value);
         }
 
-        // 考试信息属性
-        public string ExamPaperName => ExamPaper?.Name ?? string.Empty;
-        public int Duration => ExamPaper?.Duration ?? 0;
-        public decimal TotalScore => ExamPaper?.TotalScore ?? 0;
-        public decimal PassScore => ExamPaper?.PassScore ?? 0;
-        public int QuestionCount => Questions.Count;
+        // 新增：以 PaperQuestion 作为预览绑定数据源，保证分值来自试卷指定分值
+        private ObservableCollection<PaperQuestion> _paperQuestions = new();
+        public ObservableCollection<PaperQuestion> PaperQuestions
+        {
+            get => _paperQuestions;
+            set => SetProperty(ref _paperQuestions, value);
+        }
+
+        // 修复：题目数量以 PaperQuestions 计算
+        public int QuestionCount => PaperQuestions?.Count ?? 0;
+
         public bool AllowRetake => ExamPaper?.AllowRetake ?? false;
-        public bool RandomQuestions => ExamPaper?.RandomQuestions ?? false;
+        public bool RandomQuestions => ExamPaper?.IsRandomOrder ?? false;
         public DateTime? StartTime => ExamPaper?.StartTime;
         public DateTime? EndTime => ExamPaper?.EndTime;
         public string Description => ExamPaper?.Description ?? string.Empty;
+
+        // 新增：提供基础属性以供 UI 绑定与文本格式化使用
+        public string ExamPaperName => ExamPaper?.Name ?? string.Empty;
+        public int Duration => ExamPaper?.Duration ?? 0;
+        public decimal TotalScore => ExamPaper?.TotalScore ?? (PaperQuestions?.Sum(pq => pq.Score) ?? 0m);
+        public decimal PassScore => ExamPaper?.PassScore ?? 0m;
+
+        // 兼容 XAML 中使用的命名（RandomQuestionText），以及现有属性
+        public string RandomQuestionText => RandomQuestions ? "是" : "否";
 
         // 格式化显示属性
         public string DurationText => $"{Duration} 分钟";
@@ -108,21 +124,30 @@ namespace ExamSystem.WPF.ViewModels
                 ErrorMessage = string.Empty;
 
                 // 加载试卷信息
-                ExamPaper = await _examPaperService.GetByIdAsync(examPaperId);
+                ExamPaper = await _examPaperService.GetExamPaperByIdAsync(examPaperId);
                 if (ExamPaper == null)
                 {
                     ErrorMessage = "试卷不存在";
                     return;
                 }
 
-                // 加载试卷题目
-                var questions = await _questionService.GetQuestionsByPaperIdAsync(examPaperId);
+                // 加载试卷题目（从试卷服务获取 PaperQuestion 列表，并取出其中的 Question）
+                var paperQuestions = await _examPaperService.GetPaperQuestionsAsync(examPaperId);
+
+                // 绑定 PaperQuestions 作为预览的数据源（包含分值与题序）
+                PaperQuestions = new ObservableCollection<PaperQuestion>(paperQuestions.OrderBy(pq => pq.OrderIndex));
+
+                // 保留 Questions 以兼容旧逻辑（不再作为绑定来源）
                 Questions.Clear();
-                foreach (var question in questions)
+                foreach (var pq in paperQuestions.OrderBy(pq => pq.OrderIndex))
                 {
-                    Questions.Add(question);
+                    if (pq.Question != null)
+                    {
+                        Questions.Add(pq.Question);
+                    }
                 }
 
+                OnPropertyChanged(nameof(QuestionCount));
                 // 通知属性更改
                 OnPropertyChanged(nameof(ExamPaperName));
                 OnPropertyChanged(nameof(Duration));
@@ -140,6 +165,7 @@ namespace ExamSystem.WPF.ViewModels
                 OnPropertyChanged(nameof(QuestionCountText));
                 OnPropertyChanged(nameof(AllowRetakeText));
                 OnPropertyChanged(nameof(RandomQuestionsText));
+                OnPropertyChanged(nameof(RandomQuestionText));
                 OnPropertyChanged(nameof(StartTimeText));
                 OnPropertyChanged(nameof(EndTimeText));
             }

@@ -3,99 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ExamSystem.WPF.Converters"
+             xmlns:local="clr-namespace:ExamSystem.WPF.Views"
+             xmlns:converters="clr-namespace:ExamSystem.WPF.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1200">
 
     <UserControl.Resources>
-        <!-- 样式定义 -->
-        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="#2C3E50"/>
-            <Setter Property="Margin" Value="0,0,0,20"/>
-        </Style>
-
-        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="#34495E"/>
-            <Setter Property="Margin" Value="0,10,0,5"/>
-        </Style>
-
-        <Style x:Key="ActionButtonStyle" TargetType="Button">
-            <Setter Property="Padding" Value="15,8"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Background" Value="#3498DB"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="4" 
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" 
-                                            VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#2980B9"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#21618C"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#BDC3C7"/>
-                                <Setter Property="Cursor" Value="Arrow"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="#E74C3C"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#C0392B"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#A93226"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="#27AE60"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#229954"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#1E8449"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="WarningButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="#F39C12"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E67E22"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#D35400"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- 状态转换器 -->
-        <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <!-- 统一使用全局样式与转换器（CommonStyles.xaml / App.xaml） -->
     </UserControl.Resources>
 
     <Grid Margin="20">
@@ -106,7 +20,7 @@
         </Grid.RowDefinitions>
 
         <!-- 标题 -->
-        <TextBlock Grid.Row="0" Text="试卷管理" Style="{StaticResource HeaderTextStyle}"/>
+        <TextBlock Grid.Row="0" Text="试卷管理" Style="{StaticResource TitleText}"/>
 
         <!-- 工具栏 -->
         <Grid Grid.Row="1" Margin="0,0,0,20">
@@ -121,13 +35,9 @@
                          Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
                          Width="300" 
                          Height="35"
-                         Padding="10,8"
-                         FontSize="14"
-                         VerticalContentAlignment="Center"
-                         BorderBrush="#BDC3C7"
-                         BorderThickness="1">
+                         VerticalContentAlignment="Center">
                     <TextBox.Style>
-                        <Style TargetType="TextBox">
+                        <Style TargetType="TextBox" BasedOn="{StaticResource ModernTextBox}">
                             <Style.Triggers>
                                 <Trigger Property="Text" Value="">
                                     <Setter Property="Background">
@@ -151,15 +61,15 @@
                 <ComboBox x:Name="StatusFilterComboBox"
                           SelectedItem="{Binding StatusFilter}"
                           ItemsSource="{Binding StatusOptions}"
-                          Width="120"
+                          Style="{StaticResource ModernComboBox}"
+                          Width="140"
                           Height="35"
                           Margin="10,0,0,0"
-                          FontSize="14"
                           VerticalContentAlignment="Center"/>
 
                 <Button Content="刷新" 
                         Command="{Binding RefreshCommand}"
-                        Style="{StaticResource ActionButtonStyle}"
+                        Style="{StaticResource SecondaryButtonStyle}"
                         Margin="10,0,0,0"/>
             </StackPanel>
 
@@ -167,13 +77,13 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Button Content="新建试卷" 
                         Command="{Binding CreateExamPaperCommand}"
-                        Style="{StaticResource SuccessButtonStyle}"/>
+                        Style="{StaticResource PrimaryButtonStyle}"/>
                 <Button Content="编辑试卷" 
                         Command="{Binding EditExamPaperCommand}"
-                        Style="{StaticResource ActionButtonStyle}"/>
+                        Style="{StaticResource SecondaryButtonStyle}"/>
                 <Button Content="复制试卷" 
                         Command="{Binding CopyExamPaperCommand}"
-                        Style="{StaticResource ActionButtonStyle}"/>
+                        Style="{StaticResource SecondaryButtonStyle}"/>
                 <Button Content="删除试卷" 
                         Command="{Binding DeleteExamPaperCommand}"
                         Style="{StaticResource DangerButtonStyle}"/>
@@ -189,7 +99,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- 试卷列表 -->
-            <Border Grid.Column="0" BorderBrush="#E5E5E5" BorderThickness="1" CornerRadius="4">
+            <Border Grid.Column="0" Style="{StaticResource Card}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -198,17 +108,14 @@
 
                     <!-- 列表标题 -->
                     <Border Grid.Row="0" Background="#F8F9FA" Padding="15,10" BorderBrush="#E5E5E5" BorderThickness="0,0,0,1">
-                        <TextBlock Text="试卷列表" Style="{StaticResource SectionHeaderStyle}" Margin="0"/>
+                        <TextBlock Text="试卷列表" Style="{StaticResource SubtitleText}" Margin="0"/>
                     </Border>
 
                     <!-- 试卷列表 -->
                     <DataGrid Grid.Row="1"
+                              Style="{StaticResource ModernDataGrid}"
                               ItemsSource="{Binding ExamPapersView}"
                               SelectedItem="{Binding SelectedExamPaper}"
-                              AutoGenerateColumns="False"
-                              IsReadOnly="True"
-                              GridLinesVisibility="Horizontal"
-                              HeadersVisibility="Column"
                               SelectionMode="Single"
                               CanUserResizeColumns="True"
                               CanUserSortColumns="True"
@@ -237,7 +144,7 @@
                             <DataGridTextColumn Header="总分" Binding="{Binding TotalScore, StringFormat=F1}" Width="60"/>
                             <DataGridTextColumn Header="时长(分钟)" Binding="{Binding Duration}" Width="80"/>
                             <DataGridTextColumn Header="题目数" Binding="{Binding PaperQuestions.Count}" Width="60"/>
-                            <DataGridTextColumn Header="创建者" Binding="{Binding Creator.RealName}" Width="100"/>
+                            <DataGridTextColumn Header="创建者" Binding="{Binding Creator.RealName, TargetNullValue=-}" Width="100"/>
                             <DataGridTextColumn Header="创建时间" Binding="{Binding CreatedAt, StringFormat=yyyy-MM-dd}" Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
@@ -261,7 +168,7 @@
                           Background="#E5E5E5"/>
 
             <!-- 试卷详情和操作 -->
-            <Border Grid.Column="2" BorderBrush="#E5E5E5" BorderThickness="1" CornerRadius="4">
+            <Border Grid.Column="2" Style="{StaticResource Card}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -271,12 +178,13 @@
 
                     <!-- 详情标题 -->
                     <Border Grid.Row="0" Background="#F8F9FA" Padding="15,10" BorderBrush="#E5E5E5" BorderThickness="0,0,0,1">
-                        <TextBlock Text="试卷详情" Style="{StaticResource SectionHeaderStyle}" Margin="0"/>
+                        <TextBlock Text="试卷详情" Style="{StaticResource SubtitleText}" Margin="0"/>
                     </Border>
 
                     <!-- 试卷详情 -->
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="15">
-                        <StackPanel Visibility="{Binding IsExamPaperSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid>
+                            <StackPanel Visibility="{Binding IsExamPaperSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <!-- 基本信息 -->
                             <TextBlock Text="基本信息" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10"/>
                             
@@ -354,15 +262,16 @@
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
-                        </StackPanel>
+                            </StackPanel>
 
-                        <!-- 未选择提示 -->
-                        <TextBlock Text="请选择一个试卷查看详情" 
-                                   FontSize="14" 
-                                   Foreground="#95A5A6" 
-                                   HorizontalAlignment="Center" 
-                                   VerticalAlignment="Center"
-                                   Visibility="{Binding IsExamPaperSelected, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"/>
+                            <!-- 未选择提示 -->
+                            <TextBlock Text="请选择一个试卷查看详情" 
+                                       FontSize="14" 
+                                       Foreground="#95A5A6" 
+                                       HorizontalAlignment="Center" 
+                                       VerticalAlignment="Center"
+                                       Visibility="{Binding IsExamPaperSelected, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"/>
+                        </Grid>
                     </ScrollViewer>
 
                     <!-- 操作按钮 -->

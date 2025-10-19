@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Windows.Input;
-using ExamSystem.Models.Entities;
-using ExamSystem.Models.Enums;
+using ExamSystem.WPF.Commands;
+using ExamSystem.Domain.Entities;
+using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -16,6 +18,42 @@ namespace ExamSystem.WPF.ViewModels
     {
         private readonly IUserService _userService;
         private readonly ILogger<UserManagementViewModel> _logger;
+
+        // 无参构造函数，用于 XAML 设计时支持
+        public UserManagementViewModel()
+        {
+            // 设计时模式，创建空的服务实例
+            _userService = null;
+            _logger = null;
+
+            Users = new ObservableCollection<UserDisplayModel>();
+            FilteredUsers = new ObservableCollection<UserDisplayModel>();
+
+            // 初始化命令（设计时模式下使用空命令）
+            LoadUsersCommand = new RelayCommand(() => { });
+            SearchCommand = new RelayCommand(() => { });
+            AddUserCommand = new RelayCommand(() => { });
+            ImportUsersCommand = new RelayCommand(() => { });
+            ExportUsersCommand = new RelayCommand(() => { });
+            EditUserCommand = new RelayCommand<UserDisplayModel>(_ => { });
+            ResetPasswordCommand = new RelayCommand<UserDisplayModel>(_ => { });
+            ToggleStatusCommand = new RelayCommand<UserDisplayModel>(_ => { });
+            DeleteUserCommand = new RelayCommand<UserDisplayModel>(_ => { });
+            FirstPageCommand = new RelayCommand(() => { }, () => false);
+            PreviousPageCommand = new RelayCommand(() => { }, () => false);
+            NextPageCommand = new RelayCommand(() => { }, () => false);
+            LastPageCommand = new RelayCommand(() => { }, () => false);
+
+            // 初始化筛选选项
+            RoleOptions = Enum.GetValues<UserRole>().ToList();
+            StatusOptions = new[] { "全部", "启用", "禁用" }.ToList();
+
+            // 设置默认值
+            SelectedRole = null;
+            SelectedStatus = "全部";
+            PageSize = 20;
+            CurrentPage = 1;
+        }
 
         public UserManagementViewModel(IUserService userService, ILogger<UserManagementViewModel> logger)
         {
@@ -137,6 +175,12 @@ namespace ExamSystem.WPF.ViewModels
         {
             try
             {
+                // 检查服务是否可用（设计时模式下为 null）
+                if (_userService == null)
+                {
+                    return;
+                }
+
                 var users = await _userService.GetAllUsersAsync();
                 
                 Users.Clear();
@@ -144,10 +188,10 @@ namespace ExamSystem.WPF.ViewModels
                 {
                     Users.Add(new UserDisplayModel
                     {
-                        Id = user.Id,
+                        Id = user.UserId,
                         Username = user.Username,
-                        FullName = user.FullName,
-                        Email = user.Email,
+                        FullName = user.RealName ?? string.Empty,
+                        Email = user.Email ?? string.Empty,
                         Role = user.Role,
                         RoleDisplay = GetRoleDisplay(user.Role),
                         CreatedAt = user.CreatedAt,
@@ -161,7 +205,7 @@ namespace ExamSystem.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "加载用户数据时发生错误");
+                _logger?.LogError(ex, "加载用户数据时发生错误");
             }
         }
 
@@ -219,33 +263,33 @@ namespace ExamSystem.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "应用筛选时发生错误");
+                _logger?.LogError(ex, "应用筛选时发生错误");
             }
         }
 
         private void AddUser()
         {
             // TODO: 实现添加用户功能
-            _logger.LogInformation("添加用户功能被调用");
+            _logger?.LogInformation("添加用户功能被调用");
         }
 
         private void ImportUsers()
         {
             // TODO: 实现导入用户功能
-            _logger.LogInformation("导入用户功能被调用");
+            _logger?.LogInformation("导入用户功能被调用");
         }
 
         private void ExportUsers()
         {
             // TODO: 实现导出用户功能
-            _logger.LogInformation("导出用户功能被调用");
+            _logger?.LogInformation("导出用户功能被调用");
         }
 
         private void EditUser(UserDisplayModel user)
         {
             if (user == null) return;
             // TODO: 实现编辑用户功能
-            _logger.LogInformation($"编辑用户功能被调用，用户ID: {user.Id}");
+            _logger?.LogInformation($"编辑用户功能被调用，用户ID: {user.Id}");
         }
 
         private async void ResetPassword(UserDisplayModel user)
@@ -255,12 +299,12 @@ namespace ExamSystem.WPF.ViewModels
             try
             {
                 // TODO: 实现重置密码功能
-                _logger.LogInformation($"重置密码功能被调用，用户ID: {user.Id}");
+                _logger?.LogInformation($"重置密码功能被调用，用户ID: {user.Id}");
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"重置用户密码时发生错误，用户ID: {user.Id}");
+                _logger?.LogError(ex, $"重置用户密码时发生错误，用户ID: {user.Id}");
             }
         }
 
@@ -274,12 +318,12 @@ namespace ExamSystem.WPF.ViewModels
                 user.IsActive = !user.IsActive;
                 user.StatusDisplay = user.IsActive ? "启用" : "禁用";
                 
-                _logger.LogInformation($"切换用户状态功能被调用，用户ID: {user.Id}，新状态: {user.StatusDisplay}");
+                _logger?.LogInformation($"切换用户状态功能被调用，用户ID: {user.Id}，新状态: {user.StatusDisplay}");
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"切换用户状态时发生错误，用户ID: {user.Id}");
+                _logger?.LogError(ex, $"切换用户状态时发生错误，用户ID: {user.Id}");
             }
         }
 
@@ -290,12 +334,12 @@ namespace ExamSystem.WPF.ViewModels
             try
             {
                 // TODO: 实现删除用户功能（需要确认对话框）
-                _logger.LogInformation($"删除用户功能被调用，用户ID: {user.Id}");
+                _logger?.LogInformation($"删除用户功能被调用，用户ID: {user.Id}");
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"删除用户时发生错误，用户ID: {user.Id}");
+                _logger?.LogError(ex, $"删除用户时发生错误，用户ID: {user.Id}");
             }
         }
 
@@ -405,26 +449,4 @@ namespace ExamSystem.WPF.ViewModels
         }
     }
 
-    // 支持泛型参数的RelayCommand
-    public class RelayCommand<T> : ICommand
-    {
-        private readonly Action<T> _execute;
-        private readonly Func<T, bool> _canExecute;
-
-        public RelayCommand(Action<T> execute, Func<T, bool> canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter) => _canExecute?.Invoke((T)parameter) ?? true;
-
-        public void Execute(object parameter) => _execute((T)parameter);
-    }
 }

@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        x:Name="RootWindow"
         Title="在线考试系统 - WPF版本" 
         Height="800" 
         Width="1200"
@@ -37,18 +38,34 @@
                 <StackPanel Orientation="Horizontal" 
                            DockPanel.Dock="Right" 
                            HorizontalAlignment="Right">
-                    <Button Content="题库管理"
+                    <!-- 用户信息显示 -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="👤" FontSize="16" Margin="0,0,6,0" Foreground="White"/>
+                        <TextBlock Text="{Binding ElementName=RootWindow, Path=CurrentUsername}" 
+                                   Foreground="White" 
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <!-- 上次登录时间显示 -->
+                    <StackPanel Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="🕒" FontSize="16" Margin="0,0,6,0" Foreground="White"/>
+                        <TextBlock Text="上次登录：" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBlock Foreground="White" VerticalAlignment="Center">
+                            <TextBlock.Text>
+                                <Binding ElementName="RootWindow" Path="PreviousLoginAt" StringFormat="{}{0:yyyy-MM-dd HH:mm}" TargetNullValue="首次登录" />
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!-- 功能按钮：修改密码、退出系统 -->
+                    <Button Content="修改密码"
                             Style="{StaticResource HeaderButton}"
-                            Margin="8,0"/>
-                    <Button Content="试卷管理"
+                            Margin="16,0,0,0"
+                            Click="ChangePasswordButton_Click"/>
+                    <Button Content="退出系统"
                             Style="{StaticResource HeaderButton}"
-                            Margin="8,0"/>
-                    <Button Content="考试管理"
-                            Style="{StaticResource HeaderButton}"
-                            Margin="8,0"/>
-                    <Button Content="设置"
-                            Style="{StaticResource HeaderButton}"
-                            Margin="8,0"/>
+                            Margin="8,0,0,0"
+                            Click="LogoutButton_Click"/>
                 </StackPanel>
             </DockPanel>
         </Border>

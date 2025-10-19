@@ -242,6 +242,27 @@ public class QuestionService : IQuestionService
     }
 
     /// <summary>
+    /// 搜索题目（简化版本）
+    /// </summary>
+    public async Task<List<Question>> SearchAsync(int bankId, string? keyword, QuestionType? questionType, Difficulty? difficulty)
+    {
+        try
+        {
+            return (await _questionRepository.SearchQuestionsAsync(
+                keyword: keyword,
+                bankId: bankId,
+                questionType: questionType,
+                difficulty: difficulty
+            )).ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "搜索题目失败: BankId={BankId}, Keyword={Keyword}", bankId, keyword);
+            throw;
+        }
+    }
+
+    /// <summary>
     /// 验证题目数据
     /// </summary>
     public async Task<ValidationResult> ValidateQuestionAsync(Question question)

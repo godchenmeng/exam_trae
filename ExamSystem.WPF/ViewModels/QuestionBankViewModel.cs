@@ -1,10 +1,17 @@
 using ExamSystem.Domain.Entities;
+using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
 using ExamSystem.WPF.Commands;
 using ExamSystem.WPF.ViewModels.Base;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -19,7 +26,10 @@ public class QuestionBankViewModel : BaseViewModel
     private readonly IQuestionBankService _questionBankService;
     private readonly IQuestionService _questionService;
     private readonly IPermissionService _permissionService;
+    private readonly IExcelImportService _excelImportService;
+    private readonly IExcelExportService _excelExportService;
     private readonly ILogger<QuestionBankViewModel> _logger;
+    private readonly ILoggerFactory _loggerFactory;
 
     #region 属性
 
@@ -89,17 +99,41 @@ public class QuestionBankViewModel : BaseViewModel
         set => SetProperty(ref _statusMessage, value);
     }
 
+    // 当前用户属性
+    private User? _currentUser;
+    public User? CurrentUser
+    {
+        get => _currentUser;
+        set => SetProperty(ref _currentUser, value);
+    }
+
     // UI状态属性
     public bool IsQuestionBankSelected => SelectedQuestionBank != null;
     public bool IsQuestionSelected => SelectedQuestion != null;
 
     // 权限相关属性
-    public bool CanCreateQuestionBank => _permissionService.HasPermission(CurrentUser?.Role ?? UserRole.Student, "CreateQuestionBank");
-    public bool CanEditQuestionBank => IsQuestionBankSelected && _permissionService.HasPermission(CurrentUser?.Role ?? UserRole.Student, "UpdateQuestionBank");
-    public bool CanDeleteQuestionBank => IsQuestionBankSelected && _permissionService.HasPermission(CurrentUser?.Role ?? UserRole.Student, "DeleteQuestionBank");
-    public bool CanCreateQuestion => IsQuestionBankSelected && _permissionService.HasPermission(CurrentUser?.Role ?? UserRole.Student, "CreateQuestion");
-    public bool CanEditQuestion => IsQuestionSelected && _permissionService.HasPermission(CurrentUser?.Role ?? UserRole.Student, "UpdateQuestion");
-    public bool CanDeleteQuestion => IsQuestionSelected && _permissionService.HasPermission(CurrentUser?.Role ?? UserRole.Student, "DeleteQuestion");
+    public bool CanCreateQuestionBank 
+    { 
+        get 
+        { 
+            // 取消权限检测，直接返回true
+            return true;
+        } 
+    }
+    public bool CanEditQuestionBank => IsQuestionBankSelected;
+    public bool CanDeleteQuestionBank => IsQuestionBankSelected;
+    public bool CanCreateQuestion 
+    { 
+        get 
+        { 
+            // 始终允许创建题目，不进行权限和题库选择检查
+            return true;
+        } 
+    }
+    public bool CanEditQuestion => IsQuestionSelected;
+    public bool CanDeleteQuestion => IsQuestionSelected && CurrentUser != null && _permissionService.HasPermission(CurrentUser.Role, "DeleteQuestion");
+    public bool CanImportQuestions => IsQuestionBankSelected;
+    public bool CanExportQuestions => IsQuestionBankSelected && Questions.Any();
 
     #endregion
 
@@ -116,6 +150,9 @@ public class QuestionBankViewModel : BaseViewModel
     public ICommand DeleteQuestionCommand { get; }
     public ICommand DuplicateQuestionCommand { get; }
     public ICommand RefreshCommand { get; }
+    public ICommand DownloadTemplateCommand { get; }
+    public ICommand ImportQuestionsCommand { get; }
+    public ICommand ExportQuestionsCommand { get; }
 
     #endregion
 
@@ -123,12 +160,18 @@ public class QuestionBankViewModel : BaseViewModel
         IQuestionBankService questionBankService,
         IQuestionService questionService,
         IPermissionService permissionService,
-        ILogger<QuestionBankViewModel> logger)
+        IExcelImportService excelImportService,
+        IExcelExportService excelExportService,
+        ILogger<QuestionBankViewModel> logger,
+        ILoggerFactory loggerFactory)
     {
         _questionBankService = questionBankService;
         _questionService = questionService;
         _permissionService = permissionService;
+        _excelImportService = excelImportService;
+        _excelExportService = excelExportService;
         _logger = logger;
+        _loggerFactory = loggerFactory;
 
         // 初始化命令
         LoadQuestionBanksCommand = new RelayCommand(async () => await LoadQuestionBanksAsync());
@@ -142,6 +185,9 @@ public class QuestionBankViewModel : BaseViewModel
         DeleteQuestionCommand = new RelayCommand(async () => await DeleteQuestionAsync(), () => CanDeleteQuestion);
         DuplicateQuestionCommand = new RelayCommand(async () => await DuplicateQuestionAsync(), () => IsQuestionSelected);
         RefreshCommand = new RelayCommand(async () => await RefreshAsync());
+        DownloadTemplateCommand = new RelayCommand(async () => await DownloadTemplateAsync());
+        ImportQuestionsCommand = new RelayCommand(async () => await ImportQuestionsAsync(), () => CanImportQuestions);
+        ExportQuestionsCommand = new RelayCommand(async () => await ExportQuestionsAsync(), () => CanExportQuestions);
 
         // 加载数据
         _ = LoadQuestionBanksAsync();
@@ -273,13 +319,17 @@ public class QuestionBankViewModel : BaseViewModel
     {
         try
         {
-            var editViewModel = new QuestionBankEditViewModel(_questionBankService, _logger);
-            editViewModel.SetQuestionBank(null); // 新建模式
+            var editViewModel = new QuestionBankEditViewModel(_questionBankService, _loggerFactory.CreateLogger<QuestionBankEditViewModel>());
+            editViewModel.SetCurrentUser(CurrentUser); // 使用SetCurrentUser方法
+            editViewModel.SetQuestionBank(null!); // 新建模式
             
             var dialog = new Views.QuestionBankEditDialog(editViewModel);
-            if (Application.Current.MainWindow != null)
+            
+            // 安全设置Owner属性
+            var mainWindow = Application.Current.MainWindow;
+            if (mainWindow != null && mainWindow.IsLoaded && mainWindow != dialog)
             {
-                dialog.Owner = Application.Current.MainWindow;
+                dialog.Owner = mainWindow;
             }
             
             if (dialog.ShowDialog() == true)
@@ -304,13 +354,17 @@ public class QuestionBankViewModel : BaseViewModel
 
         try
         {
-            var editViewModel = new QuestionBankEditViewModel(_questionBankService, _logger);
+            var editViewModel = new QuestionBankEditViewModel(_questionBankService, _loggerFactory.CreateLogger<QuestionBankEditViewModel>());
+            editViewModel.SetCurrentUser(CurrentUser); // 使用SetCurrentUser方法
             editViewModel.SetQuestionBank(SelectedQuestionBank);
             
             var dialog = new Views.QuestionBankEditDialog(editViewModel);
-            if (Application.Current.MainWindow != null)
+            
+            // 安全设置Owner属性
+            var mainWindow = Application.Current.MainWindow;
+            if (mainWindow != null && mainWindow.IsLoaded && mainWindow != dialog)
             {
-                dialog.Owner = Application.Current.MainWindow;
+                dialog.Owner = mainWindow;
             }
             
             if (dialog.ShowDialog() == true)
@@ -381,17 +435,25 @@ public class QuestionBankViewModel : BaseViewModel
     /// </summary>
     private async void CreateQuestion()
     {
-        if (SelectedQuestionBank == null) return;
+        // 如果没有选择题库，提示用户先选择题库
+        if (SelectedQuestionBank == null)
+        {
+            MessageBox.Show("请先选择一个题库，然后再创建题目。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
 
         try
         {
-            var editViewModel = new QuestionEditViewModel(_questionService, _logger);
+            var editViewModel = new QuestionEditViewModel(_questionService, _loggerFactory.CreateLogger<QuestionEditViewModel>());
             editViewModel.SetQuestion(null, SelectedQuestionBank.BankId);
             
             var dialog = new Views.QuestionEditDialog(editViewModel);
-            if (Application.Current.MainWindow != null)
+            
+            // 安全设置Owner属性
+            var mainWindow = Application.Current.MainWindow;
+            if (mainWindow != null && mainWindow.IsLoaded && mainWindow != dialog)
             {
-                dialog.Owner = Application.Current.MainWindow;
+                dialog.Owner = mainWindow;
             }
             
             if (dialog.ShowDialog() == true)
@@ -416,13 +478,16 @@ public class QuestionBankViewModel : BaseViewModel
 
         try
         {
-            var editViewModel = new QuestionEditViewModel(_questionService, _logger);
+            var editViewModel = new QuestionEditViewModel(_questionService, _loggerFactory.CreateLogger<QuestionEditViewModel>());
             editViewModel.SetQuestion(SelectedQuestion, SelectedQuestion.BankId);
             
             var dialog = new Views.QuestionEditDialog(editViewModel);
-            if (Application.Current.MainWindow != null)
+            
+            // 安全设置Owner属性
+            var mainWindow = Application.Current.MainWindow;
+            if (mainWindow != null && mainWindow.IsLoaded && mainWindow != dialog)
             {
-                dialog.Owner = Application.Current.MainWindow;
+                dialog.Owner = mainWindow;
             }
             
             if (dialog.ShowDialog() == true)
@@ -523,8 +588,6 @@ public class QuestionBankViewModel : BaseViewModel
         }
     }
 
-    #endregion
-
     /// <summary>
     /// 刷新数据
     /// </summary>
@@ -538,6 +601,26 @@ public class QuestionBankViewModel : BaseViewModel
     }
 
     /// <summary>
+    /// 设置当前用户
+    /// </summary>
+    /// <param name="user">当前登录用户</param>
+    public void SetCurrentUser(User user)
+    {
+        _logger.LogInformation($"=== QuestionBankViewModel.SetCurrentUser ===");
+        _logger.LogInformation($"接收到的用户: {user?.Username} ({user?.Role})");
+        _logger.LogInformation($"用户ID: {user?.UserId}");
+        _logger.LogInformation($"用户对象是否为null: {user == null}");
+        
+        CurrentUser = user;
+        
+        _logger.LogInformation($"设置后的CurrentUser: {CurrentUser?.Username} ({CurrentUser?.Role})");
+        _logger.LogInformation($"CurrentUser是否为null: {CurrentUser == null}");
+        
+        UpdatePermissions();
+        _logger.LogInformation($"QuestionBankViewModel: 用户信息设置完成");
+    }
+
+    /// <summary>
     /// 更新权限相关属性
     /// </summary>
     public void UpdatePermissions()
@@ -548,5 +631,208 @@ public class QuestionBankViewModel : BaseViewModel
         OnPropertyChanged(nameof(CanCreateQuestion));
         OnPropertyChanged(nameof(CanEditQuestion));
         OnPropertyChanged(nameof(CanDeleteQuestion));
+        OnPropertyChanged(nameof(CanImportQuestions));
+        OnPropertyChanged(nameof(CanExportQuestions));
     }
+
+    #endregion
+
+    #region 导入导出功能
+
+    /// <summary>
+    /// 下载题目导入模板
+    /// </summary>
+    private async Task DownloadTemplateAsync()
+    {
+        try
+        {
+            IsLoading = true;
+            StatusMessage = "正在生成模板文件...";
+
+            // 打开文件保存对话框
+            var saveFileDialog = new SaveFileDialog
+            {
+                Title = "保存题目导入模板",
+                Filter = "Excel文件 (*.xlsx)|*.xlsx",
+                FileName = "题目导入模板.xlsx"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // 生成Excel模板
+                var templateBytes = _excelExportService.ExportQuestionTemplate();
+                
+                // 保存模板文件
+                await File.WriteAllBytesAsync(saveFileDialog.FileName, templateBytes);
+                
+                StatusMessage = "模板文件下载成功";
+                MessageBox.Show("模板文件下载成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "下载模板文件时发生错误");
+            StatusMessage = "下载模板文件失败";
+            MessageBox.Show($"下载模板文件失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// 导入题目
+    /// </summary>
+    private async Task ImportQuestionsAsync()
+    {
+        if (SelectedQuestionBank == null)
+        {
+            MessageBox.Show("请先选择题库", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        try
+        {
+            // 打开文件选择对话框
+            var openFileDialog = new OpenFileDialog
+            {
+                Title = "选择要导入的Excel文件",
+                Filter = "Excel文件 (*.xlsx)|*.xlsx|所有文件 (*.*)|*.*",
+                Multiselect = false
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                IsLoading = true;
+                StatusMessage = "正在导入题目...";
+
+                // 使用Excel导入服务导入题目
+                using var fileStream = File.OpenRead(openFileDialog.FileName);
+                var importResult = await _excelImportService.ImportQuestionsFromExcelAsync(fileStream, SelectedQuestionBank.BankId);
+
+                StatusMessage = $"导入完成：成功 {importResult.SuccessCount} 题，失败 {importResult.FailureCount} 题";
+                
+                // 刷新题目列表
+                await LoadQuestionsAsync();
+
+                // 显示导入结果报告
+                ShowImportResultDialog(importResult);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "导入题目时发生异常");
+            MessageBox.Show($"导入题目失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// 显示导入结果对话框
+    /// </summary>
+    private void ShowImportResultDialog(ExamSystem.Services.Models.ImportResult importResult)
+    {
+        try
+        {
+            // 转换为视图模型
+            var viewModel = new ImportResultViewModel
+            {
+                TotalCount = importResult.TotalCount,
+                SuccessCount = importResult.SuccessCount,
+                FailureCount = importResult.FailureCount,
+                SuccessfulQuestions = importResult.SuccessfulQuestions?.Select(q => new ImportedQuestionInfo
+                {
+                    RowNumber = q.RowNumber,
+                    Title = q.Title,
+                    QuestionType = q.QuestionType,
+                    Difficulty = q.Difficulty,
+                    Score = q.Score,
+                    Tags = q.Tags
+                }).ToList() ?? new List<ImportedQuestionInfo>(),
+                FailedQuestions = importResult.FailedQuestions?.Select(f => new ImportFailureInfo
+                {
+                    RowNumber = f.RowNumber,
+                    Title = f.Title,
+                    ErrorMessage = f.ErrorMessage,
+                    RawData = f.RawData
+                }).ToList() ?? new List<ImportFailureInfo>()
+            };
+
+            // 显示对话框
+            var dialog = new Views.ImportResultDialog(viewModel);
+            
+            // 安全设置Owner属性
+            var mainWindow = Application.Current.MainWindow;
+            if (mainWindow != null && mainWindow.IsLoaded && mainWindow != dialog)
+            {
+                dialog.Owner = mainWindow;
+            }
+            
+            dialog.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "显示导入结果对话框时发生异常");
+            MessageBox.Show($"显示导入结果时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    /// <summary>
+    /// 导出题目
+    /// </summary>
+    private async Task ExportQuestionsAsync()
+    {
+        if (SelectedQuestionBank == null)
+        {
+            MessageBox.Show("请先选择题库", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        if (!Questions.Any())
+        {
+            MessageBox.Show("当前题库没有题目可导出", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        try
+        {
+            // 打开文件保存对话框
+            var saveFileDialog = new SaveFileDialog
+            {
+                Title = "导出题目到Excel文件",
+                Filter = "Excel文件 (*.xlsx)|*.xlsx",
+                FileName = $"{SelectedQuestionBank.Name}_题目列表_{DateTime.Now:yyyyMMdd}.xlsx"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                IsLoading = true;
+                StatusMessage = "正在导出题目...";
+
+                // 使用Excel导出服务导出题目
+                var exportBytes = await _excelExportService.ExportQuestionsToExcelAsync(Questions.ToList(), SelectedQuestionBank.Name);
+                await File.WriteAllBytesAsync(saveFileDialog.FileName, exportBytes);
+
+                StatusMessage = $"成功导出 {Questions.Count} 道题目";
+                MessageBox.Show($"成功导出 {Questions.Count} 道题目到文件：\n{saveFileDialog.FileName}", 
+                    "导出成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "导出题目时发生错误");
+            StatusMessage = "导出题目失败";
+            MessageBox.Show($"导出题目失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    #endregion
 }

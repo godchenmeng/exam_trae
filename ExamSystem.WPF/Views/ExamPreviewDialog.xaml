@@ -1,89 +1,48 @@
 <Window x:Class="ExamSystem.WPF.Views.ExamPreviewDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="考试预览" Height="700" Width="900"
-        WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:enums="clr-namespace:ExamSystem.Domain.Enums;assembly=ExamSystem.Domain"
+        mc:Ignorable="d"
+        Title="试卷预览" Height="750" Width="1100"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BackgroundBrush}">
     
     <Window.Resources>
-        <!-- 样式定义 -->
-        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="#2C3E50"/>
-            <Setter Property="Margin" Value="0,0,0,15"/>
+        <!-- 对话框标题样式 -->
+        <Style x:Key="DialogTitleTextStyle" TargetType="TextBlock" BasedOn="{StaticResource TitleTextStyle}">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
         </Style>
         
-        <Style x:Key="SubHeaderTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="#34495E"/>
-            <Setter Property="Margin" Value="0,0,0,10"/>
+        <!-- 信息卡片样式 -->
+        <Style x:Key="InfoCardStyle" TargetType="Border" BasedOn="{StaticResource CardStyle}">
+            <Setter Property="Margin" Value="0,0,0,20"/>
+            <Setter Property="Padding" Value="24"/>
         </Style>
         
-        <Style x:Key="InfoTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Foreground" Value="#7F8C8D"/>
-            <Setter Property="Margin" Value="0,0,15,5"/>
+        <!-- 题目卡片样式 -->
+        <Style x:Key="QuestionCardStyle" TargetType="Border" BasedOn="{StaticResource CardStyle}">
+            <Setter Property="Margin" Value="0,0,0,16"/>
+            <Setter Property="Padding" Value="20"/>
         </Style>
         
-        <Style x:Key="ValueTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="#2C3E50"/>
-            <Setter Property="Margin" Value="0,0,0,5"/>
-        </Style>
-        
-        <Style x:Key="QuestionTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="#2C3E50"/>
+        <!-- 选项文本样式 -->
+        <Style x:Key="OptionTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextStyle}">
+            <Setter Property="Margin" Value="8,4"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Background" Value="#F8F9FA"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="LineHeight" Value="20"/>
-            <Setter Property="Margin" Value="0,5,0,10"/>
         </Style>
         
-        <Style x:Key="ActionButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="35"/>
-            <Setter Property="MinWidth" Value="100"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="1" 
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" 
-                                            VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Opacity" Value="0.8"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="#3498DB"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#2980B9"/>
-        </Style>
-        
-        <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="#27AE60"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#229954"/>
-        </Style>
-        
-        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="#95A5A6"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#7F8C8D"/>
+        <!-- 底部按钮区域样式 -->
+        <Style x:Key="ButtonPanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,1,0,0"/>
+            <Setter Property="Padding" Value="24,16"/>
         </Style>
     </Window.Resources>
     
@@ -94,15 +53,14 @@
         </Grid.RowDefinitions>
         
         <!-- 主要内容区域 -->
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="20">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" 
+                      Padding="24" Background="{StaticResource BackgroundBrush}">
             <StackPanel>
                 <!-- 试卷标题 -->
-                <TextBlock Text="{Binding ExamPaper.PaperName}" Style="{StaticResource HeaderTextStyle}" 
-                           HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding ExamPaper.Name}" Style="{StaticResource DialogTitleTextStyle}"/>
                 
-                <!-- 试卷基本信息 -->
-                <Border Background="#F8F9FA" BorderBrush="#DEE2E6" BorderThickness="1" 
-                        CornerRadius="5" Padding="15" Margin="0,0,0,20">
+                <!-- 试卷基本信息卡片 -->
+                <Border Style="{StaticResource InfoCardStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -113,87 +71,139 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="考试时长：" Style="{StaticResource InfoTextStyle}"/>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ExamPaper.Duration}" 
-                                   Style="{StaticResource ValueTextStyle}" Margin="70,0,0,5"/>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="分钟" Style="{StaticResource ValueTextStyle}" 
-                                   Margin="110,0,0,5"/>
+                        <!-- 第一行：考试时长和总分 -->
+                        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="考试时长：" Style="{StaticResource InfoTextStyle}"/>
+                            <TextBlock Text="{Binding ExamPaper.Duration}" Style="{StaticResource ValueTextStyle}"/>
+                            <TextBlock Text="分钟" Style="{StaticResource ValueTextStyle}" Margin="2,0,0,0"/>
+                        </StackPanel>
                         
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="总分：" Style="{StaticResource InfoTextStyle}"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ExamPaper.TotalScore}" 
-                                   Style="{StaticResource ValueTextStyle}" Margin="40,0,0,5"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="分" Style="{StaticResource ValueTextStyle}" 
-                                   Margin="70,0,0,5"/>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="总分：" Style="{StaticResource InfoTextStyle}"/>
+                            <TextBlock Text="{Binding ExamPaper.TotalScore}" Style="{StaticResource ValueTextStyle}"/>
+                            <TextBlock Text="分" Style="{StaticResource ValueTextStyle}" Margin="2,0,0,0"/>
+                        </StackPanel>
                         
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="及格分：" Style="{StaticResource InfoTextStyle}"/>
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ExamPaper.PassScore}" 
-                                   Style="{StaticResource ValueTextStyle}" Margin="55,0,0,5"/>
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="分" Style="{StaticResource ValueTextStyle}" 
-                                   Margin="85,0,0,5"/>
+                        <!-- 第二行：及格分数和题目数量 -->
+                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="及格分数：" Style="{StaticResource InfoTextStyle}"/>
+                            <TextBlock Text="{Binding ExamPaper.PassScore}" Style="{StaticResource ValueTextStyle}"/>
+                            <TextBlock Text="分" Style="{StaticResource ValueTextStyle}" Margin="2,0,0,0"/>
+                        </StackPanel>
                         
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="题目数量：" Style="{StaticResource InfoTextStyle}"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ExamPaper.QuestionCount}" 
-                                   Style="{StaticResource ValueTextStyle}" Margin="70,0,0,5"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="题" Style="{StaticResource ValueTextStyle}" 
-                                   Margin="100,0,0,5"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="题目数量：" Style="{StaticResource InfoTextStyle}"/>
+                            <TextBlock Text="{Binding QuestionCount}" Style="{StaticResource ValueTextStyle}"/>
+                            <TextBlock Text="题" Style="{StaticResource ValueTextStyle}" Margin="2,0,0,0"/>
+                        </StackPanel>
                         
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="允许重考：" Style="{StaticResource InfoTextStyle}"/>
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding AllowRetakeText}" 
-                                   Style="{StaticResource ValueTextStyle}" Margin="70,0,0,5"/>
+                        <!-- 第三行：随机题目和允许重考 -->
+                        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="随机题目：" Style="{StaticResource InfoTextStyle}"/>
+                            <TextBlock Text="{Binding RandomQuestionText}" Style="{StaticResource ValueTextStyle}"/>
+                        </StackPanel>
                         
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="随机题目：" Style="{StaticResource InfoTextStyle}"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RandomQuestionText}" 
-                                   Style="{StaticResource ValueTextStyle}" Margin="70,0,0,5"/>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="允许重考：" Style="{StaticResource InfoTextStyle}"/>
+                            <TextBlock Text="{Binding AllowRetakeText}" Style="{StaticResource ValueTextStyle}"/>
+                        </StackPanel>
                         
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="开始时间：" Style="{StaticResource InfoTextStyle}"/>
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding StartTimeText}" 
-                                   Style="{StaticResource ValueTextStyle}" Margin="70,0,0,5"/>
+                        <!-- 第四行：考试时间 -->
+                        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
+                            <TextBlock Text="开始时间：" Style="{StaticResource InfoTextStyle}"/>
+                            <TextBlock Text="{Binding StartTimeText}" Style="{StaticResource ValueTextStyle}"/>
+                        </StackPanel>
                         
-                        <TextBlock Grid.Row="3" Grid.Column="1" Text="结束时间：" Style="{StaticResource InfoTextStyle}"/>
-                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding EndTimeText}" 
-                                   Style="{StaticResource ValueTextStyle}" Margin="70,0,0,5"/>
-                        
-                        <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Text="考试说明：" 
-                                   Style="{StaticResource InfoTextStyle}" Margin="0,10,0,5"/>
-                        <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Text="{Binding ExamPaper.Description}" 
-                                   Style="{StaticResource ValueTextStyle}" TextWrapping="Wrap" 
-                                   Margin="0,25,0,5"/>
+                        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock Text="结束时间：" Style="{StaticResource InfoTextStyle}"/>
+                            <TextBlock Text="{Binding EndTimeText}" Style="{StaticResource ValueTextStyle}"/>
+                        </StackPanel>
                     </Grid>
                 </Border>
                 
-                <!-- 题目列表 -->
-                <TextBlock Text="题目预览" Style="{StaticResource SubHeaderTextStyle}"/>
+                <!-- 考试须知 -->
+                <Border Style="{StaticResource InfoCardStyle}" 
+                        Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="考试须知" Style="{StaticResource SubHeaderTextStyle}" Margin="0,0,0,12"/>
+                        <TextBlock Text="{Binding Description}" Style="{StaticResource BodyTextStyle}" 
+                                   TextWrapping="Wrap" LineHeight="22"/>
+                    </StackPanel>
+                </Border>
                 
-                <ItemsControl ItemsSource="{Binding Questions}">
+                <!-- 题目预览 -->
+                <TextBlock Text="题目预览" Style="{StaticResource SubHeaderTextStyle}" Margin="0,0,0,16"/>
+                
+                <ItemsControl ItemsSource="{Binding PaperQuestions}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="White" BorderBrush="#E9ECEF" BorderThickness="1" 
-                                    CornerRadius="5" Margin="0,0,0,15" Padding="15">
+                            <Border Style="{StaticResource QuestionCardStyle}">
                                 <StackPanel>
                                     <!-- 题目标题 -->
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <TextBlock Text="第" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding QuestionNumber}" FontWeight="SemiBold"/>
-                                        <TextBlock Text="题" FontWeight="SemiBold"/>
-                                        <TextBlock Text="（" FontWeight="SemiBold" Margin="10,0,0,0"/>
-                                        <TextBlock Text="{Binding QuestionTypeText}" FontWeight="SemiBold"/>
-                                        <TextBlock Text="，" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding Score}" FontWeight="SemiBold"/>
-                                        <TextBlock Text="分）" FontWeight="SemiBold"/>
-                                    </StackPanel>
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                            <TextBlock Text="第" Style="{StaticResource QuestionTextStyle}"/>
+                                            <TextBlock Text="{Binding OrderIndex}" Style="{StaticResource QuestionTextStyle}"/>
+                                            <TextBlock Text="题" Style="{StaticResource QuestionTextStyle}"/>
+                                            <TextBlock Text="（" Style="{StaticResource QuestionTextStyle}" Margin="8,0,0,0"/>
+                                            <TextBlock Text="{Binding Question.Type, Converter={StaticResource QuestionTypeConverter}}" 
+                                                       Style="{StaticResource QuestionTextStyle}"/>
+                                            <TextBlock Text="）" Style="{StaticResource QuestionTextStyle}"/>
+                                        </StackPanel>
+                                        
+                                        <Border Grid.Column="1" Background="{StaticResource PrimaryLightBrush}" 
+                                                CornerRadius="12" Padding="8,4">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Score}" Style="{StaticResource ValueTextStyle}" 
+                                                           Foreground="{StaticResource PrimaryBrush}"/>
+                                                <TextBlock Text="分" Style="{StaticResource ValueTextStyle}" 
+                                                           Foreground="{StaticResource PrimaryBrush}" Margin="2,0,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
                                     
                                     <!-- 题目内容 -->
-                                    <TextBlock Text="{Binding Content}" Style="{StaticResource QuestionTextStyle}"/>
+                                    <TextBlock Text="{Binding Question.Content}" Style="{StaticResource QuestionTextStyle}" 
+                                               Margin="0,0,0,16"/>
                                     
                                     <!-- 选项 -->
-                                    <ItemsControl ItemsSource="{Binding Options}" 
-                                                  Visibility="{Binding HasOptions, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <ItemsControl ItemsSource="{Binding Question.Options}">
+                                        <ItemsControl.Style>
+                                            <Style TargetType="ItemsControl">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Question.Type}" Value="{x:Static enums:QuestionType.SingleChoice}">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Question.Type}" Value="{x:Static enums:QuestionType.MultipleChoice}">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Question.Type}" Value="{x:Static enums:QuestionType.TrueFalse}">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Question.Type}" Value="{x:Static enums:QuestionType.Essay}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ItemsControl.Style>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <TextBlock Text="{Binding}" Margin="20,2,0,2" FontSize="13"/>
+                                                <Border Background="#F8F9FA" 
+                                                        CornerRadius="6" Margin="8,4" Padding="8,4">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Label}" Style="{StaticResource ValueTextStyle}" 
+                                                                   Margin="0,0,8,0" MinWidth="20"/>
+                                                        <TextBlock Text="{Binding Content}" Style="{StaticResource BodyTextStyle}" 
+                                                                   TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                </Border>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -202,48 +212,32 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                
-                <!-- 考试须知 -->
-                <Border Background="#FFF3CD" BorderBrush="#FFEAA7" BorderThickness="1" 
-                        CornerRadius="5" Padding="15" Margin="0,20,0,0">
-                    <StackPanel>
-                        <TextBlock Text="考试须知" Style="{StaticResource SubHeaderTextStyle}" 
-                                   Foreground="#856404"/>
-                        <TextBlock TextWrapping="Wrap" FontSize="13" Foreground="#856404">
-                            <Run Text="1. 考试开始后，系统将自动计时，请合理安排答题时间。"/>
-                            <LineBreak/>
-                            <Run Text="2. 考试过程中，答案会自动保存，可随时切换题目。"/>
-                            <LineBreak/>
-                            <Run Text="3. 考试时间到后，系统将自动提交试卷。"/>
-                            <LineBreak/>
-                            <Run Text="4. 请确保网络连接稳定，避免因网络问题影响考试。"/>
-                            <LineBreak/>
-                            <Run Text="5. 考试期间请勿关闭浏览器或刷新页面。"/>
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
             </StackPanel>
         </ScrollViewer>
         
         <!-- 底部按钮栏 -->
-        <Border Grid.Row="1" Background="#F8F9FA" BorderBrush="#DEE2E6" BorderThickness="0,1,0,0" 
-                Padding="20,15">
+        <Border Grid.Row="1" Style="{StaticResource ButtonPanelStyle}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="取消" Style="{StaticResource SecondaryButtonStyle}" 
-                        Command="{Binding CancelCommand}"/>
+                        Command="{Binding CancelCommand}" Margin="0,0,12,0"/>
                 <Button Content="开始考试" Style="{StaticResource SuccessButtonStyle}" 
-                        Command="{Binding StartExamCommand}"
-                        IsEnabled="{Binding CanStartExam}"/>
+                        Command="{Binding StartExamCommand}"/>
             </StackPanel>
         </Border>
         
         <!-- 加载指示器 -->
         <Grid Grid.RowSpan="2" Background="#80000000" 
               Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <ProgressBar IsIndeterminate="True" Width="200" Height="4" Margin="0,0,0,10"/>
-                <TextBlock Text="加载中..." Foreground="White" FontSize="16" HorizontalAlignment="Center"/>
-            </StackPanel>
+            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" 
+                    Padding="32,24" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Effect="{StaticResource DropShadowEffect}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Width="200" Height="4" Margin="0,0,0,16"
+                                 Style="{StaticResource ModernProgressBar}"/>
+                    <TextBlock Text="加载中..." Style="{StaticResource BodyTextStyle}" 
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </Window>

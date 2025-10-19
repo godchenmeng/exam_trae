@@ -1,11 +1,18 @@
 using ExamSystem.Domain.Entities;
 using ExamSystem.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using ExamSystem.WPF.Commands;
+using ExamSystem.WPF.ViewModels.Base;
+using ExamSystem.WPF.Views;
 
 namespace ExamSystem.WPF.ViewModels;
 
@@ -17,6 +24,8 @@ public class ExamPaperViewModel : BaseViewModel
     private readonly IExamPaperService _examPaperService;
     private readonly IQuestionBankService _questionBankService;
     private readonly ILogger<ExamPaperViewModel> _logger;
+    private readonly IQuestionService _questionService;
+    private readonly ILoggerFactory _loggerFactory;
 
     #region 属性
 
@@ -129,11 +138,15 @@ public class ExamPaperViewModel : BaseViewModel
     public ExamPaperViewModel(
         IExamPaperService examPaperService,
         IQuestionBankService questionBankService,
-        ILogger<ExamPaperViewModel> logger)
+        IQuestionService questionService,
+        ILogger<ExamPaperViewModel> logger,
+        ILoggerFactory loggerFactory)
     {
         _examPaperService = examPaperService;
         _questionBankService = questionBankService;
         _logger = logger;
+        _questionService = questionService;
+        _loggerFactory = loggerFactory;
 
         // 初始化命令
         LoadExamPapersCommand = new RelayCommand(async () => await LoadExamPapersAsync());
@@ -478,10 +491,15 @@ public class ExamPaperViewModel : BaseViewModel
 
         try
         {
-            var viewModel = Program.ServiceProvider.GetRequiredService<PaperQuestionManageViewModel>();
+            var viewModel = new PaperQuestionManageViewModel(
+                _examPaperService,
+                _questionBankService,
+                _questionService,
+                _loggerFactory.CreateLogger<PaperQuestionManageViewModel>()
+            );
             var dialog = new PaperQuestionManageDialog(viewModel);
             
-            await viewModel.InitializeAsync(SelectedExamPaper.Id);
+            await viewModel.InitializeAsync(SelectedExamPaper.PaperId);
             
             if (dialog.ShowDialog() == true)
             {
@@ -499,17 +517,21 @@ public class ExamPaperViewModel : BaseViewModel
     /// <summary>
     /// 预览试卷
     /// </summary>
-    private void PreviewExamPaper()
+    private async void PreviewExamPaper()
     {
         if (SelectedExamPaper == null)
             return;
 
         try
         {
-            var viewModel = Program.ServiceProvider.GetRequiredService<ExamPreviewViewModel>();
+            var viewModel = new ExamPreviewViewModel(
+                _examPaperService,
+                _questionService,
+                _loggerFactory.CreateLogger<ExamPreviewViewModel>()
+            );
             var dialog = new ExamPreviewDialog(viewModel);
             
-            viewModel.Initialize(SelectedExamPaper.Id);
+            await viewModel.InitializeAsync(SelectedExamPaper.PaperId);
             dialog.ShowDialog();
         }
         catch (Exception ex)

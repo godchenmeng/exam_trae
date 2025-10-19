@@ -5,8 +5,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using ExamSystem.Models.Entities;
-using ExamSystem.Models.Enums;
+using ExamSystem.WPF.Commands;
+using ExamSystem.Domain.Entities;
+using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -14,16 +15,16 @@ namespace ExamSystem.WPF.ViewModels
 {
     public class StatisticsViewModel : INotifyPropertyChanged
     {
-        private readonly IStatisticsService _statisticsService;
+        private readonly IExamService _examService;
         private readonly IExamPaperService _examPaperService;
         private readonly ILogger<StatisticsViewModel> _logger;
 
         public StatisticsViewModel(
-            IStatisticsService statisticsService,
+            IExamService examService,
             IExamPaperService examPaperService,
             ILogger<StatisticsViewModel> logger)
         {
-            _statisticsService = statisticsService;
+            _examService = examService;
             _examPaperService = examPaperService;
             _logger = logger;
 

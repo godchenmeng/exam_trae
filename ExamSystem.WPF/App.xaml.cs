@@ -4,12 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using ExamSystem.Infrastructure.Data;
+using ExamSystem.Data;
 using ExamSystem.Infrastructure.Repositories;
 using ExamSystem.Services.Interfaces;
 using ExamSystem.Services.Services;
 using ExamSystem.WPF.Views;
 using ExamSystem.WPF.ViewModels;
+using Serilog;
 
 namespace ExamSystem.WPF
 {
@@ -19,21 +20,34 @@ namespace ExamSystem.WPF
     public partial class App : Application
     {
         private IHost? _host;
+        
+        public IServiceProvider? Services { get; private set; }
 
-        protected override void OnStartup(StartupEventArgs e)
+        public IServiceProvider GetServices() => _host?.Services ?? throw new InvalidOperationException("Host not initialized");
+
+        protected override async void OnStartup(StartupEventArgs e)
         {
             _host = CreateHostBuilder().Build();
-            
-            // 确保数据库已创建
-            using (var scope = _host.Services.CreateScope())
+            Services = _host.Services;
+            await _host.StartAsync();
+
+            // 初始化数据库种子数据
+            try
             {
+                using var scope = Services.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<ExamDbContext>();
-                context.Database.EnsureCreated();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<DatabaseSeeder>>();
+                var seeder = new DatabaseSeeder(context, logger);
+                await seeder.SeedAsync();
+            }
+            catch (Exception ex)
+            {
+                var logger = Services.GetRequiredService<ILogger<App>>();
+                logger.LogError(ex, "数据库初始化失败");
             }
 
-            // 显示主窗口
-            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+            var loginWindow = Services.GetRequiredService<LoginWindow>();
+            loginWindow.Show();
 
             base.OnStartup(e);
         }
@@ -68,30 +82,68 @@ namespace ExamSystem.WPF
                     services.AddScoped<IExamPaperService, ExamPaperService>();
                     services.AddScoped<IExamService, ExamService>();
                     services.AddScoped<IPermissionService, PermissionService>();
+                    services.AddScoped<IExcelImportService, ExcelImportService>();
+                    services.AddScoped<IExcelExportService, ExcelExportService>();
+                    services.AddScoped<ExamSystem.WPF.Services.IStatisticsService, ExamSystem.WPF.Services.StatisticsService>();
 
                     // ViewModels
+                    services.AddTransient<DashboardViewModel>();
                     services.AddTransient<ExamViewModel>();
                     services.AddTransient<ExamPaperViewModel>();
                     services.AddTransient<ExamPaperEditViewModel>();
                     services.AddTransient<ExamPreviewViewModel>();
                     services.AddTransient<ExamResultViewModel>();
-                    services.AddTransient<QuestionBankViewModel>();
-                    services.AddTransient<QuestionBankEditViewModel>();
-                    services.AddTransient<QuestionEditViewModel>();
+                    services.AddTransient<LoginViewModel>();
                     services.AddTransient<PaperQuestionManageViewModel>();
+                    services.AddTransient<QuestionBankEditViewModel>();
+                    services.AddTransient<QuestionBankViewModel>();
+                    services.AddTransient<StatisticsViewModel>();
+                    services.AddTransient<UserManagementViewModel>();
 
                     // Views
+                    services.AddTransient<LoginWindow>();
                     services.AddTransient<MainWindow>();
+                    
+                    // 添加DatabaseSeeder
+                    services.AddTransient<DatabaseSeeder>();
+                    services.AddTransient<DashboardView>();
                     services.AddTransient<ExamView>();
                     services.AddTransient<ExamPaperView>();
                     services.AddTransient<ExamResultView>();
-                    services.AddTransient<QuestionBankView>();
+                    services.AddTransient<LoginWindow>();
+                    services.AddTransient<QuestionBankView>(provider =>
+                    {
+                        var viewModel = provider.GetRequiredService<QuestionBankViewModel>();
+                        return new QuestionBankView(viewModel);
+                    });
+                    services.AddTransient<StatisticsView>();
+                    services.AddTransient<UserManagementView>();
+                    
+                    // Dialogs
+                    services.AddTransient<ExamPaperEditDialog>();
+                    services.AddTransient<ExamPreviewDialog>();
+                    services.AddTransient<PaperQuestionManageDialog>();
+                    services.AddTransient<QuestionBankEditDialog>();
+                    services.AddTransient<QuestionEditDialog>();
+
+                    // 配置Serilog全局日志
+                    Log.Logger = new LoggerConfiguration()
+                        .MinimumLevel.Debug()
+                        .WriteTo.Console()
+                        .WriteTo.File(
+                            path: "Logs/exam_system_.log",
+                            rollingInterval: RollingInterval.Day,
+                            retainedFileCountLimit: 7,
+                            fileSizeLimitBytes: 10 * 1024 * 1024, // 10MB
+                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                        .CreateLogger();
 
                     // 日志
                     services.AddLogging(builder =>
                     {
-                        builder.AddConsole();
-                        builder.AddDebug();
+                        builder.ClearProviders();
+                        builder.AddSerilog();
+                        builder.SetMinimumLevel(LogLevel.Debug);
                     });
                 });
         }

@@ -540,4 +540,141 @@ public class ExamPaperService : IExamPaperService
             _logger.LogError(ex, "更新试卷总分时发生错误: {PaperId}", paperId);
         }
     }
+
+    /// <summary>
+    /// 更新单个题目顺序
+    /// </summary>
+    public async Task<bool> UpdateQuestionOrderAsync(int paperId, int questionId, int orderIndex)
+    {
+        try
+        {
+            var paperQuestion = await _context.PaperQuestions
+                .FirstOrDefaultAsync(pq => pq.PaperId == paperId && pq.QuestionId == questionId);
+
+            if (paperQuestion == null)
+            {
+                _logger.LogWarning("试卷题目不存在: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
+                return false;
+            }
+
+            paperQuestion.OrderIndex = orderIndex;
+            var result = await _context.SaveChangesAsync();
+
+            _logger.LogInformation("更新单个题目顺序成功: PaperId={PaperId}, QuestionId={QuestionId}, OrderIndex={OrderIndex}", 
+                paperId, questionId, orderIndex);
+            return result > 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "更新单个题目顺序时发生错误: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 更新单个题目分值
+    /// </summary>
+    public async Task<bool> UpdateQuestionScoreAsync(int paperId, int questionId, decimal score)
+    {
+        try
+        {
+            var paperQuestion = await _context.PaperQuestions
+                .FirstOrDefaultAsync(pq => pq.PaperId == paperId && pq.QuestionId == questionId);
+
+            if (paperQuestion == null)
+            {
+                _logger.LogWarning("试卷题目不存在: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
+                return false;
+            }
+
+            paperQuestion.Score = score;
+            var result = await _context.SaveChangesAsync();
+
+            // 更新试卷总分
+            await UpdateTotalScoreAsync(paperId);
+
+            _logger.LogInformation("更新单个题目分值成功: PaperId={PaperId}, QuestionId={QuestionId}, Score={Score}", 
+                paperId, questionId, score);
+            return result > 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "更新单个题目分值时发生错误: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 从试卷中移除单个题目
+    /// </summary>
+    public async Task<bool> RemoveQuestionAsync(int paperId, int questionId)
+    {
+        try
+        {
+            var paperQuestion = await _context.PaperQuestions
+                .FirstOrDefaultAsync(pq => pq.PaperId == paperId && pq.QuestionId == questionId);
+
+            if (paperQuestion == null)
+            {
+                _logger.LogWarning("试卷题目不存在: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
+                return false;
+            }
+
+            _context.PaperQuestions.Remove(paperQuestion);
+            var result = await _context.SaveChangesAsync();
+
+            // 更新试卷总分
+            await UpdateTotalScoreAsync(paperId);
+
+            _logger.LogInformation("从试卷中移除题目成功: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
+            return result > 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "从试卷中移除题目时发生错误: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 添加单个题目到试卷
+    /// </summary>
+    public async Task<bool> AddQuestionAsync(int paperId, int questionId, int orderIndex, decimal score)
+    {
+        try
+        {
+            // 检查题目是否已存在于试卷中
+            var existingPaperQuestion = await _context.PaperQuestions
+                .FirstOrDefaultAsync(pq => pq.PaperId == paperId && pq.QuestionId == questionId);
+
+            if (existingPaperQuestion != null)
+            {
+                _logger.LogWarning("题目已存在于试卷中: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
+                return false;
+            }
+
+            var paperQuestion = new PaperQuestion
+            {
+                PaperId = paperId,
+                QuestionId = questionId,
+                Score = score,
+                OrderIndex = orderIndex
+            };
+
+            _context.PaperQuestions.Add(paperQuestion);
+            var result = await _context.SaveChangesAsync();
+
+            // 更新试卷总分
+            await UpdateTotalScoreAsync(paperId);
+
+            _logger.LogInformation("添加题目到试卷成功: PaperId={PaperId}, QuestionId={QuestionId}, Score={Score}", 
+                paperId, questionId, score);
+            return result > 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "添加题目到试卷时发生错误: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
+            return false;
+        }
+    }
 }}

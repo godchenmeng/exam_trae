@@ -63,6 +63,16 @@ namespace ExamSystem.Services.Interfaces
     Task<List<Question>> SearchQuestionsAsync(QuestionSearchCriteria searchCriteria);
 
     /// <summary>
+    /// 搜索题目（简化版本）
+    /// </summary>
+    /// <param name="bankId">题库ID</param>
+    /// <param name="keyword">关键词</param>
+    /// <param name="questionType">题目类型</param>
+    /// <param name="difficulty">难度</param>
+    /// <returns>题目列表</returns>
+    Task<List<Question>> SearchAsync(int bankId, string? keyword, QuestionType? questionType, Difficulty? difficulty);
+
+    /// <summary>
     /// 验证题目数据
     /// </summary>
     /// <param name="question">题目信息</param>

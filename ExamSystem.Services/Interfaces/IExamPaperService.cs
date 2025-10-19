@@ -70,12 +70,30 @@ namespace ExamSystem.Services.Interfaces
     Task<bool> AddQuestionsToExamPaperAsync(int paperId, List<int> questionIds);
 
     /// <summary>
+    /// 添加单个题目到试卷
+    /// </summary>
+    /// <param name="paperId">试卷ID</param>
+    /// <param name="questionId">题目ID</param>
+    /// <param name="orderIndex">题目顺序</param>
+    /// <param name="score">题目分值</param>
+    /// <returns>添加结果</returns>
+    Task<bool> AddQuestionAsync(int paperId, int questionId, int orderIndex, decimal score);
+
+    /// <summary>
     /// 从试卷中移除题目
     /// </summary>
     /// <param name="paperId">试卷ID</param>
     /// <param name="questionIds">题目ID列表</param>
     /// <returns>移除结果</returns>
     Task<bool> RemoveQuestionsFromExamPaperAsync(int paperId, List<int> questionIds);
+
+    /// <summary>
+    /// 从试卷中移除单个题目
+    /// </summary>
+    /// <param name="paperId">试卷ID</param>
+    /// <param name="questionId">题目ID</param>
+    /// <returns>移除结果</returns>
+    Task<bool> RemoveQuestionAsync(int paperId, int questionId);
 
     /// <summary>
     /// 更新试卷题目顺序
@@ -86,12 +104,30 @@ namespace ExamSystem.Services.Interfaces
     Task<bool> UpdateQuestionOrdersAsync(int paperId, List<(int QuestionId, int OrderIndex)> questionOrders);
 
     /// <summary>
+    /// 更新单个题目顺序
+    /// </summary>
+    /// <param name="paperId">试卷ID</param>
+    /// <param name="questionId">题目ID</param>
+    /// <param name="orderIndex">新的顺序索引</param>
+    /// <returns>更新结果</returns>
+    Task<bool> UpdateQuestionOrderAsync(int paperId, int questionId, int orderIndex);
+
+    /// <summary>
     /// 更新试卷题目分值
     /// </summary>
     /// <param name="paperId">试卷ID</param>
     /// <param name="questionScores">题目分值列表</param>
     /// <returns>更新结果</returns>
     Task<bool> UpdateQuestionScoresAsync(int paperId, List<(int QuestionId, decimal Score)> questionScores);
+
+    /// <summary>
+    /// 更新单个题目分值
+    /// </summary>
+    /// <param name="paperId">试卷ID</param>
+    /// <param name="questionId">题目ID</param>
+    /// <param name="score">新的分值</param>
+    /// <returns>更新结果</returns>
+    Task<bool> UpdateQuestionScoreAsync(int paperId, int questionId, decimal score);
 
     /// <summary>
     /// 计算试卷总分

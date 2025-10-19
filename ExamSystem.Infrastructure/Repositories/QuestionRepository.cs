@@ -23,7 +23,8 @@ namespace ExamSystem.Infrastructure.Repositories
         /// </summary>
         public async Task<IEnumerable<Question>> GetQuestionsByBankIdAsync(int bankId)
         {
-            return await _dbSet.Where(q => q.BankId == bankId)
+            return await _dbSet.Include(q => q.Options)
+                              .Where(q => q.BankId == bankId)
                               .OrderBy(q => q.QuestionId)
                               .ToListAsync();
         }
@@ -57,7 +58,7 @@ namespace ExamSystem.Infrastructure.Repositories
             QuestionType? questionType = null, 
             Difficulty? difficulty = null)
         {
-            var query = _dbSet.AsQueryable();
+            var query = _dbSet.Include(q => q.Options).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {

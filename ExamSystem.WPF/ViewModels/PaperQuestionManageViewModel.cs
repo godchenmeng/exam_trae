@@ -28,7 +28,7 @@ namespace ExamSystem.WPF.ViewModels
         private Question _selectedAvailableQuestion;
         private PaperQuestion _selectedPaperQuestion;
         private string _searchKeyword;
-        private QuestionDifficulty? _selectedDifficulty;
+        private Difficulty? _selectedDifficulty;
         private QuestionType? _selectedQuestionType;
         
         public PaperQuestionManageViewModel(
@@ -124,7 +124,7 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
         
-        public QuestionDifficulty? SelectedDifficulty
+        public Difficulty? SelectedDifficulty
         {
             get => _selectedDifficulty;
             set
@@ -146,7 +146,7 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
         
-        public List<QuestionDifficulty?> DifficultyOptions { get; private set; }
+        public List<Difficulty?> DifficultyOptions { get; private set; }
         public List<QuestionType?> QuestionTypeOptions { get; private set; }
         
         #endregion
@@ -177,7 +177,7 @@ namespace ExamSystem.WPF.ViewModels
                 ValidationMessage = "";
                 
                 // 加载试卷信息
-                _examPaper = await _examPaperService.GetByIdAsync(examPaperId);
+                _examPaper = await _examPaperService.GetExamPaperByIdAsync(examPaperId);
                 if (_examPaper == null)
                 {
                     ValidationMessage = "试卷不存在";
@@ -211,7 +211,7 @@ namespace ExamSystem.WPF.ViewModels
         {
             AddQuestionCommand = new RelayCommand(
                 async () => await AddQuestionAsync(),
-                () => SelectedAvailableQuestion != null && !IsQuestionInPaper(SelectedAvailableQuestion.Id));
+                () => SelectedAvailableQuestion != null && !IsQuestionInPaper(SelectedAvailableQuestion.QuestionId));
                 
             RemoveQuestionCommand = new RelayCommand(
                 async () => await RemoveQuestionAsync(),
@@ -232,12 +232,12 @@ namespace ExamSystem.WPF.ViewModels
         
         private void InitializeOptions()
         {
-            DifficultyOptions = new List<QuestionDifficulty?>
+            DifficultyOptions = new List<Difficulty?>
             {
                 null, // 全部
-                QuestionDifficulty.Easy,
-                QuestionDifficulty.Medium,
-                QuestionDifficulty.Hard
+                Difficulty.Easy,
+                Difficulty.Medium,
+                Difficulty.Hard
             };
             
             QuestionTypeOptions = new List<QuestionType?>
@@ -255,7 +255,7 @@ namespace ExamSystem.WPF.ViewModels
         {
             try
             {
-                var questionBanks = await _questionBankService.GetAllAsync();
+                var questionBanks = await _questionBankService.GetAllQuestionBanksAsync();
                 QuestionBanks.Clear();
                 foreach (var bank in questionBanks)
                 {
@@ -280,7 +280,7 @@ namespace ExamSystem.WPF.ViewModels
             try
             {
                 var questions = await _questionService.SearchAsync(
-                    SelectedQuestionBank.Id,
+                    SelectedQuestionBank.BankId,
                     SearchKeyword,
                     SelectedQuestionType,
                     SelectedDifficulty);
@@ -302,7 +302,7 @@ namespace ExamSystem.WPF.ViewModels
         {
             try
             {
-                var paperQuestions = await _examPaperService.GetPaperQuestionsAsync(_examPaper.Id);
+                var paperQuestions = await _examPaperService.GetPaperQuestionsAsync(_examPaper.PaperId);
                 PaperQuestions.Clear();
                 foreach (var pq in paperQuestions.OrderBy(x => x.OrderIndex))
                 {
@@ -319,7 +319,7 @@ namespace ExamSystem.WPF.ViewModels
         
         private async Task AddQuestionAsync()
         {
-            if (SelectedAvailableQuestion == null || IsQuestionInPaper(SelectedAvailableQuestion.Id))
+            if (SelectedAvailableQuestion == null || IsQuestionInPaper(SelectedAvailableQuestion.QuestionId))
                 return;
             
             try
@@ -329,10 +329,10 @@ namespace ExamSystem.WPF.ViewModels
                 
                 var nextOrder = PaperQuestions.Count + 1;
                 await _examPaperService.AddQuestionAsync(
-                    _examPaper.Id, 
-                    SelectedAvailableQuestion.Id, 
+                    _examPaper.PaperId, 
+                    SelectedAvailableQuestion.QuestionId, 
                     nextOrder, 
-                    SelectedAvailableQuestion.DefaultScore);
+                    SelectedAvailableQuestion.Score);
                 
                 await LoadPaperQuestionsAsync();
                 
@@ -360,7 +360,7 @@ namespace ExamSystem.WPF.ViewModels
                 IsLoading = true;
                 ValidationMessage = "";
                 
-                await _examPaperService.RemoveQuestionAsync(_examPaper.Id, SelectedPaperQuestion.QuestionId);
+                await _examPaperService.RemoveQuestionAsync(_examPaper.PaperId, SelectedPaperQuestion.QuestionId);
                 await LoadPaperQuestionsAsync();
                 
                 // 刷新命令状态
@@ -391,7 +391,7 @@ namespace ExamSystem.WPF.ViewModels
                 var targetIndex = currentIndex - 1;
                 
                 await _examPaperService.UpdateQuestionOrderAsync(
-                    _examPaper.Id, 
+                    _examPaper.PaperId, 
                     SelectedPaperQuestion.QuestionId, 
                     targetIndex);
                 
@@ -422,7 +422,7 @@ namespace ExamSystem.WPF.ViewModels
                 var targetIndex = currentIndex + 1;
                 
                 await _examPaperService.UpdateQuestionOrderAsync(
-                    _examPaper.Id, 
+                    _examPaper.PaperId, 
                     SelectedPaperQuestion.QuestionId, 
                     targetIndex);
                 
@@ -450,7 +450,7 @@ namespace ExamSystem.WPF.ViewModels
                 foreach (var paperQuestion in PaperQuestions)
                 {
                     await _examPaperService.UpdateQuestionScoreAsync(
-                        _examPaper.Id, 
+                        _examPaper.PaperId, 
                         paperQuestion.QuestionId, 
                         paperQuestion.Score);
                 }
