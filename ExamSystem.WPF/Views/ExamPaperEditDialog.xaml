@@ -213,23 +213,28 @@
                         <!-- 显示答案 -->
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="考试后显示答案" Style="{StaticResource FormLabelText}"/>
                         <CheckBox Grid.Row="1" Grid.Column="1" 
-                                  IsChecked="{Binding ExamPaper.ShowAnswerAfterSubmit}" 
+                                  IsChecked="{Binding ExamPaper.AllowViewAnswer}" 
                                   VerticalAlignment="Center"
                                   Margin="0,0,0,15"/>
 
                         <!-- 随机题目顺序 -->
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="随机题目顺序" Style="{StaticResource FormLabelText}"/>
                         <CheckBox Grid.Row="2" Grid.Column="1" 
-                                  IsChecked="{Binding ExamPaper.RandomQuestionOrder}" 
+                                  IsChecked="{Binding ExamPaper.IsRandomOrder}" 
                                   VerticalAlignment="Center"
                                   Margin="0,0,0,15"/>
 
-                        <!-- 随机选项顺序 -->
+                        <!-- 随机选项顺序（暂不支持，移除该项） -->
+                        <!-- 删除原 RandomOptionOrder 绑定，避免绑定错误导致用户以为保存无效 -->
+                        <!-- 原代码：
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="随机选项顺序" Style="{StaticResource FormLabelText}"/>
                         <CheckBox Grid.Row="3" Grid.Column="1" 
                                   IsChecked="{Binding ExamPaper.RandomOptionOrder}" 
                                   VerticalAlignment="Center"
                                   Margin="0,0,0,15"/>
+                        -->
+                        <TextBlock Grid.Row="3" Grid.Column="0" Visibility="Collapsed"/>
+                        <CheckBox Grid.Row="3" Grid.Column="1" Visibility="Collapsed"/>
                     </Grid>
                 </GroupBox>
 
@@ -277,6 +282,16 @@
                     Click="CancelButton_Click"
                     Style="{StaticResource SecondaryButtonStyle}"/>
         </StackPanel>
+
+        <!-- 全局错误提示（保存失败等） -->
+        <TextBlock Grid.Row="2"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center"
+                   Margin="0,20,0,0"
+                   Foreground="#E74C3C"
+                   FontSize="12"
+                   Text="{Binding ValidationMessages.General}"
+                   Visibility="{Binding ValidationMessages.General, Converter={StaticResource StringToVisibilityConverter}}"/>
 
         <!-- 加载遮罩 -->
         <Grid Grid.RowSpan="3" 

@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net5.0\QuickDbCheck.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net5.0\QuickDbCheck.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net5.0\QuickDbCheck.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net5.0\QuickDbCheck.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net5.0\QuickDbCheck.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net5.0\QuickDbCheck.sourcelink.json

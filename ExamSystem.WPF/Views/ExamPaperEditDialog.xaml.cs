@@ -23,13 +23,26 @@ namespace ExamSystem.WPF.Views
             _viewModel.SaveCompleted += OnSaveCompleted;
         }
 
-        private void OnSaveCompleted(object sender, bool success)
+        private void OnSaveCompleted(object? sender, bool success)
         {
-            if (success)
+            Dispatcher.Invoke(() =>
             {
-                DialogResult = true;
-                Close();
-            }
+                if (success)
+                {
+                    DialogResult = true;
+                    Close();
+                }
+                else
+                {
+                    // 显示失败原因，避免用户以为“没有反应”
+                    var msg = _viewModel?.ValidationMessages?.General;
+                    if (string.IsNullOrWhiteSpace(msg))
+                    {
+                        msg = "保存失败，请检查输入或稍后重试。";
+                    }
+                    MessageBox.Show(this, msg, "保存失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            });
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

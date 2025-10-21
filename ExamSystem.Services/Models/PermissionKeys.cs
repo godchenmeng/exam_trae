@@ -11,9 +11,12 @@ namespace ExamSystem.Services.Models
         public const string ReceiveNotification = "ReceiveNotification";  // 学生
 
         // 学习资源相关
-        public const string UploadResource = "UploadResource";            // 老师/管理员
-        public const string ManageResource = "ManageResource";            // 老师/管理员（上下架、分类等）
-        public const string ViewResource = "ViewResource";                // 所有角色
-        public const string DownloadResource = "DownloadResource";        // 学生/老师（管理员默认允许）
+    public const string UploadResource = "UploadResource";            // 老师/管理员
+    public const string ManageResource = "ManageResource";            // 老师/管理员（上下架、分类等）
+    public const string ViewResource = "ViewResource";                // 所有角色
+    public const string DownloadResource = "DownloadResource";        // 学生/老师（管理员默认允许）
+
+    // 成绩查看相关
+    public const string ViewOwnGrades = "ViewOwnGrades";              // 查看自己的成绩（所有角色）
     }
 }

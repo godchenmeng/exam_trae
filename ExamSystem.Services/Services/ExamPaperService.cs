@@ -71,6 +71,12 @@ public class ExamPaperService : IExamPaperService
         {
             examPaper.CreatedAt = DateTime.Now;
             examPaper.UpdatedAt = DateTime.Now;
+            // 确保状态与发布标志一致
+            if (string.IsNullOrWhiteSpace(examPaper.Status))
+            {
+                examPaper.Status = "草稿";
+            }
+            examPaper.IsPublished = examPaper.Status == "已发布";
 
             await _examPaperRepository.AddAsync(examPaper);
 
@@ -104,6 +110,8 @@ public class ExamPaperService : IExamPaperService
             existingPaper.TotalScore = examPaper.TotalScore;
             existingPaper.Duration = examPaper.Duration;
             existingPaper.Status = examPaper.Status;
+            // 同步发布标志
+            existingPaper.IsPublished = existingPaper.Status == "已发布";
             existingPaper.StartTime = examPaper.StartTime;
             existingPaper.EndTime = examPaper.EndTime;
             existingPaper.IsActive = examPaper.IsActive;
@@ -380,6 +388,7 @@ public class ExamPaperService : IExamPaperService
             }
 
             examPaper.Status = "已发布";
+            examPaper.IsPublished = true;
             examPaper.UpdatedAt = DateTime.Now;
 
             var result = await _context.SaveChangesAsync();
@@ -409,6 +418,7 @@ public class ExamPaperService : IExamPaperService
             }
 
             examPaper.Status = "草稿";
+            examPaper.IsPublished = false;
             examPaper.UpdatedAt = DateTime.Now;
 
             var result = await _context.SaveChangesAsync();
@@ -445,6 +455,7 @@ public class ExamPaperService : IExamPaperService
                 Duration = originalPaper.Duration,
                 CreatorId = creatorId,
                 Status = "草稿",
+                IsPublished = false,
                 IsActive = true,
                 IsRandomOrder = originalPaper.IsRandomOrder,
                 AllowViewAnswer = originalPaper.AllowViewAnswer,
@@ -675,6 +686,34 @@ public class ExamPaperService : IExamPaperService
         {
             _logger.LogError(ex, "添加题目到试卷时发生错误: PaperId={PaperId}, QuestionId={QuestionId}", paperId, questionId);
             return false;
+        }
+    }
+
+    /// <summary>
+    /// 获取已发布的试卷列表
+    /// </summary>
+    /// <returns>已发布的试卷列表</returns>
+    public async Task<List<ExamPaper>> GetPublishedPapersAsync()
+    {
+        try
+        {
+            _logger.LogInformation("开始获取已发布的试卷列表");
+            
+            var publishedPapers = await _context.ExamPapers
+                .Include(p => p.Creator)
+                .Include(p => p.PaperQuestions)
+                .ThenInclude(pq => pq.Question)
+                .Where(p => p.IsPublished)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
+            _logger.LogInformation("成功获取 {Count} 个已发布的试卷", publishedPapers.Count);
+            return publishedPapers;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取已发布试卷列表时发生错误");
+            return new List<ExamPaper>();
         }
     }
 }}

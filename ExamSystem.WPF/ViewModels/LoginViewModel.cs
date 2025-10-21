@@ -119,8 +119,16 @@ namespace ExamSystem.WPF.ViewModels
                     return;
                 }
 
+                // 基本输入校验，避免传入 null
+                if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+                {
+                    ErrorMessage = "请输入用户名和密码";
+                    _logger.LogWarning("用户名或密码为空，终止登录请求");
+                    return;
+                }
+
                 _logger.LogInformation("调用AuthService.LoginAsync方法");
-                var result = await _authService.LoginAsync(Username, Password);
+                var result = await _authService.LoginAsync(Username, Password!);
 
                 _logger.LogInformation($"=== 登录服务返回结果 ===");
                 _logger.LogInformation($"成功: {result.Success}");
@@ -139,7 +147,13 @@ namespace ExamSystem.WPF.ViewModels
                         _logger.LogInformation("保存用户凭据");
                     }
 
-                    // 触发登录成功事件
+                    // 触发登录成功事件（确保 User 非 null）
+                    if (result.User == null)
+                    {
+                        _logger.LogError("登录结果 Success=true 但 User 为 null，终止事件触发");
+                        ErrorMessage = "登录数据异常，请重试";
+                        return;
+                    }
                     _logger.LogInformation("触发登录成功事件");
                     LoginSuccess?.Invoke(this, new LoginSuccessEventArgs(result.User, "", result.PreviousLoginAt));
                 }

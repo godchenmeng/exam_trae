@@ -1,0 +1,1587 @@
+2025-10-20 01:19:37.840 +08:00 [DBG] Hosting starting
+2025-10-20 01:19:37.859 +08:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-10-20 01:19:37.860 +08:00 [INF] Hosting environment: Production
+2025-10-20 01:19:37.861 +08:00 [INF] Content root path: E:\Project\exam_trae\ExamSystem.Infrastructure
+2025-10-20 01:19:37.861 +08:00 [DBG] Hosting started
+2025-10-20 01:19:37.894 +08:00 [DBG] An 'IServiceProvider' was created for internal use by Entity Framework.
+2025-10-20 01:19:38.028 +08:00 [DBG] No relationship from 'ExamRecord' to 'User' has been configured by convention because there are multiple properties on one entity type {'Grader', 'User'} that could be matched with the properties on the other entity type {'ExamRecords'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-10-20 01:19:38.042 +08:00 [DBG] No relationship from 'User' to 'ExamRecord' has been configured by convention because there are multiple properties on one entity type {'ExamRecords'} that could be matched with the properties on the other entity type {'Grader', 'User'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-10-20 01:19:38.101 +08:00 [DBG] No relationship from 'ExamRecord' to 'User' has been configured by convention because there are multiple properties on one entity type {'Grader', 'User'} that could be matched with the properties on the other entity type {'ExamRecords'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-10-20 01:19:38.101 +08:00 [DBG] No relationship from 'User' to 'ExamRecord' has been configured by convention because there are multiple properties on one entity type {'ExamRecords'} that could be matched with the properties on the other entity type {'Grader', 'User'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-10-20 01:19:38.126 +08:00 [DBG] The index {'NotificationId'} was not created on entity type 'NotificationRecipient' as the properties are already covered by the index {'NotificationId', 'ReceiverId'}.
+2025-10-20 01:19:38.250 +08:00 [INF] Entity Framework Core 5.0.17 initialized 'ExamDbContext' using provider 'Microsoft.EntityFrameworkCore.Sqlite' with options: MigrationsAssembly=ExamSystem.Infrastructure 
+2025-10-20 01:19:38.279 +08:00 [DBG] Migrating using database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.283 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.288 +08:00 [DBG] An error occurred using the connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.289 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.289 +08:00 [DBG] An error occurred using the connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.289 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.292 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.296 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.300 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (3ms).
+2025-10-20 01:19:38.305 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+PRAGMA journal_mode = 'wal';
+2025-10-20 01:19:38.320 +08:00 [INF] Executed DbCommand (15ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+PRAGMA journal_mode = 'wal';
+2025-10-20 01:19:38.320 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.321 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.353 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:38.354 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:38.365 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.365 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.366 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.367 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.367 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "__EFMigrationsHistory" (
+    "MigrationId" TEXT NOT NULL CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY,
+    "ProductVersion" TEXT NOT NULL
+);
+2025-10-20 01:19:38.375 +08:00 [INF] Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "__EFMigrationsHistory" (
+    "MigrationId" TEXT NOT NULL CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY,
+    "ProductVersion" TEXT NOT NULL
+);
+2025-10-20 01:19:38.377 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.380 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.383 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.383 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.387 +08:00 [DBG] Creating DbCommand for 'ExecuteScalar'.
+2025-10-20 01:19:38.387 +08:00 [DBG] Created DbCommand for 'ExecuteScalar' (0ms).
+2025-10-20 01:19:38.387 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.387 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.387 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-10-20 01:19:38.391 +08:00 [INF] Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-10-20 01:19:38.391 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.392 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.394 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:38.394 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:38.394 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.394 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.394 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+2025-10-20 01:19:38.396 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+2025-10-20 01:19:38.397 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:38.398 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.398 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.408 +08:00 [INF] Applying migration '20251017032241_InitialCreate'.
+2025-10-20 01:19:38.429 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.430 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.431 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:19:38.433 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:19:38.433 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.433 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.433 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Users" (
+    "UserId" INTEGER NOT NULL CONSTRAINT "PK_Users" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "RealName" TEXT NULL,
+    "Role" INTEGER NOT NULL,
+    "Email" TEXT NULL,
+    "Phone" TEXT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "LastLoginAt" TEXT NULL,
+    "LoginFailCount" INTEGER NOT NULL,
+    "LockoutEnd" TEXT NULL
+);
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Users" (
+    "UserId" INTEGER NOT NULL CONSTRAINT "PK_Users" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "RealName" TEXT NULL,
+    "Role" INTEGER NOT NULL,
+    "Email" TEXT NULL,
+    "Phone" TEXT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "LastLoginAt" TEXT NULL,
+    "LoginFailCount" INTEGER NOT NULL,
+    "LockoutEnd" TEXT NULL
+);
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "ExamPapers" (
+    "PaperId" INTEGER NOT NULL CONSTRAINT "PK_ExamPapers" PRIMARY KEY AUTOINCREMENT,
+    "Name" TEXT NOT NULL,
+    "Description" TEXT NULL,
+    "TotalScore" decimal(6,2) NOT NULL,
+    "Duration" INTEGER NOT NULL,
+    "CreatorId" INTEGER NOT NULL,
+    "Status" TEXT NOT NULL,
+    "StartTime" TEXT NULL,
+    "EndTime" TEXT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "UpdatedAt" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "IsRandomOrder" INTEGER NOT NULL,
+    "AllowRetake" INTEGER NOT NULL,
+    "AllowViewAnswer" INTEGER NOT NULL,
+    "PassScore" decimal(6,2) NOT NULL,
+    CONSTRAINT "FK_ExamPapers_Users_CreatorId" FOREIGN KEY ("CreatorId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "ExamPapers" (
+    "PaperId" INTEGER NOT NULL CONSTRAINT "PK_ExamPapers" PRIMARY KEY AUTOINCREMENT,
+    "Name" TEXT NOT NULL,
+    "Description" TEXT NULL,
+    "TotalScore" decimal(6,2) NOT NULL,
+    "Duration" INTEGER NOT NULL,
+    "CreatorId" INTEGER NOT NULL,
+    "Status" TEXT NOT NULL,
+    "StartTime" TEXT NULL,
+    "EndTime" TEXT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "UpdatedAt" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "IsRandomOrder" INTEGER NOT NULL,
+    "AllowRetake" INTEGER NOT NULL,
+    "AllowViewAnswer" INTEGER NOT NULL,
+    "PassScore" decimal(6,2) NOT NULL,
+    CONSTRAINT "FK_ExamPapers_Users_CreatorId" FOREIGN KEY ("CreatorId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "QuestionBanks" (
+    "BankId" INTEGER NOT NULL CONSTRAINT "PK_QuestionBanks" PRIMARY KEY AUTOINCREMENT,
+    "Name" TEXT NOT NULL,
+    "Description" TEXT NULL,
+    "CreatorId" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "UpdatedAt" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL,
+    CONSTRAINT "FK_QuestionBanks_Users_CreatorId" FOREIGN KEY ("CreatorId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "QuestionBanks" (
+    "BankId" INTEGER NOT NULL CONSTRAINT "PK_QuestionBanks" PRIMARY KEY AUTOINCREMENT,
+    "Name" TEXT NOT NULL,
+    "Description" TEXT NULL,
+    "CreatorId" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "UpdatedAt" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL,
+    CONSTRAINT "FK_QuestionBanks_Users_CreatorId" FOREIGN KEY ("CreatorId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "ExamRecords" (
+    "RecordId" INTEGER NOT NULL CONSTRAINT "PK_ExamRecords" PRIMARY KEY AUTOINCREMENT,
+    "UserId" INTEGER NOT NULL,
+    "PaperId" INTEGER NOT NULL,
+    "StartTime" TEXT NULL,
+    "EndTime" TEXT NULL,
+    "SubmitTime" TEXT NULL,
+    "Status" INTEGER NOT NULL,
+    "TotalScore" decimal(6,2) NOT NULL,
+    "ObjectiveScore" decimal(6,2) NOT NULL,
+    "SubjectiveScore" decimal(6,2) NOT NULL,
+    "CorrectCount" INTEGER NOT NULL,
+    "TotalCount" INTEGER NOT NULL,
+    "IsPassed" INTEGER NOT NULL,
+    "RemainingTime" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "GradedAt" TEXT NULL,
+    "GraderId" INTEGER NULL,
+    CONSTRAINT "FK_ExamRecords_ExamPapers_PaperId" FOREIGN KEY ("PaperId") REFERENCES "ExamPapers" ("PaperId") ON DELETE RESTRICT,
+    CONSTRAINT "FK_ExamRecords_Users_GraderId" FOREIGN KEY ("GraderId") REFERENCES "Users" ("UserId") ON DELETE SET NULL,
+    CONSTRAINT "FK_ExamRecords_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "ExamRecords" (
+    "RecordId" INTEGER NOT NULL CONSTRAINT "PK_ExamRecords" PRIMARY KEY AUTOINCREMENT,
+    "UserId" INTEGER NOT NULL,
+    "PaperId" INTEGER NOT NULL,
+    "StartTime" TEXT NULL,
+    "EndTime" TEXT NULL,
+    "SubmitTime" TEXT NULL,
+    "Status" INTEGER NOT NULL,
+    "TotalScore" decimal(6,2) NOT NULL,
+    "ObjectiveScore" decimal(6,2) NOT NULL,
+    "SubjectiveScore" decimal(6,2) NOT NULL,
+    "CorrectCount" INTEGER NOT NULL,
+    "TotalCount" INTEGER NOT NULL,
+    "IsPassed" INTEGER NOT NULL,
+    "RemainingTime" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "GradedAt" TEXT NULL,
+    "GraderId" INTEGER NULL,
+    CONSTRAINT "FK_ExamRecords_ExamPapers_PaperId" FOREIGN KEY ("PaperId") REFERENCES "ExamPapers" ("PaperId") ON DELETE RESTRICT,
+    CONSTRAINT "FK_ExamRecords_Users_GraderId" FOREIGN KEY ("GraderId") REFERENCES "Users" ("UserId") ON DELETE SET NULL,
+    CONSTRAINT "FK_ExamRecords_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Questions" (
+    "QuestionId" INTEGER NOT NULL CONSTRAINT "PK_Questions" PRIMARY KEY AUTOINCREMENT,
+    "BankId" INTEGER NOT NULL,
+    "QuestionType" INTEGER NOT NULL,
+    "Title" TEXT NOT NULL,
+    "Content" TEXT NOT NULL,
+    "Answer" TEXT NOT NULL,
+    "Analysis" TEXT NULL,
+    "Score" decimal(5,2) NOT NULL,
+    "Difficulty" INTEGER NOT NULL,
+    "Tags" TEXT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "UpdatedAt" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL,
+    CONSTRAINT "FK_Questions_QuestionBanks_BankId" FOREIGN KEY ("BankId") REFERENCES "QuestionBanks" ("BankId") ON DELETE CASCADE
+);
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Questions" (
+    "QuestionId" INTEGER NOT NULL CONSTRAINT "PK_Questions" PRIMARY KEY AUTOINCREMENT,
+    "BankId" INTEGER NOT NULL,
+    "QuestionType" INTEGER NOT NULL,
+    "Title" TEXT NOT NULL,
+    "Content" TEXT NOT NULL,
+    "Answer" TEXT NOT NULL,
+    "Analysis" TEXT NULL,
+    "Score" decimal(5,2) NOT NULL,
+    "Difficulty" INTEGER NOT NULL,
+    "Tags" TEXT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "UpdatedAt" TEXT NOT NULL,
+    "IsActive" INTEGER NOT NULL,
+    CONSTRAINT "FK_Questions_QuestionBanks_BankId" FOREIGN KEY ("BankId") REFERENCES "QuestionBanks" ("BankId") ON DELETE CASCADE
+);
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "AnswerRecords" (
+    "AnswerId" INTEGER NOT NULL CONSTRAINT "PK_AnswerRecords" PRIMARY KEY AUTOINCREMENT,
+    "RecordId" INTEGER NOT NULL,
+    "QuestionId" INTEGER NOT NULL,
+    "UserAnswer" TEXT NULL,
+    "Score" decimal(5,2) NOT NULL,
+    "IsCorrect" INTEGER NOT NULL,
+    "IsGraded" INTEGER NOT NULL,
+    "Comment" TEXT NULL,
+    "AnswerTime" TEXT NULL,
+    "GradeTime" TEXT NULL,
+    "GraderId" INTEGER NULL,
+    CONSTRAINT "FK_AnswerRecords_ExamRecords_RecordId" FOREIGN KEY ("RecordId") REFERENCES "ExamRecords" ("RecordId") ON DELETE CASCADE,
+    CONSTRAINT "FK_AnswerRecords_Questions_QuestionId" FOREIGN KEY ("QuestionId") REFERENCES "Questions" ("QuestionId") ON DELETE RESTRICT,
+    CONSTRAINT "FK_AnswerRecords_Users_GraderId" FOREIGN KEY ("GraderId") REFERENCES "Users" ("UserId") ON DELETE SET NULL
+);
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "AnswerRecords" (
+    "AnswerId" INTEGER NOT NULL CONSTRAINT "PK_AnswerRecords" PRIMARY KEY AUTOINCREMENT,
+    "RecordId" INTEGER NOT NULL,
+    "QuestionId" INTEGER NOT NULL,
+    "UserAnswer" TEXT NULL,
+    "Score" decimal(5,2) NOT NULL,
+    "IsCorrect" INTEGER NOT NULL,
+    "IsGraded" INTEGER NOT NULL,
+    "Comment" TEXT NULL,
+    "AnswerTime" TEXT NULL,
+    "GradeTime" TEXT NULL,
+    "GraderId" INTEGER NULL,
+    CONSTRAINT "FK_AnswerRecords_ExamRecords_RecordId" FOREIGN KEY ("RecordId") REFERENCES "ExamRecords" ("RecordId") ON DELETE CASCADE,
+    CONSTRAINT "FK_AnswerRecords_Questions_QuestionId" FOREIGN KEY ("QuestionId") REFERENCES "Questions" ("QuestionId") ON DELETE RESTRICT,
+    CONSTRAINT "FK_AnswerRecords_Users_GraderId" FOREIGN KEY ("GraderId") REFERENCES "Users" ("UserId") ON DELETE SET NULL
+);
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "PaperQuestions" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_PaperQuestions" PRIMARY KEY AUTOINCREMENT,
+    "PaperId" INTEGER NOT NULL,
+    "QuestionId" INTEGER NOT NULL,
+    "OrderIndex" INTEGER NOT NULL,
+    "Score" decimal(5,2) NOT NULL,
+    CONSTRAINT "FK_PaperQuestions_ExamPapers_PaperId" FOREIGN KEY ("PaperId") REFERENCES "ExamPapers" ("PaperId") ON DELETE CASCADE,
+    CONSTRAINT "FK_PaperQuestions_Questions_QuestionId" FOREIGN KEY ("QuestionId") REFERENCES "Questions" ("QuestionId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "PaperQuestions" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_PaperQuestions" PRIMARY KEY AUTOINCREMENT,
+    "PaperId" INTEGER NOT NULL,
+    "QuestionId" INTEGER NOT NULL,
+    "OrderIndex" INTEGER NOT NULL,
+    "Score" decimal(5,2) NOT NULL,
+    CONSTRAINT "FK_PaperQuestions_ExamPapers_PaperId" FOREIGN KEY ("PaperId") REFERENCES "ExamPapers" ("PaperId") ON DELETE CASCADE,
+    CONSTRAINT "FK_PaperQuestions_Questions_QuestionId" FOREIGN KEY ("QuestionId") REFERENCES "Questions" ("QuestionId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "QuestionOptions" (
+    "OptionId" INTEGER NOT NULL CONSTRAINT "PK_QuestionOptions" PRIMARY KEY AUTOINCREMENT,
+    "QuestionId" INTEGER NOT NULL,
+    "OptionLabel" TEXT NOT NULL,
+    "Content" TEXT NOT NULL,
+    "IsCorrect" INTEGER NOT NULL,
+    "OrderIndex" INTEGER NOT NULL,
+    CONSTRAINT "FK_QuestionOptions_Questions_QuestionId" FOREIGN KEY ("QuestionId") REFERENCES "Questions" ("QuestionId") ON DELETE CASCADE
+);
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "QuestionOptions" (
+    "OptionId" INTEGER NOT NULL CONSTRAINT "PK_QuestionOptions" PRIMARY KEY AUTOINCREMENT,
+    "QuestionId" INTEGER NOT NULL,
+    "OptionLabel" TEXT NOT NULL,
+    "Content" TEXT NOT NULL,
+    "IsCorrect" INTEGER NOT NULL,
+    "OrderIndex" INTEGER NOT NULL,
+    CONSTRAINT "FK_QuestionOptions_Questions_QuestionId" FOREIGN KEY ("QuestionId") REFERENCES "Questions" ("QuestionId") ON DELETE CASCADE
+);
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Users" ("UserId", "CreatedAt", "Email", "IsActive", "LastLoginAt", "LockoutEnd", "LoginFailCount", "PasswordHash", "Phone", "RealName", "Role", "Username")
+VALUES (1, '2025-10-17 11:22:41.2195357', 'admin@exam.com', 1, NULL, NULL, 0, 'admin123', NULL, '系统管理员', 2, 'admin');
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Users" ("UserId", "CreatedAt", "Email", "IsActive", "LastLoginAt", "LockoutEnd", "LoginFailCount", "PasswordHash", "Phone", "RealName", "Role", "Username")
+VALUES (1, '2025-10-17 11:22:41.2195357', 'admin@exam.com', 1, NULL, NULL, 0, 'admin123', NULL, '系统管理员', 2, 'admin');
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "QuestionBanks" ("BankId", "CreatedAt", "CreatorId", "Description", "IsActive", "Name", "UpdatedAt")
+VALUES (1, '2025-10-17 11:22:41.2203938', 1, '系统默认题库', 1, '默认题库', '2025-10-17 11:22:41.2204049');
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "QuestionBanks" ("BankId", "CreatedAt", "CreatorId", "Description", "IsActive", "Name", "UpdatedAt")
+VALUES (1, '2025-10-17 11:22:41.2203938', 1, '系统默认题库', 1, '默认题库', '2025-10-17 11:22:41.2204049');
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_AnswerRecords_GraderId" ON "AnswerRecords" ("GraderId");
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_AnswerRecords_GraderId" ON "AnswerRecords" ("GraderId");
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_AnswerRecords_QuestionId" ON "AnswerRecords" ("QuestionId");
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_AnswerRecords_QuestionId" ON "AnswerRecords" ("QuestionId");
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_AnswerRecords_RecordId" ON "AnswerRecords" ("RecordId");
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_AnswerRecords_RecordId" ON "AnswerRecords" ("RecordId");
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.434 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_ExamPapers_CreatorId" ON "ExamPapers" ("CreatorId");
+2025-10-20 01:19:38.434 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_ExamPapers_CreatorId" ON "ExamPapers" ("CreatorId");
+2025-10-20 01:19:38.434 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.434 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_ExamRecords_GraderId" ON "ExamRecords" ("GraderId");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_ExamRecords_GraderId" ON "ExamRecords" ("GraderId");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_ExamRecords_PaperId" ON "ExamRecords" ("PaperId");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_ExamRecords_PaperId" ON "ExamRecords" ("PaperId");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_ExamRecords_UserId" ON "ExamRecords" ("UserId");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_ExamRecords_UserId" ON "ExamRecords" ("UserId");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_PaperQuestions_PaperId" ON "PaperQuestions" ("PaperId");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_PaperQuestions_PaperId" ON "PaperQuestions" ("PaperId");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_PaperQuestions_QuestionId" ON "PaperQuestions" ("QuestionId");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_PaperQuestions_QuestionId" ON "PaperQuestions" ("QuestionId");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_QuestionBanks_CreatorId" ON "QuestionBanks" ("CreatorId");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_QuestionBanks_CreatorId" ON "QuestionBanks" ("CreatorId");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_QuestionOptions_QuestionId" ON "QuestionOptions" ("QuestionId");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_QuestionOptions_QuestionId" ON "QuestionOptions" ("QuestionId");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_Questions_BankId" ON "Questions" ("BankId");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_Questions_BankId" ON "Questions" ("BankId");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE UNIQUE INDEX "IX_Users_Email" ON "Users" ("Email");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE UNIQUE INDEX "IX_Users_Email" ON "Users" ("Email");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE UNIQUE INDEX "IX_Users_Username" ON "Users" ("Username");
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE UNIQUE INDEX "IX_Users_Username" ON "Users" ("Username");
+2025-10-20 01:19:38.435 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.435 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.435 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20251017032241_InitialCreate', '5.0.17');
+2025-10-20 01:19:38.435 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20251017032241_InitialCreate', '5.0.17');
+2025-10-20 01:19:38.436 +08:00 [DBG] Committing transaction.
+2025-10-20 01:19:38.442 +08:00 [DBG] Committed transaction.
+2025-10-20 01:19:38.443 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:19:38.443 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.447 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.447 +08:00 [INF] Applying migration '20251019171711_AddNotifications'.
+2025-10-20 01:19:38.457 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.457 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.457 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:19:38.458 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:19:38.458 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.458 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.458 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Notifications" (
+    "NotificationId" INTEGER NOT NULL CONSTRAINT "PK_Notifications" PRIMARY KEY AUTOINCREMENT,
+    "Title" TEXT NOT NULL,
+    "Content" TEXT NOT NULL,
+    "Priority" INTEGER NOT NULL,
+    "Status" INTEGER NOT NULL,
+    "Scope" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "SenderId" INTEGER NOT NULL,
+    CONSTRAINT "FK_Notifications_Users_SenderId" FOREIGN KEY ("SenderId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.458 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Notifications" (
+    "NotificationId" INTEGER NOT NULL CONSTRAINT "PK_Notifications" PRIMARY KEY AUTOINCREMENT,
+    "Title" TEXT NOT NULL,
+    "Content" TEXT NOT NULL,
+    "Priority" INTEGER NOT NULL,
+    "Status" INTEGER NOT NULL,
+    "Scope" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "SenderId" INTEGER NOT NULL,
+    CONSTRAINT "FK_Notifications_Users_SenderId" FOREIGN KEY ("SenderId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.458 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.458 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.458 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "NotificationRecipients" (
+    "NotificationRecipientId" INTEGER NOT NULL CONSTRAINT "PK_NotificationRecipients" PRIMARY KEY AUTOINCREMENT,
+    "NotificationId" INTEGER NOT NULL,
+    "ReceiverId" INTEGER NOT NULL,
+    "DeliveryStatus" INTEGER NOT NULL,
+    "ReadAt" TEXT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    CONSTRAINT "FK_NotificationRecipients_Notifications_NotificationId" FOREIGN KEY ("NotificationId") REFERENCES "Notifications" ("NotificationId") ON DELETE CASCADE,
+    CONSTRAINT "FK_NotificationRecipients_Users_ReceiverId" FOREIGN KEY ("ReceiverId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.458 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "NotificationRecipients" (
+    "NotificationRecipientId" INTEGER NOT NULL CONSTRAINT "PK_NotificationRecipients" PRIMARY KEY AUTOINCREMENT,
+    "NotificationId" INTEGER NOT NULL,
+    "ReceiverId" INTEGER NOT NULL,
+    "DeliveryStatus" INTEGER NOT NULL,
+    "ReadAt" TEXT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    CONSTRAINT "FK_NotificationRecipients_Notifications_NotificationId" FOREIGN KEY ("NotificationId") REFERENCES "Notifications" ("NotificationId") ON DELETE CASCADE,
+    CONSTRAINT "FK_NotificationRecipients_Users_ReceiverId" FOREIGN KEY ("ReceiverId") REFERENCES "Users" ("UserId") ON DELETE RESTRICT
+);
+2025-10-20 01:19:38.458 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.458 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.458 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+UPDATE "QuestionBanks" SET "CreatedAt" = '2025-10-20 01:17:10.7265189', "UpdatedAt" = '2025-10-20 01:17:10.7265259'
+WHERE "BankId" = 1;
+SELECT changes();
+2025-10-20 01:19:38.458 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+UPDATE "QuestionBanks" SET "CreatedAt" = '2025-10-20 01:17:10.7265189', "UpdatedAt" = '2025-10-20 01:17:10.7265259'
+WHERE "BankId" = 1;
+SELECT changes();
+2025-10-20 01:19:38.458 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.458 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.458 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Users" SET "CreatedAt" = '2025-10-20 01:17:10.7259707'
+WHERE "UserId" = 1;
+SELECT changes();
+2025-10-20 01:19:38.458 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Users" SET "CreatedAt" = '2025-10-20 01:17:10.7259707'
+WHERE "UserId" = 1;
+SELECT changes();
+2025-10-20 01:19:38.458 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.459 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.459 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE UNIQUE INDEX "IX_NotificationRecipients_NotificationId_ReceiverId" ON "NotificationRecipients" ("NotificationId", "ReceiverId");
+2025-10-20 01:19:38.459 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE UNIQUE INDEX "IX_NotificationRecipients_NotificationId_ReceiverId" ON "NotificationRecipients" ("NotificationId", "ReceiverId");
+2025-10-20 01:19:38.459 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.459 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.459 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_NotificationRecipients_ReceiverId" ON "NotificationRecipients" ("ReceiverId");
+2025-10-20 01:19:38.459 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_NotificationRecipients_ReceiverId" ON "NotificationRecipients" ("ReceiverId");
+2025-10-20 01:19:38.459 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.459 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.459 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_Notifications_SenderId" ON "Notifications" ("SenderId");
+2025-10-20 01:19:38.459 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX "IX_Notifications_SenderId" ON "Notifications" ("SenderId");
+2025-10-20 01:19:38.459 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-10-20 01:19:38.459 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-10-20 01:19:38.459 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20251019171711_AddNotifications', '5.0.17');
+2025-10-20 01:19:38.459 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20251019171711_AddNotifications', '5.0.17');
+2025-10-20 01:19:38.459 +08:00 [DBG] Committing transaction.
+2025-10-20 01:19:38.464 +08:00 [DBG] Committed transaction.
+2025-10-20 01:19:38.464 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:19:38.464 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.467 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.488 +08:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .Any(u => (int)u.Role == 2)'
+2025-10-20 01:19:38.598 +08:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleAsync<bool>(
+    asyncEnumerable: new SingleQueryingEnumerable<bool>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.SelectExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> 0
+            SELECT EXISTS (
+                Projection Mapping:
+                SELECT 1
+                FROM Users AS u
+                WHERE u.Role == 2)), 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, bool>, 
+        ExamSystem.Data.ExamDbContext, 
+        False, 
+        False
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-10-20 01:19:38.608 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:38.608 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:38.608 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.608 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.608 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM "Users" AS "u"
+    WHERE "u"."Role" = 2)
+2025-10-20 01:19:38.610 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM "Users" AS "u"
+    WHERE "u"."Role" = 2)
+2025-10-20 01:19:38.611 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:38.611 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.612 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.612 +08:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .Any(u => (int)u.Role == 0)'
+2025-10-20 01:19:38.613 +08:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleAsync<bool>(
+    asyncEnumerable: new SingleQueryingEnumerable<bool>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.SelectExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> 0
+            SELECT EXISTS (
+                Projection Mapping:
+                SELECT 1
+                FROM Users AS u
+                WHERE u.Role == 0)), 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, bool>, 
+        ExamSystem.Data.ExamDbContext, 
+        False, 
+        False
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-10-20 01:19:38.613 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:38.613 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:38.613 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.613 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.613 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM "Users" AS "u"
+    WHERE "u"."Role" = 0)
+2025-10-20 01:19:38.615 +08:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM "Users" AS "u"
+    WHERE "u"."Role" = 0)
+2025-10-20 01:19:38.615 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:38.615 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.615 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.615 +08:00 [INF] 创建测试学生用户
+2025-10-20 01:19:38.803 +08:00 [DBG] 'ExamDbContext' generated a temporary value for the property 'UserId.User'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:38.831 +08:00 [DBG] Context 'ExamDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:38.832 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:38.832 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:38.837 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:38.843 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.843 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.843 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:19:38.845 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:19:38.860 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:38.860 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:38.861 +08:00 [DBG] Executing DbCommand [Parameters=[@p0='?', @p1='?' (Size = 16), @p2='?', @p3='?', @p4='?', @p5='?', @p6='?' (Size = 60), @p7='?', @p8='?' (Size = 4), @p9='?', @p10='?' (Size = 7)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Users" ("CreatedAt", "Email", "IsActive", "LastLoginAt", "LockoutEnd", "LoginFailCount", "PasswordHash", "Phone", "RealName", "Role", "Username")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+SELECT "UserId"
+FROM "Users"
+WHERE changes() = 1 AND "rowid" = last_insert_rowid();
+2025-10-20 01:19:38.863 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[@p0='?', @p1='?' (Size = 16), @p2='?', @p3='?', @p4='?', @p5='?', @p6='?' (Size = 60), @p7='?', @p8='?' (Size = 4), @p9='?', @p10='?' (Size = 7)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Users" ("CreatedAt", "Email", "IsActive", "LastLoginAt", "LockoutEnd", "LoginFailCount", "PasswordHash", "Phone", "RealName", "Role", "Username")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+SELECT "UserId"
+FROM "Users"
+WHERE changes() = 1 AND "rowid" = last_insert_rowid();
+2025-10-20 01:19:38.870 +08:00 [DBG] The foreign key property 'User.UserId' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-10-20 01:19:38.872 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:38.872 +08:00 [DBG] Committing transaction.
+2025-10-20 01:19:38.878 +08:00 [DBG] Committed transaction.
+2025-10-20 01:19:38.878 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.881 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.881 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:19:38.886 +08:00 [DBG] An entity of type 'User' tracked by 'ExamDbContext' changed state from '"Added"' to '"Unchanged"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:38.887 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 1 entities written to the database.
+2025-10-20 01:19:38.887 +08:00 [INF] 测试学生用户创建成功 - 用户名: student, 密码: student123
+2025-10-20 01:19:38.887 +08:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .Any(u => (int)u.Role == 1)'
+2025-10-20 01:19:38.888 +08:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleAsync<bool>(
+    asyncEnumerable: new SingleQueryingEnumerable<bool>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.SelectExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> 0
+            SELECT EXISTS (
+                Projection Mapping:
+                SELECT 1
+                FROM Users AS u
+                WHERE u.Role == 1)), 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, bool>, 
+        ExamSystem.Data.ExamDbContext, 
+        False, 
+        False
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-10-20 01:19:38.888 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:38.888 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:38.888 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.888 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.888 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM "Users" AS "u"
+    WHERE "u"."Role" = 1)
+2025-10-20 01:19:38.890 +08:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM "Users" AS "u"
+    WHERE "u"."Role" = 1)
+2025-10-20 01:19:38.890 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:38.890 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:38.891 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:38.891 +08:00 [INF] 创建测试教师用户
+2025-10-20 01:19:39.068 +08:00 [DBG] 'ExamDbContext' generated a temporary value for the property 'UserId.User'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:39.069 +08:00 [DBG] Context 'ExamDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:39.069 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:39.069 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:39.070 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:39.070 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:39.071 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:39.071 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:19:39.072 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:19:39.072 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:39.072 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:39.072 +08:00 [DBG] Executing DbCommand [Parameters=[@p0='?', @p1='?' (Size = 16), @p2='?', @p3='?', @p4='?', @p5='?', @p6='?' (Size = 60), @p7='?', @p8='?' (Size = 4), @p9='?', @p10='?' (Size = 7)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Users" ("CreatedAt", "Email", "IsActive", "LastLoginAt", "LockoutEnd", "LoginFailCount", "PasswordHash", "Phone", "RealName", "Role", "Username")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+SELECT "UserId"
+FROM "Users"
+WHERE changes() = 1 AND "rowid" = last_insert_rowid();
+2025-10-20 01:19:39.073 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[@p0='?', @p1='?' (Size = 16), @p2='?', @p3='?', @p4='?', @p5='?', @p6='?' (Size = 60), @p7='?', @p8='?' (Size = 4), @p9='?', @p10='?' (Size = 7)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Users" ("CreatedAt", "Email", "IsActive", "LastLoginAt", "LockoutEnd", "LoginFailCount", "PasswordHash", "Phone", "RealName", "Role", "Username")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+SELECT "UserId"
+FROM "Users"
+WHERE changes() = 1 AND "rowid" = last_insert_rowid();
+2025-10-20 01:19:39.073 +08:00 [DBG] The foreign key property 'User.UserId' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-10-20 01:19:39.073 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:39.073 +08:00 [DBG] Committing transaction.
+2025-10-20 01:19:39.077 +08:00 [DBG] Committed transaction.
+2025-10-20 01:19:39.078 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:39.080 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:39.080 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:19:39.080 +08:00 [DBG] An entity of type 'User' tracked by 'ExamDbContext' changed state from '"Added"' to '"Unchanged"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:39.080 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 1 entities written to the database.
+2025-10-20 01:19:39.080 +08:00 [INF] 测试教师用户创建成功 - 用户名: teacher, 密码: teacher123
+2025-10-20 01:19:39.081 +08:00 [DBG] 'ExamDbContext' disposed.
+2025-10-20 01:19:39.083 +08:00 [INF] Entity Framework Core 5.0.17 initialized 'ExamDbContext' using provider 'Microsoft.EntityFrameworkCore.Sqlite' with options: MigrationsAssembly=ExamSystem.Infrastructure 
+2025-10-20 01:19:43.681 +08:00 [INF] === 开始登录流程 ===
+2025-10-20 01:19:43.681 +08:00 [INF] 用户名: admin
+2025-10-20 01:19:43.681 +08:00 [INF] 密码长度: 8
+2025-10-20 01:19:43.681 +08:00 [INF] AuthService是否为null: False
+2025-10-20 01:19:43.681 +08:00 [INF] 调用AuthService.LoginAsync方法
+2025-10-20 01:19:43.683 +08:00 [INF] === AuthService.LoginAsync 开始 ===
+2025-10-20 01:19:43.683 +08:00 [INF] 接收到的用户名: admin
+2025-10-20 01:19:43.683 +08:00 [INF] 接收到的密码长度: 8
+2025-10-20 01:19:43.683 +08:00 [INF] 开始查询用户
+2025-10-20 01:19:43.683 +08:00 [INF] UserRepository是否为null: False
+2025-10-20 01:19:43.683 +08:00 [INF] Context是否为null: False
+2025-10-20 01:19:43.683 +08:00 [INF] 测试数据库连接...
+2025-10-20 01:19:43.684 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:43.684 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:43.684 +08:00 [INF] 数据库连接测试结果: True
+2025-10-20 01:19:43.685 +08:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .Count()'
+2025-10-20 01:19:43.688 +08:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleAsync<int>(
+    asyncEnumerable: new SingleQueryingEnumerable<int>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.SelectExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> 0
+            SELECT COUNT(*)
+            FROM Users AS u), 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, int>, 
+        ExamSystem.Data.ExamDbContext, 
+        False, 
+        False
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-10-20 01:19:43.691 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:43.691 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:43.691 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:43.692 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:43.692 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM "Users" AS "u"
+2025-10-20 01:19:43.693 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM "Users" AS "u"
+2025-10-20 01:19:43.693 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:43.694 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:43.694 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:43.694 +08:00 [INF] 数据库中用户总数: 3
+2025-10-20 01:19:43.695 +08:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .FirstOrDefault(u => u.Username == __username_0)'
+2025-10-20 01:19:43.707 +08:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
+    asyncEnumerable: new SingleQueryingEnumerable<User>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.SelectExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: User.UserId (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: User.CreatedAt (DateTime) Required, 1], [Property: User.Email (string) Index MaxLength(200), 2], [Property: User.IsActive (bool) Required, 3], [Property: User.LastLoginAt (Nullable<DateTime>), 4], [Property: User.LockoutEnd (Nullable<DateTime>), 5], [Property: User.LoginFailCount (int) Required, 6], [Property: User.PasswordHash (string) Required MaxLength(255), 7], [Property: User.Phone (string) MaxLength(20), 8], [Property: User.RealName (string) MaxLength(100), 9], [Property: User.Role (UserRole) Required, 10], [Property: User.Username (string) Required Index MaxLength(50), 11], }
+            SELECT TOP(1) u.UserId, u.CreatedAt, u.Email, u.IsActive, u.LastLoginAt, u.LockoutEnd, u.LoginFailCount, u.PasswordHash, u.Phone, u.RealName, u.Role, u.Username
+            FROM Users AS u
+            WHERE u.Username == @__username_0), 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+        ExamSystem.Data.ExamDbContext, 
+        False, 
+        False
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-10-20 01:19:43.710 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:43.710 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:43.711 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:43.711 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:43.711 +08:00 [DBG] Executing DbCommand [Parameters=[@__username_0='?' (Size = 5)], CommandType='"Text"', CommandTimeout='30']
+SELECT "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM "Users" AS "u"
+WHERE "u"."Username" = @__username_0
+LIMIT 1
+2025-10-20 01:19:43.712 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[@__username_0='?' (Size = 5)], CommandType='"Text"', CommandTimeout='30']
+SELECT "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM "Users" AS "u"
+WHERE "u"."Username" = @__username_0
+LIMIT 1
+2025-10-20 01:19:43.714 +08:00 [DBG] Context 'ExamDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:43.714 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:43.714 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:43.715 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:43.715 +08:00 [INF] 用户查询结果: 找到用户
+2025-10-20 01:19:43.715 +08:00 [INF] 用户ID: 1, 用户名: admin, 角色: Admin
+2025-10-20 01:19:43.715 +08:00 [INF] 用户是否激活: True
+2025-10-20 01:19:43.715 +08:00 [INF] 登录失败次数: 0
+2025-10-20 01:19:43.715 +08:00 [INF] 检查账户锁定状态
+2025-10-20 01:19:43.717 +08:00 [INF] 开始验证密码
+2025-10-20 01:19:43.717 +08:00 [INF] 存储的密码哈希长度: 8
+2025-10-20 01:19:43.717 +08:00 [INF] 密码哈希是否为空: False
+2025-10-20 01:19:43.717 +08:00 [INF] 密码哈希前20字符: admin123...
+2025-10-20 01:19:43.717 +08:00 [INF] 开始验证密码 - 用户: admin
+2025-10-20 01:19:43.717 +08:00 [INF] 密码哈希长度: 8
+2025-10-20 01:19:43.717 +08:00 [INF] 密码哈希前缀: admin123
+2025-10-20 01:19:43.717 +08:00 [ERR] 密码验证过程中发生异常
+BCrypt.Net.SaltParseException: Invalid salt version
+   at BCrypt.Net.BCrypt.HashPassword(String inputKey, String salt, Boolean enhancedEntropy, HashType hashType)
+   at BCrypt.Net.BCrypt.Verify(String text, String hash, Boolean enhancedEntropy, HashType hashType)
+   at ExamSystem.Services.Services.AuthService.LoginAsync(String username, String password) in E:\Project\exam_trae\ExamSystem.Services\Services\AuthService.cs:line 138
+2025-10-20 01:19:43.725 +08:00 [ERR] 异常类型: SaltParseException
+2025-10-20 01:19:43.725 +08:00 [ERR] 异常消息: Invalid salt version
+2025-10-20 01:19:43.725 +08:00 [ERR] 用户名: admin
+2025-10-20 01:19:43.725 +08:00 [ERR] 密码哈希: admin123
+2025-10-20 01:19:43.725 +08:00 [WRN] 检测到密码哈希格式问题，尝试重新生成密码哈希
+2025-10-20 01:19:43.895 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:43.895 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:43.896 +08:00 [DBG] The unchanged property 'User.PasswordHash' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-10-20 01:19:43.896 +08:00 [DBG] An entity of type 'User' tracked by 'ExamDbContext' changed state from '"Unchanged"' to '"Modified"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:43.896 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:43.896 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:43.896 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:43.896 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:19:43.898 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:19:43.898 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:43.898 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:43.898 +08:00 [DBG] Executing DbCommand [Parameters=[@p1='?', @p0='?' (Size = 60)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Users" SET "PasswordHash" = @p0
+WHERE "UserId" = @p1;
+SELECT changes();
+2025-10-20 01:19:43.899 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[@p1='?', @p0='?' (Size = 60)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Users" SET "PasswordHash" = @p0
+WHERE "UserId" = @p1;
+SELECT changes();
+2025-10-20 01:19:43.900 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:43.900 +08:00 [DBG] Committing transaction.
+2025-10-20 01:19:43.904 +08:00 [DBG] Committed transaction.
+2025-10-20 01:19:43.904 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:43.907 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:43.907 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:19:43.907 +08:00 [DBG] An entity of type 'User' tracked by 'ExamDbContext' changed state from '"Modified"' to '"Unchanged"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:43.907 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 1 entities written to the database.
+2025-10-20 01:19:43.907 +08:00 [INF] 已为用户 admin 重新生成密码哈希
+2025-10-20 01:19:44.078 +08:00 [INF] 使用新哈希验证结果: True
+2025-10-20 01:19:44.078 +08:00 [INF] 密码验证成功，更新用户信息
+2025-10-20 01:19:44.078 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:44.078 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:44.078 +08:00 [DBG] The unchanged property 'User.LastLoginAt' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-10-20 01:19:44.078 +08:00 [DBG] An entity of type 'User' tracked by 'ExamDbContext' changed state from '"Unchanged"' to '"Modified"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:44.079 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:44.079 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:44.079 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:44.079 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:19:44.081 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:19:44.081 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:44.081 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:44.081 +08:00 [DBG] Executing DbCommand [Parameters=[@p1='?', @p0='?'], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Users" SET "LastLoginAt" = @p0
+WHERE "UserId" = @p1;
+SELECT changes();
+2025-10-20 01:19:44.081 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[@p1='?', @p0='?'], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Users" SET "LastLoginAt" = @p0
+WHERE "UserId" = @p1;
+SELECT changes();
+2025-10-20 01:19:44.081 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:44.081 +08:00 [DBG] Committing transaction.
+2025-10-20 01:19:44.132 +08:00 [DBG] Committed transaction.
+2025-10-20 01:19:44.132 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:44.135 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:44.135 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:19:44.135 +08:00 [DBG] An entity of type 'User' tracked by 'ExamDbContext' changed state from '"Modified"' to '"Unchanged"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:44.135 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 1 entities written to the database.
+2025-10-20 01:19:44.135 +08:00 [INF] 用户信息更新完成
+2025-10-20 01:19:44.135 +08:00 [INF] 用户登录成功 - admin
+2025-10-20 01:19:44.135 +08:00 [INF] === AuthService.LoginAsync 结束 ===
+2025-10-20 01:19:44.136 +08:00 [INF] === 登录服务返回结果 ===
+2025-10-20 01:19:44.136 +08:00 [INF] 成功: True
+2025-10-20 01:19:44.136 +08:00 [INF] 消息: 登录成功
+2025-10-20 01:19:44.136 +08:00 [INF] 用户对象是否为null: False
+2025-10-20 01:19:44.136 +08:00 [INF] 用户 admin 登录成功
+2025-10-20 01:19:44.136 +08:00 [INF] 上次登录时间: 无记录
+2025-10-20 01:19:44.136 +08:00 [INF] 触发登录成功事件
+2025-10-20 01:19:44.136 +08:00 [INF] === LoginWindow.OnLoginSuccess ===
+2025-10-20 01:19:44.137 +08:00 [INF] 登录成功的用户: admin (Admin)
+2025-10-20 01:19:44.137 +08:00 [INF] 用户ID: 1
+2025-10-20 01:19:44.137 +08:00 [INF] 用户对象是否为null: False
+2025-10-20 01:19:44.148 +08:00 [INF] MainWindow 构造函数完成，延迟加载页面直到用户登录
+2025-10-20 01:19:44.148 +08:00 [INF] 获取到MainWindow实例，准备设置用户信息
+2025-10-20 01:19:44.158 +08:00 [DBG] Compiling query expression: 
+'DbSet<QuestionBank>()'
+2025-10-20 01:19:44.160 +08:00 [DBG] Generated query execution expression: 
+'queryContext => new SingleQueryingEnumerable<QuestionBank>(
+    (RelationalQueryContext)queryContext, 
+    RelationalCommandCache.SelectExpression(
+        Projection Mapping:
+            EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: QuestionBank.BankId (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: QuestionBank.CreatedAt (DateTime) Required, 1], [Property: QuestionBank.CreatorId (int) Required FK Index, 2], [Property: QuestionBank.Description (string) MaxLength(500), 3], [Property: QuestionBank.IsActive (bool) Required, 4], [Property: QuestionBank.Name (string) Required MaxLength(100), 5], [Property: QuestionBank.UpdatedAt (DateTime) Required, 6], }
+        SELECT q.BankId, q.CreatedAt, q.CreatorId, q.Description, q.IsActive, q.Name, q.UpdatedAt
+        FROM QuestionBanks AS q), 
+    Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, QuestionBank>, 
+    ExamSystem.Data.ExamDbContext, 
+    False, 
+    False
+)'
+2025-10-20 01:19:44.160 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:44.160 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:44.160 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:44.161 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:44.161 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "q"."BankId", "q"."CreatedAt", "q"."CreatorId", "q"."Description", "q"."IsActive", "q"."Name", "q"."UpdatedAt"
+FROM "QuestionBanks" AS "q"
+2025-10-20 01:19:44.162 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "q"."BankId", "q"."CreatedAt", "q"."CreatorId", "q"."Description", "q"."IsActive", "q"."Name", "q"."UpdatedAt"
+FROM "QuestionBanks" AS "q"
+2025-10-20 01:19:44.162 +08:00 [DBG] Context 'ExamDbContext' started tracking 'QuestionBank' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:44.169 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:44.169 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:44.170 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:44.176 +08:00 [INF] 在LoadPages中为QuestionBankViewModel设置用户信息
+2025-10-20 01:19:44.176 +08:00 [INF] === QuestionBankViewModel.SetCurrentUser ===
+2025-10-20 01:19:44.176 +08:00 [INF] 接收到的用户: admin (Admin)
+2025-10-20 01:19:44.176 +08:00 [INF] 用户ID: 1
+2025-10-20 01:19:44.176 +08:00 [INF] 用户对象是否为null: False
+2025-10-20 01:19:44.176 +08:00 [INF] 设置后的CurrentUser: admin (Admin)
+2025-10-20 01:19:44.176 +08:00 [INF] CurrentUser是否为null: False
+2025-10-20 01:19:44.176 +08:00 [INF] QuestionBankViewModel: 用户信息设置完成
+2025-10-20 01:19:44.177 +08:00 [DBG] Compiling query expression: 
+'DbSet<ExamPaper>()'
+2025-10-20 01:19:44.179 +08:00 [DBG] Generated query execution expression: 
+'queryContext => new SingleQueryingEnumerable<ExamPaper>(
+    (RelationalQueryContext)queryContext, 
+    RelationalCommandCache.SelectExpression(
+        Projection Mapping:
+            EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: ExamPaper.PaperId (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: ExamPaper.AllowRetake (bool) Required, 1], [Property: ExamPaper.AllowViewAnswer (bool) Required, 2], [Property: ExamPaper.CreatedAt (DateTime) Required, 3], [Property: ExamPaper.CreatorId (int) Required FK Index, 4], [Property: ExamPaper.Description (string) MaxLength(500), 5], [Property: ExamPaper.Duration (int) Required, 6], [Property: ExamPaper.EndTime (Nullable<DateTime>), 7], [Property: ExamPaper.IsActive (bool) Required, 8], [Property: ExamPaper.IsRandomOrder (bool) Required, 9], [Property: ExamPaper.Name (string) Required MaxLength(100), 10], [Property: ExamPaper.PassScore (decimal) Required, 11], [Property: ExamPaper.StartTime (Nullable<DateTime>), 12], [Property: ExamPaper.Status (string) Required MaxLength(20), 13], [Property: ExamPaper.TotalScore (decimal) Required, 14], [Property: ExamPaper.UpdatedAt (DateTime) Required, 15], }
+        SELECT e.PaperId, e.AllowRetake, e.AllowViewAnswer, e.CreatedAt, e.CreatorId, e.Description, e.Duration, e.EndTime, e.IsActive, e.IsRandomOrder, e.Name, e.PassScore, e.StartTime, e.Status, e.TotalScore, e.UpdatedAt
+        FROM ExamPapers AS e), 
+    Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, ExamPaper>, 
+    ExamSystem.Data.ExamDbContext, 
+    False, 
+    False
+)'
+2025-10-20 01:19:44.179 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:44.179 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:44.179 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:44.179 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:44.180 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "e"."PaperId", "e"."AllowRetake", "e"."AllowViewAnswer", "e"."CreatedAt", "e"."CreatorId", "e"."Description", "e"."Duration", "e"."EndTime", "e"."IsActive", "e"."IsRandomOrder", "e"."Name", "e"."PassScore", "e"."StartTime", "e"."Status", "e"."TotalScore", "e"."UpdatedAt"
+FROM "ExamPapers" AS "e"
+2025-10-20 01:19:44.181 +08:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "e"."PaperId", "e"."AllowRetake", "e"."AllowViewAnswer", "e"."CreatedAt", "e"."CreatorId", "e"."Description", "e"."Duration", "e"."EndTime", "e"."IsActive", "e"."IsRandomOrder", "e"."Name", "e"."PassScore", "e"."StartTime", "e"."Status", "e"."TotalScore", "e"."UpdatedAt"
+FROM "ExamPapers" AS "e"
+2025-10-20 01:19:44.181 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:44.181 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:44.182 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:44.182 +08:00 [INF] 加载试卷列表成功，共 0 个试卷
+2025-10-20 01:19:44.205 +08:00 [INF] 所有页面加载完成
+2025-10-20 01:19:44.205 +08:00 [INF] === UpdateViewModelsWithCurrentUser ===
+2025-10-20 01:19:44.205 +08:00 [INF] 当前用户: admin (Admin)
+2025-10-20 01:19:44.205 +08:00 [INF] QuestionBankFrame是否为null: False
+2025-10-20 01:19:44.205 +08:00 [INF] QuestionBankFrame.Content是否为null: True
+2025-10-20 01:19:44.205 +08:00 [WRN] QuestionBankFrame.Content为null
+2025-10-20 01:19:44.205 +08:00 [INF] 所有ViewModel的用户信息已更新
+2025-10-20 01:19:44.205 +08:00 [INF] 用户信息设置完成，显示主窗口
+2025-10-20 01:19:44.215 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:44.227 +08:00 [INF] 关闭登录窗口
+2025-10-20 01:19:44.230 +08:00 [INF] === 登录流程结束 ===
+2025-10-20 01:19:44.246 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:44.259 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:45.418 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:45.590 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:46.474 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:46.520 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:47.489 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:47.617 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:47.758 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:47.990 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:48.146 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:48.306 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:48.444 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:48.706 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:49.640 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:49.697 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:49.700 +08:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .FirstOrDefault(u => u.UserId == __id_0)'
+2025-10-20 01:19:49.703 +08:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
+    asyncEnumerable: new SingleQueryingEnumerable<User>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.SelectExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: User.UserId (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: User.CreatedAt (DateTime) Required, 1], [Property: User.Email (string) Index MaxLength(200), 2], [Property: User.IsActive (bool) Required, 3], [Property: User.LastLoginAt (Nullable<DateTime>), 4], [Property: User.LockoutEnd (Nullable<DateTime>), 5], [Property: User.LoginFailCount (int) Required, 6], [Property: User.PasswordHash (string) Required MaxLength(255), 7], [Property: User.Phone (string) MaxLength(20), 8], [Property: User.RealName (string) MaxLength(100), 9], [Property: User.Role (UserRole) Required, 10], [Property: User.Username (string) Required Index MaxLength(50), 11], }
+            SELECT TOP(1) u.UserId, u.CreatedAt, u.Email, u.IsActive, u.LastLoginAt, u.LockoutEnd, u.LoginFailCount, u.PasswordHash, u.Phone, u.RealName, u.Role, u.Username
+            FROM Users AS u
+            WHERE u.UserId == @__id_0), 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+        ExamSystem.Data.ExamDbContext, 
+        False, 
+        False
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-10-20 01:19:49.703 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:49.703 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:49.703 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:49.703 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:49.703 +08:00 [DBG] Executing DbCommand [Parameters=[@__id_0='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM "Users" AS "u"
+WHERE "u"."UserId" = @__id_0
+LIMIT 1
+2025-10-20 01:19:49.705 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[@__id_0='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM "Users" AS "u"
+WHERE "u"."UserId" = @__id_0
+LIMIT 1
+2025-10-20 01:19:49.705 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:49.705 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:49.706 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:49.706 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:49.707 +08:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .Where(u => (int)u.Role == (int)__role_0)'
+2025-10-20 01:19:49.709 +08:00 [DBG] Generated query execution expression: 
+'queryContext => new SingleQueryingEnumerable<User>(
+    (RelationalQueryContext)queryContext, 
+    RelationalCommandCache.SelectExpression(
+        Projection Mapping:
+            EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: User.UserId (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: User.CreatedAt (DateTime) Required, 1], [Property: User.Email (string) Index MaxLength(200), 2], [Property: User.IsActive (bool) Required, 3], [Property: User.LastLoginAt (Nullable<DateTime>), 4], [Property: User.LockoutEnd (Nullable<DateTime>), 5], [Property: User.LoginFailCount (int) Required, 6], [Property: User.PasswordHash (string) Required MaxLength(255), 7], [Property: User.Phone (string) MaxLength(20), 8], [Property: User.RealName (string) MaxLength(100), 9], [Property: User.Role (UserRole) Required, 10], [Property: User.Username (string) Required Index MaxLength(50), 11], }
+        SELECT u.UserId, u.CreatedAt, u.Email, u.IsActive, u.LastLoginAt, u.LockoutEnd, u.LoginFailCount, u.PasswordHash, u.Phone, u.RealName, u.Role, u.Username
+        FROM Users AS u
+        WHERE u.Role == @__role_0), 
+    Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+    ExamSystem.Data.ExamDbContext, 
+    False, 
+    False
+)'
+2025-10-20 01:19:49.709 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:49.709 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:49.709 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:49.709 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:49.709 +08:00 [DBG] Executing DbCommand [Parameters=[@__role_0='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM "Users" AS "u"
+WHERE "u"."Role" = @__role_0
+2025-10-20 01:19:49.710 +08:00 [INF] Executed DbCommand (1ms) [Parameters=[@__role_0='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM "Users" AS "u"
+WHERE "u"."Role" = @__role_0
+2025-10-20 01:19:49.710 +08:00 [DBG] Context 'ExamDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:49.712 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:49.712 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:49.712 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:49.720 +08:00 [DBG] 'ExamDbContext' generated a temporary value for the property 'NotificationId.Notification'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:49.731 +08:00 [DBG] Context 'ExamDbContext' started tracking 'Notification' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:49.732 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:49.732 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:49.735 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:49.735 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:49.736 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:49.736 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:19:49.737 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:19:49.738 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:49.738 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:49.738 +08:00 [DBG] Executing DbCommand [Parameters=[@p0='?' (Size = 2), @p1='?', @p2='?', @p3='?', @p4='?', @p5='?', @p6='?' (Size = 1)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Notifications" ("Content", "CreatedAt", "Priority", "Scope", "SenderId", "Status", "Title")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+SELECT "NotificationId"
+FROM "Notifications"
+WHERE changes() = 1 AND "rowid" = last_insert_rowid();
+2025-10-20 01:19:49.739 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 2), @p1='?', @p2='?', @p3='?', @p4='?', @p5='?', @p6='?' (Size = 1)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "Notifications" ("Content", "CreatedAt", "Priority", "Scope", "SenderId", "Status", "Title")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+SELECT "NotificationId"
+FROM "Notifications"
+WHERE changes() = 1 AND "rowid" = last_insert_rowid();
+2025-10-20 01:19:49.739 +08:00 [DBG] The foreign key property 'Notification.NotificationId' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-10-20 01:19:49.740 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:49.740 +08:00 [DBG] Committing transaction.
+2025-10-20 01:19:49.744 +08:00 [DBG] Committed transaction.
+2025-10-20 01:19:49.744 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:49.747 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:49.747 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:19:49.748 +08:00 [DBG] An entity of type 'Notification' tracked by 'ExamDbContext' changed state from '"Added"' to '"Unchanged"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:49.748 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 1 entities written to the database.
+2025-10-20 01:19:49.748 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:49.748 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:49.748 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:49.748 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 0 entities written to the database.
+2025-10-20 01:19:49.748 +08:00 [DBG] 'ExamDbContext' generated a temporary value for the property 'NotificationRecipientId.NotificationRecipient'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:49.754 +08:00 [DBG] Context 'ExamDbContext' started tracking 'NotificationRecipient' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:49.754 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:49.754 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:49.755 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:49.756 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:49.756 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:49.756 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:19:49.757 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:19:49.757 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:49.757 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:49.758 +08:00 [DBG] Executing DbCommand [Parameters=[@p0='?', @p1='?', @p2='?', @p3='?', @p4='?'], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "NotificationRecipients" ("CreatedAt", "DeliveryStatus", "NotificationId", "ReadAt", "ReceiverId")
+VALUES (@p0, @p1, @p2, @p3, @p4);
+SELECT "NotificationRecipientId"
+FROM "NotificationRecipients"
+WHERE changes() = 1 AND "rowid" = last_insert_rowid();
+2025-10-20 01:19:49.758 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[@p0='?', @p1='?', @p2='?', @p3='?', @p4='?'], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "NotificationRecipients" ("CreatedAt", "DeliveryStatus", "NotificationId", "ReadAt", "ReceiverId")
+VALUES (@p0, @p1, @p2, @p3, @p4);
+SELECT "NotificationRecipientId"
+FROM "NotificationRecipients"
+WHERE changes() = 1 AND "rowid" = last_insert_rowid();
+2025-10-20 01:19:49.759 +08:00 [DBG] The foreign key property 'NotificationRecipient.NotificationRecipientId' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-10-20 01:19:49.759 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:49.759 +08:00 [DBG] Committing transaction.
+2025-10-20 01:19:49.764 +08:00 [DBG] Committed transaction.
+2025-10-20 01:19:49.764 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:49.767 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:49.767 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:19:49.768 +08:00 [DBG] An entity of type 'NotificationRecipient' tracked by 'ExamDbContext' changed state from '"Added"' to '"Unchanged"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:49.768 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 1 entities written to the database.
+2025-10-20 01:19:49.768 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:49.768 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:49.768 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:49.768 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 0 entities written to the database.
+2025-10-20 01:19:49.768 +08:00 [INF] 通知已发送：NotificationId=1, SenderId=1, Receivers=1
+2025-10-20 01:19:49.789 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:50.755 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:50.786 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:53.667 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:54.023 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:55.674 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:56.075 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:56.290 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:56.385 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:56.589 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:56.665 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:56.775 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:56.962 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:57.085 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:57.211 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:57.243 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:57.321 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:57.401 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:57.557 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:57.683 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:57.787 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:57.929 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.073 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.188 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.235 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.390 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.436 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.590 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.623 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.757 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.821 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:58.940 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:59.084 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:59.192 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:19:59.287 +08:00 [INF] === 开始登录流程 ===
+2025-10-20 01:19:59.287 +08:00 [INF] 用户名: student
+2025-10-20 01:19:59.287 +08:00 [INF] 密码长度: 10
+2025-10-20 01:19:59.287 +08:00 [INF] AuthService是否为null: False
+2025-10-20 01:19:59.287 +08:00 [INF] 调用AuthService.LoginAsync方法
+2025-10-20 01:19:59.287 +08:00 [INF] === AuthService.LoginAsync 开始 ===
+2025-10-20 01:19:59.287 +08:00 [INF] 接收到的用户名: student
+2025-10-20 01:19:59.287 +08:00 [INF] 接收到的密码长度: 10
+2025-10-20 01:19:59.287 +08:00 [INF] 开始查询用户
+2025-10-20 01:19:59.287 +08:00 [INF] UserRepository是否为null: False
+2025-10-20 01:19:59.287 +08:00 [INF] Context是否为null: False
+2025-10-20 01:19:59.287 +08:00 [INF] 测试数据库连接...
+2025-10-20 01:19:59.288 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.288 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.288 +08:00 [INF] 数据库连接测试结果: True
+2025-10-20 01:19:59.289 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:59.289 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:59.289 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.289 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.289 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM "Users" AS "u"
+2025-10-20 01:19:59.290 +08:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM "Users" AS "u"
+2025-10-20 01:19:59.290 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:59.290 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.291 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.291 +08:00 [INF] 数据库中用户总数: 3
+2025-10-20 01:19:59.292 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:59.292 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:59.292 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.293 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.293 +08:00 [DBG] Executing DbCommand [Parameters=[@__username_0='?' (Size = 7)], CommandType='"Text"', CommandTimeout='30']
+SELECT "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM "Users" AS "u"
+WHERE "u"."Username" = @__username_0
+LIMIT 1
+2025-10-20 01:19:59.294 +08:00 [INF] Executed DbCommand (1ms) [Parameters=[@__username_0='?' (Size = 7)], CommandType='"Text"', CommandTimeout='30']
+SELECT "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM "Users" AS "u"
+WHERE "u"."Username" = @__username_0
+LIMIT 1
+2025-10-20 01:19:59.294 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:59.294 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.295 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.295 +08:00 [INF] 用户查询结果: 找到用户
+2025-10-20 01:19:59.295 +08:00 [INF] 用户ID: 2, 用户名: student, 角色: Student
+2025-10-20 01:19:59.295 +08:00 [INF] 用户是否激活: True
+2025-10-20 01:19:59.295 +08:00 [INF] 登录失败次数: 0
+2025-10-20 01:19:59.295 +08:00 [INF] 检查账户锁定状态
+2025-10-20 01:19:59.295 +08:00 [INF] 开始验证密码
+2025-10-20 01:19:59.295 +08:00 [INF] 存储的密码哈希长度: 60
+2025-10-20 01:19:59.295 +08:00 [INF] 密码哈希是否为空: False
+2025-10-20 01:19:59.295 +08:00 [INF] 密码哈希前20字符: $2a$12$U9ytBFh65KhxZ...
+2025-10-20 01:19:59.295 +08:00 [INF] 开始验证密码 - 用户: student
+2025-10-20 01:19:59.295 +08:00 [INF] 密码哈希长度: 60
+2025-10-20 01:19:59.295 +08:00 [INF] 密码哈希前缀: $2a$12$U9y
+2025-10-20 01:19:59.469 +08:00 [INF] 密码验证结果: True
+2025-10-20 01:19:59.469 +08:00 [INF] 密码验证成功，更新用户信息
+2025-10-20 01:19:59.469 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:59.469 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:19:59.469 +08:00 [DBG] The unchanged property 'User.LastLoginAt' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-10-20 01:19:59.469 +08:00 [DBG] An entity of type 'User' tracked by 'ExamDbContext' changed state from '"Unchanged"' to '"Modified"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:59.469 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:19:59.469 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.469 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.469 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:19:59.498 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:19:59.499 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:59.499 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:59.499 +08:00 [DBG] Executing DbCommand [Parameters=[@p1='?', @p0='?'], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Users" SET "LastLoginAt" = @p0
+WHERE "UserId" = @p1;
+SELECT changes();
+2025-10-20 01:19:59.499 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[@p1='?', @p0='?'], CommandType='"Text"', CommandTimeout='30']
+UPDATE "Users" SET "LastLoginAt" = @p0
+WHERE "UserId" = @p1;
+SELECT changes();
+2025-10-20 01:19:59.499 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:59.499 +08:00 [DBG] Committing transaction.
+2025-10-20 01:19:59.503 +08:00 [DBG] Committed transaction.
+2025-10-20 01:19:59.503 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.506 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.506 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:19:59.506 +08:00 [DBG] An entity of type 'User' tracked by 'ExamDbContext' changed state from '"Modified"' to '"Unchanged"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:19:59.506 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 1 entities written to the database.
+2025-10-20 01:19:59.506 +08:00 [INF] 用户信息更新完成
+2025-10-20 01:19:59.506 +08:00 [INF] 用户登录成功 - student
+2025-10-20 01:19:59.506 +08:00 [INF] === AuthService.LoginAsync 结束 ===
+2025-10-20 01:19:59.506 +08:00 [INF] === 登录服务返回结果 ===
+2025-10-20 01:19:59.506 +08:00 [INF] 成功: True
+2025-10-20 01:19:59.506 +08:00 [INF] 消息: 登录成功
+2025-10-20 01:19:59.506 +08:00 [INF] 用户对象是否为null: False
+2025-10-20 01:19:59.506 +08:00 [INF] 用户 student 登录成功
+2025-10-20 01:19:59.506 +08:00 [INF] 上次登录时间: 无记录
+2025-10-20 01:19:59.506 +08:00 [INF] 触发登录成功事件
+2025-10-20 01:19:59.506 +08:00 [INF] === LoginWindow.OnLoginSuccess ===
+2025-10-20 01:19:59.506 +08:00 [INF] 登录成功的用户: student (Student)
+2025-10-20 01:19:59.506 +08:00 [INF] 用户ID: 2
+2025-10-20 01:19:59.506 +08:00 [INF] 用户对象是否为null: False
+2025-10-20 01:19:59.508 +08:00 [INF] MainWindow 构造函数完成，延迟加载页面直到用户登录
+2025-10-20 01:19:59.508 +08:00 [INF] 获取到MainWindow实例，准备设置用户信息
+2025-10-20 01:19:59.509 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:59.509 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:59.509 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.509 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.510 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "q"."BankId", "q"."CreatedAt", "q"."CreatorId", "q"."Description", "q"."IsActive", "q"."Name", "q"."UpdatedAt"
+FROM "QuestionBanks" AS "q"
+2025-10-20 01:19:59.511 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "q"."BankId", "q"."CreatedAt", "q"."CreatorId", "q"."Description", "q"."IsActive", "q"."Name", "q"."UpdatedAt"
+FROM "QuestionBanks" AS "q"
+2025-10-20 01:19:59.511 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:59.511 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.512 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.515 +08:00 [INF] 在LoadPages中为QuestionBankViewModel设置用户信息
+2025-10-20 01:19:59.515 +08:00 [INF] === QuestionBankViewModel.SetCurrentUser ===
+2025-10-20 01:19:59.515 +08:00 [INF] 接收到的用户: student (Student)
+2025-10-20 01:19:59.515 +08:00 [INF] 用户ID: 2
+2025-10-20 01:19:59.515 +08:00 [INF] 用户对象是否为null: False
+2025-10-20 01:19:59.515 +08:00 [INF] 设置后的CurrentUser: student (Student)
+2025-10-20 01:19:59.515 +08:00 [INF] CurrentUser是否为null: False
+2025-10-20 01:19:59.515 +08:00 [INF] QuestionBankViewModel: 用户信息设置完成
+2025-10-20 01:19:59.515 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:59.515 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:59.515 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.516 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.516 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "e"."PaperId", "e"."AllowRetake", "e"."AllowViewAnswer", "e"."CreatedAt", "e"."CreatorId", "e"."Description", "e"."Duration", "e"."EndTime", "e"."IsActive", "e"."IsRandomOrder", "e"."Name", "e"."PassScore", "e"."StartTime", "e"."Status", "e"."TotalScore", "e"."UpdatedAt"
+FROM "ExamPapers" AS "e"
+2025-10-20 01:19:59.518 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "e"."PaperId", "e"."AllowRetake", "e"."AllowViewAnswer", "e"."CreatedAt", "e"."CreatorId", "e"."Description", "e"."Duration", "e"."EndTime", "e"."IsActive", "e"."IsRandomOrder", "e"."Name", "e"."PassScore", "e"."StartTime", "e"."Status", "e"."TotalScore", "e"."UpdatedAt"
+FROM "ExamPapers" AS "e"
+2025-10-20 01:19:59.518 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:59.518 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.519 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.519 +08:00 [INF] 加载试卷列表成功，共 0 个试卷
+2025-10-20 01:19:59.537 +08:00 [DBG] Compiling query expression: 
+'DbSet<NotificationRecipient>()
+    .Include(r => r.Notification)
+    .ThenInclude(n => n.Sender)
+    .Where(r => r.ReceiverId == __receiverId_0)
+    .Count()'
+2025-10-20 01:19:59.542 +08:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleAsync<int>(
+    asyncEnumerable: new SingleQueryingEnumerable<int>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.SelectExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> 0
+            SELECT COUNT(*)
+            FROM NotificationRecipients AS n
+            WHERE n.ReceiverId == @__receiverId_0), 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, int>, 
+        ExamSystem.Data.ExamDbContext, 
+        False, 
+        False
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-10-20 01:19:59.543 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:59.543 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:59.543 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.543 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.543 +08:00 [DBG] Executing DbCommand [Parameters=[@__receiverId_0='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM "NotificationRecipients" AS "n"
+WHERE "n"."ReceiverId" = @__receiverId_0
+2025-10-20 01:19:59.545 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[@__receiverId_0='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM "NotificationRecipients" AS "n"
+WHERE "n"."ReceiverId" = @__receiverId_0
+2025-10-20 01:19:59.546 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:59.546 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.547 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.547 +08:00 [DBG] Compiling query expression: 
+'DbSet<NotificationRecipient>()
+    .Include(r => r.Notification)
+    .ThenInclude(n => n.Sender)
+    .Where(r => r.ReceiverId == __receiverId_0)
+    .OrderByDescending(r => r.Notification.CreatedAt)
+    .Skip(__p_1)
+    .Take(__p_2)'
+2025-10-20 01:19:59.552 +08:00 [DBG] Including navigation: 'NotificationRecipient.Notification'.
+2025-10-20 01:19:59.553 +08:00 [DBG] Including navigation: 'Notification.Sender'.
+2025-10-20 01:19:59.576 +08:00 [DBG] Generated query execution expression: 
+'queryContext => new SingleQueryingEnumerable<NotificationRecipient>(
+    (RelationalQueryContext)queryContext, 
+    RelationalCommandCache.SelectExpression(
+        Projection Mapping:
+        SELECT t.NotificationRecipientId, t.CreatedAt, t.DeliveryStatus, t.NotificationId, t.ReadAt, t.ReceiverId, t.NotificationId0, t.Content, t.CreatedAt0, t.Priority, t.Scope, t.SenderId, t.Status, t.Title, u.UserId, u.CreatedAt, u.Email, u.IsActive, u.LastLoginAt, u.LockoutEnd, u.LoginFailCount, u.PasswordHash, u.Phone, u.RealName, u.Role, u.Username
+        FROM Projection Mapping:
+        (
+            SELECT n.NotificationRecipientId, n.CreatedAt, n.DeliveryStatus, n.NotificationId, n.ReadAt, n.ReceiverId, n0.NotificationId AS NotificationId0, n0.Content, n0.CreatedAt AS CreatedAt0, n0.Priority, n0.Scope, n0.SenderId, n0.Status, n0.Title
+            FROM NotificationRecipients AS n
+            INNER JOIN Notifications AS n0 ON n.NotificationId == n0.NotificationId
+            WHERE n.ReceiverId == @__receiverId_0
+            ORDER BY n0.CreatedAt DESC
+            OFFSET @__p_1 ROWS FETCH NEXT @__p_2 ROWS ONLY
+        ) AS t
+        INNER JOIN Users AS u ON t.SenderId == u.UserId
+        ORDER BY t.CreatedAt0 DESC), 
+    Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, NotificationRecipient>, 
+    ExamSystem.Data.ExamDbContext, 
+    False, 
+    False
+)'
+2025-10-20 01:19:59.576 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:19:59.576 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:19:59.576 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.577 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.577 +08:00 [DBG] Executing DbCommand [Parameters=[@__receiverId_0='?', @__p_2='?', @__p_1='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "t"."NotificationRecipientId", "t"."CreatedAt", "t"."DeliveryStatus", "t"."NotificationId", "t"."ReadAt", "t"."ReceiverId", "t"."NotificationId0", "t"."Content", "t"."CreatedAt0", "t"."Priority", "t"."Scope", "t"."SenderId", "t"."Status", "t"."Title", "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM (
+    SELECT "n"."NotificationRecipientId", "n"."CreatedAt", "n"."DeliveryStatus", "n"."NotificationId", "n"."ReadAt", "n"."ReceiverId", "n0"."NotificationId" AS "NotificationId0", "n0"."Content", "n0"."CreatedAt" AS "CreatedAt0", "n0"."Priority", "n0"."Scope", "n0"."SenderId", "n0"."Status", "n0"."Title"
+    FROM "NotificationRecipients" AS "n"
+    INNER JOIN "Notifications" AS "n0" ON "n"."NotificationId" = "n0"."NotificationId"
+    WHERE "n"."ReceiverId" = @__receiverId_0
+    ORDER BY "n0"."CreatedAt" DESC
+    LIMIT @__p_2 OFFSET @__p_1
+) AS "t"
+INNER JOIN "Users" AS "u" ON "t"."SenderId" = "u"."UserId"
+ORDER BY "t"."CreatedAt0" DESC
+2025-10-20 01:19:59.579 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[@__receiverId_0='?', @__p_2='?', @__p_1='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "t"."NotificationRecipientId", "t"."CreatedAt", "t"."DeliveryStatus", "t"."NotificationId", "t"."ReadAt", "t"."ReceiverId", "t"."NotificationId0", "t"."Content", "t"."CreatedAt0", "t"."Priority", "t"."Scope", "t"."SenderId", "t"."Status", "t"."Title", "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM (
+    SELECT "n"."NotificationRecipientId", "n"."CreatedAt", "n"."DeliveryStatus", "n"."NotificationId", "n"."ReadAt", "n"."ReceiverId", "n0"."NotificationId" AS "NotificationId0", "n0"."Content", "n0"."CreatedAt" AS "CreatedAt0", "n0"."Priority", "n0"."Scope", "n0"."SenderId", "n0"."Status", "n0"."Title"
+    FROM "NotificationRecipients" AS "n"
+    INNER JOIN "Notifications" AS "n0" ON "n"."NotificationId" = "n0"."NotificationId"
+    WHERE "n"."ReceiverId" = @__receiverId_0
+    ORDER BY "n0"."CreatedAt" DESC
+    LIMIT @__p_2 OFFSET @__p_1
+) AS "t"
+INNER JOIN "Users" AS "u" ON "t"."SenderId" = "u"."UserId"
+ORDER BY "t"."CreatedAt0" DESC
+2025-10-20 01:19:59.579 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:19:59.579 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:19:59.580 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:19:59.588 +08:00 [INF] 所有页面加载完成
+2025-10-20 01:19:59.588 +08:00 [INF] === UpdateViewModelsWithCurrentUser ===
+2025-10-20 01:19:59.588 +08:00 [INF] 当前用户: student (Student)
+2025-10-20 01:19:59.588 +08:00 [INF] QuestionBankFrame是否为null: False
+2025-10-20 01:19:59.588 +08:00 [INF] QuestionBankFrame.Content是否为null: True
+2025-10-20 01:19:59.588 +08:00 [WRN] QuestionBankFrame.Content为null
+2025-10-20 01:19:59.588 +08:00 [INF] 所有ViewModel的用户信息已更新
+2025-10-20 01:19:59.588 +08:00 [INF] 用户信息设置完成，显示主窗口
+2025-10-20 01:19:59.615 +08:00 [INF] 关闭登录窗口
+2025-10-20 01:19:59.617 +08:00 [INF] === 登录流程结束 ===
+2025-10-20 01:19:59.645 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:00.652 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:00.790 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:01.545 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:01.756 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:02.689 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:02.806 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:03.876 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:11.139 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:12.257 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:13.609 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:13.659 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:14.325 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:15.137 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:15.509 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:15.559 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:17.453 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:17.507 +08:00 [DBG] Compiling query expression: 
+'DbSet<NotificationRecipient>()
+    .Include(r => r.Notification)
+    .ThenInclude(n => n.Sender)
+    .Include(r => r.Receiver)
+    .FirstOrDefault(r => r.NotificationId == __notificationId_0 && r.ReceiverId == __receiverId_1)'
+2025-10-20 01:20:17.507 +08:00 [DBG] Including navigation: 'NotificationRecipient.Notification'.
+2025-10-20 01:20:17.508 +08:00 [DBG] Including navigation: 'Notification.Sender'.
+2025-10-20 01:20:17.508 +08:00 [DBG] Including navigation: 'NotificationRecipient.Receiver'.
+2025-10-20 01:20:17.514 +08:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<NotificationRecipient>(
+    asyncEnumerable: new SingleQueryingEnumerable<NotificationRecipient>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.SelectExpression(
+            Projection Mapping:
+            SELECT TOP(1) n.NotificationRecipientId, n.CreatedAt, n.DeliveryStatus, n.NotificationId, n.ReadAt, n.ReceiverId, n0.NotificationId, n0.Content, n0.CreatedAt, n0.Priority, n0.Scope, n0.SenderId, n0.Status, n0.Title, u.UserId, u.CreatedAt, u.Email, u.IsActive, u.LastLoginAt, u.LockoutEnd, u.LoginFailCount, u.PasswordHash, u.Phone, u.RealName, u.Role, u.Username, u0.UserId, u0.CreatedAt, u0.Email, u0.IsActive, u0.LastLoginAt, u0.LockoutEnd, u0.LoginFailCount, u0.PasswordHash, u0.Phone, u0.RealName, u0.Role, u0.Username
+            FROM NotificationRecipients AS n
+            INNER JOIN Notifications AS n0 ON n.NotificationId == n0.NotificationId
+            INNER JOIN Users AS u ON n0.SenderId == u.UserId
+            INNER JOIN Users AS u0 ON n.ReceiverId == u0.UserId
+            WHERE (n.NotificationId == @__notificationId_0) && (n.ReceiverId == @__receiverId_1)), 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, NotificationRecipient>, 
+        ExamSystem.Data.ExamDbContext, 
+        False, 
+        False
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-10-20 01:20:17.514 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:20:17.514 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:20:17.514 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:20:17.514 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:20:17.515 +08:00 [DBG] Executing DbCommand [Parameters=[@__notificationId_0='?', @__receiverId_1='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "n"."NotificationRecipientId", "n"."CreatedAt", "n"."DeliveryStatus", "n"."NotificationId", "n"."ReadAt", "n"."ReceiverId", "n0"."NotificationId", "n0"."Content", "n0"."CreatedAt", "n0"."Priority", "n0"."Scope", "n0"."SenderId", "n0"."Status", "n0"."Title", "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username", "u0"."UserId", "u0"."CreatedAt", "u0"."Email", "u0"."IsActive", "u0"."LastLoginAt", "u0"."LockoutEnd", "u0"."LoginFailCount", "u0"."PasswordHash", "u0"."Phone", "u0"."RealName", "u0"."Role", "u0"."Username"
+FROM "NotificationRecipients" AS "n"
+INNER JOIN "Notifications" AS "n0" ON "n"."NotificationId" = "n0"."NotificationId"
+INNER JOIN "Users" AS "u" ON "n0"."SenderId" = "u"."UserId"
+INNER JOIN "Users" AS "u0" ON "n"."ReceiverId" = "u0"."UserId"
+WHERE ("n"."NotificationId" = @__notificationId_0) AND ("n"."ReceiverId" = @__receiverId_1)
+LIMIT 1
+2025-10-20 01:20:17.516 +08:00 [INF] Executed DbCommand (2ms) [Parameters=[@__notificationId_0='?', @__receiverId_1='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "n"."NotificationRecipientId", "n"."CreatedAt", "n"."DeliveryStatus", "n"."NotificationId", "n"."ReadAt", "n"."ReceiverId", "n0"."NotificationId", "n0"."Content", "n0"."CreatedAt", "n0"."Priority", "n0"."Scope", "n0"."SenderId", "n0"."Status", "n0"."Title", "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username", "u0"."UserId", "u0"."CreatedAt", "u0"."Email", "u0"."IsActive", "u0"."LastLoginAt", "u0"."LockoutEnd", "u0"."LoginFailCount", "u0"."PasswordHash", "u0"."Phone", "u0"."RealName", "u0"."Role", "u0"."Username"
+FROM "NotificationRecipients" AS "n"
+INNER JOIN "Notifications" AS "n0" ON "n"."NotificationId" = "n0"."NotificationId"
+INNER JOIN "Users" AS "u" ON "n0"."SenderId" = "u"."UserId"
+INNER JOIN "Users" AS "u0" ON "n"."ReceiverId" = "u0"."UserId"
+WHERE ("n"."NotificationId" = @__notificationId_0) AND ("n"."ReceiverId" = @__receiverId_1)
+LIMIT 1
+2025-10-20 01:20:17.516 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:20:17.516 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:20:17.517 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:20:17.517 +08:00 [DBG] An entity of type 'NotificationRecipient' tracked by 'ExamDbContext' changed state from '"Unchanged"' to '"Modified"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:20:17.518 +08:00 [DBG] SaveChanges starting for 'ExamDbContext'.
+2025-10-20 01:20:17.518 +08:00 [DBG] DetectChanges starting for 'ExamDbContext'.
+2025-10-20 01:20:17.518 +08:00 [DBG] DetectChanges completed for 'ExamDbContext'.
+2025-10-20 01:20:17.519 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:20:17.519 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:20:17.519 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-10-20 01:20:17.521 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-10-20 01:20:17.524 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:20:17.524 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:20:17.524 +08:00 [DBG] Executing DbCommand [Parameters=[@p5='?', @p0='?', @p1='?', @p2='?', @p3='?', @p4='?'], CommandType='"Text"', CommandTimeout='30']
+UPDATE "NotificationRecipients" SET "CreatedAt" = @p0, "DeliveryStatus" = @p1, "NotificationId" = @p2, "ReadAt" = @p3, "ReceiverId" = @p4
+WHERE "NotificationRecipientId" = @p5;
+SELECT changes();
+2025-10-20 01:20:17.524 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[@p5='?', @p0='?', @p1='?', @p2='?', @p3='?', @p4='?'], CommandType='"Text"', CommandTimeout='30']
+UPDATE "NotificationRecipients" SET "CreatedAt" = @p0, "DeliveryStatus" = @p1, "NotificationId" = @p2, "ReadAt" = @p3, "ReceiverId" = @p4
+WHERE "NotificationRecipientId" = @p5;
+SELECT changes();
+2025-10-20 01:20:17.525 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:20:17.525 +08:00 [DBG] Committing transaction.
+2025-10-20 01:20:17.530 +08:00 [DBG] Committed transaction.
+2025-10-20 01:20:17.530 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:20:17.532 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:20:17.532 +08:00 [DBG] Disposing transaction.
+2025-10-20 01:20:17.532 +08:00 [DBG] An entity of type 'NotificationRecipient' tracked by 'ExamDbContext' changed state from '"Modified"' to '"Unchanged"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-10-20 01:20:17.532 +08:00 [DBG] SaveChanges completed for 'ExamDbContext' with 1 entities written to the database.
+2025-10-20 01:20:17.532 +08:00 [INF] 通知已标记为已读：NotificationId=1, UserId=2
+2025-10-20 01:20:17.533 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:20:17.533 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:20:17.533 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:20:17.533 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:20:17.533 +08:00 [DBG] Executing DbCommand [Parameters=[@__receiverId_0='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM "NotificationRecipients" AS "n"
+WHERE "n"."ReceiverId" = @__receiverId_0
+2025-10-20 01:20:17.534 +08:00 [INF] Executed DbCommand (1ms) [Parameters=[@__receiverId_0='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM "NotificationRecipients" AS "n"
+WHERE "n"."ReceiverId" = @__receiverId_0
+2025-10-20 01:20:17.534 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:20:17.534 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:20:17.535 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:20:17.535 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-10-20 01:20:17.535 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-10-20 01:20:17.535 +08:00 [DBG] Opening connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:20:17.535 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:20:17.535 +08:00 [DBG] Executing DbCommand [Parameters=[@__receiverId_0='?', @__p_2='?', @__p_1='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "t"."NotificationRecipientId", "t"."CreatedAt", "t"."DeliveryStatus", "t"."NotificationId", "t"."ReadAt", "t"."ReceiverId", "t"."NotificationId0", "t"."Content", "t"."CreatedAt0", "t"."Priority", "t"."Scope", "t"."SenderId", "t"."Status", "t"."Title", "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM (
+    SELECT "n"."NotificationRecipientId", "n"."CreatedAt", "n"."DeliveryStatus", "n"."NotificationId", "n"."ReadAt", "n"."ReceiverId", "n0"."NotificationId" AS "NotificationId0", "n0"."Content", "n0"."CreatedAt" AS "CreatedAt0", "n0"."Priority", "n0"."Scope", "n0"."SenderId", "n0"."Status", "n0"."Title"
+    FROM "NotificationRecipients" AS "n"
+    INNER JOIN "Notifications" AS "n0" ON "n"."NotificationId" = "n0"."NotificationId"
+    WHERE "n"."ReceiverId" = @__receiverId_0
+    ORDER BY "n0"."CreatedAt" DESC
+    LIMIT @__p_2 OFFSET @__p_1
+) AS "t"
+INNER JOIN "Users" AS "u" ON "t"."SenderId" = "u"."UserId"
+ORDER BY "t"."CreatedAt0" DESC
+2025-10-20 01:20:17.536 +08:00 [INF] Executed DbCommand (1ms) [Parameters=[@__receiverId_0='?', @__p_2='?', @__p_1='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT "t"."NotificationRecipientId", "t"."CreatedAt", "t"."DeliveryStatus", "t"."NotificationId", "t"."ReadAt", "t"."ReceiverId", "t"."NotificationId0", "t"."Content", "t"."CreatedAt0", "t"."Priority", "t"."Scope", "t"."SenderId", "t"."Status", "t"."Title", "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username"
+FROM (
+    SELECT "n"."NotificationRecipientId", "n"."CreatedAt", "n"."DeliveryStatus", "n"."NotificationId", "n"."ReadAt", "n"."ReceiverId", "n0"."NotificationId" AS "NotificationId0", "n0"."Content", "n0"."CreatedAt" AS "CreatedAt0", "n0"."Priority", "n0"."Scope", "n0"."SenderId", "n0"."Status", "n0"."Title"
+    FROM "NotificationRecipients" AS "n"
+    INNER JOIN "Notifications" AS "n0" ON "n"."NotificationId" = "n0"."NotificationId"
+    WHERE "n"."ReceiverId" = @__receiverId_0
+    ORDER BY "n0"."CreatedAt" DESC
+    LIMIT @__p_2 OFFSET @__p_1
+) AS "t"
+INNER JOIN "Users" AS "u" ON "t"."SenderId" = "u"."UserId"
+ORDER BY "t"."CreatedAt0" DESC
+2025-10-20 01:20:17.536 +08:00 [DBG] A data reader was disposed.
+2025-10-20 01:20:17.536 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.Infrastructure\exam_system.db'.
+2025-10-20 01:20:17.537 +08:00 [DBG] Closed connection to database 'main' on server 'exam_system.db'.
+2025-10-20 01:20:17.546 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:17.557 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:18.774 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:19.008 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:25.160 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:25.358 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:26.335 +08:00 [INF] PermissionService.HasPermission: Role=Admin, Operation=SendNotification, Result=True
+2025-10-20 01:20:26.412 +08:00 [DBG] 'ExamDbContext' disposed.

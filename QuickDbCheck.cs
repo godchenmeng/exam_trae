@@ -22,6 +22,29 @@ class Program
                 }
             }
             
+            Console.WriteLine("\n=== 检查试卷发布状态 ===");
+            using (var cmd = new SqliteCommand("SELECT PaperId, Name, IsPublished FROM ExamPapers ORDER BY PaperId", connection))
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (!reader.HasRows)
+                {
+                    Console.WriteLine("ExamPapers 表中没有数据！");
+                }
+                else
+                {
+                    Console.WriteLine("PaperId\tName\tIsPublished");
+                    Console.WriteLine("-------\t----\t-----------");
+                    int publishedCount = 0;
+                    while (reader.Read())
+                    {
+                        var isPublished = reader["IsPublished"].ToString() == "1" || reader["IsPublished"].ToString()?.ToLower() == "true";
+                        if (isPublished) publishedCount++;
+                        Console.WriteLine($"{reader["PaperId"]}\t{reader["Name"]}\t{reader["IsPublished"]}");
+                    }
+                    Console.WriteLine($"已发布试卷数量: {publishedCount}");
+                }
+            }
+            
             Console.WriteLine("\n=== 检查题库表 ===");
             using (var cmd = new SqliteCommand("SELECT BankId, Name, CreatorId FROM QuestionBanks", connection))
             using (var reader = cmd.ExecuteReader())

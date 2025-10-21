@@ -9,6 +9,7 @@ using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
 using ExamSystem.Services.Models;
+using System.IO.Compression;
 
 namespace ExamSystem.Services.Services
 {
@@ -39,6 +40,14 @@ namespace ExamSystem.Services.Services
             try
             {
                 _logger.LogInformation("开始导入题目，题库ID: {QuestionBankId}", questionBankId);
+
+                // 预检测：文件是否为有效的 .xlsx（Open XML Zip 包）
+                if (!IsOpenXmlZip(fileStream))
+                {
+                    result.ErrorMessages.Add("提供的文件不是有效的 Excel 2007+ 工作簿 (.xlsx)。请确保使用 .xlsx 格式，或将 .xls/.csv 通过 Excel 另存为 .xlsx 后再导入。");
+                    _logger.LogWarning("Excel文件不是有效的Open XML包，终止导入");
+                    return result;
+                }
 
                 using var package = new ExcelPackage(fileStream);
                 var worksheet = package.Workbook.Worksheets.FirstOrDefault();
@@ -129,6 +138,11 @@ namespace ExamSystem.Services.Services
                 result.IsSuccess = result.SuccessCount > 0;
                 _logger.LogInformation("题目导入完成，成功: {SuccessCount}，失败: {FailureCount}", 
                     result.SuccessCount, result.FailureCount);
+            }
+            catch (InvalidDataException ex)
+            {
+                _logger.LogError(ex, "Excel文件不是有效的Open XML包或可能受保护");
+                result.ErrorMessages.Add("Excel文件不是有效的 .xlsx 包（或受密码保护）。请使用未加密的 .xlsx 文件，或在导入前取消保护/提供密码。");
             }
             catch (Exception ex)
             {
@@ -500,12 +514,16 @@ namespace ExamSystem.Services.Services
         /// </summary>
         private Question ConvertToQuestion(QuestionImportDto dto, int questionBankId)
         {
+            // 将Excel中的答案转换为服务层校验所需的格式
+            var formattedAnswer = ConvertAnswerToServiceFormat(dto.QuestionType, dto.CorrectAnswer);
+
             var question = new Question
             {
                 BankId = questionBankId,
+                Title = BuildTitleFromContent(dto.Content),
                 Content = dto.Content,
                 QuestionType = ConvertQuestionType(dto.QuestionType),
-                Answer = dto.CorrectAnswer,
+                Answer = formattedAnswer,
                 Analysis = dto.Explanation,
                 Score = decimal.Parse(dto.Points),
                 Difficulty = ConvertDifficulty(dto.Difficulty),
@@ -515,7 +533,7 @@ namespace ExamSystem.Services.Services
                 Options = new List<QuestionOption>()
             };
 
-            // 添加选项
+            // 添加选项，并标记正确选项
             if (dto.QuestionType == "单选" || dto.QuestionType == "多选")
             {
                 var options = new List<(string key, string value)>
@@ -528,6 +546,10 @@ namespace ExamSystem.Services.Services
                     ("F", dto.OptionF)
                 };
 
+                var correctSet = new HashSet<string>(formattedAnswer
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim().ToUpper()));
+
                 foreach (var (key, value) in options)
                 {
                     if (!string.IsNullOrWhiteSpace(value))
@@ -536,6 +558,7 @@ namespace ExamSystem.Services.Services
                         {
                             OptionLabel = key,
                             Content = value,
+                            IsCorrect = correctSet.Contains(key),
                             Question = question
                         });
                     }
@@ -543,6 +566,39 @@ namespace ExamSystem.Services.Services
             }
 
             return question;
+        }
+
+        // 将Excel答案转换为服务层需要的规范格式
+        private string ConvertAnswerToServiceFormat(string questionType, string excelAnswer)
+        {
+            if (string.IsNullOrWhiteSpace(excelAnswer)) return string.Empty;
+
+            switch (questionType)
+            {
+                case "判断":
+                    // 将中文“正确/错误”转换为"True"/"False"
+                    return excelAnswer.Trim() == "正确" ? "True" : "False";
+                case "多选":
+                    // 支持 "ABCD" 或 "A,B,C,D" 两种格式，统一转换为 "A,B,C,D"
+                    var lettersMulti = excelAnswer.ToUpper().Where(c => "ABCDEF".Contains(c)).Distinct().ToArray();
+                    return string.Join(",", lettersMulti);
+                case "单选":
+                    // 取第一个合法字母作为答案
+                    var letter = excelAnswer.ToUpper().FirstOrDefault(c => "ABCDEF".Contains(c));
+                    return letter == default(char) ? string.Empty : letter.ToString();
+                default:
+                    // 填空、主观题直接使用原答案
+                    return excelAnswer;
+            }
+        }
+
+        // 从内容生成标题（去除换行，截断至200字符）
+        private string BuildTitleFromContent(string content)
+        {
+            if (string.IsNullOrWhiteSpace(content)) return string.Empty;
+            var title = content.Replace("\r", " ").Replace("\n", " ").Trim();
+            if (title.Length > 200) title = title.Substring(0, 200);
+            return title;
         }
 
         /// <summary>
@@ -573,6 +629,33 @@ namespace ExamSystem.Services.Services
                 "困难" => Difficulty.Hard,
                 _ => Difficulty.Medium
             };
+        }
+
+        // 验证文件是否为有效的 .xlsx（Open XML Zip 包）
+        private bool IsOpenXmlZip(Stream fileStream)
+        {
+            long? originalPos = null;
+            try
+            {
+                if (fileStream.CanSeek)
+                {
+                    originalPos = fileStream.Position;
+                }
+                using var zip = new ZipArchive(fileStream, ZipArchiveMode.Read, true);
+                // .xlsx 至少应包含 [Content_Types].xml 文件
+                return zip.Entries.Any(e => string.Equals(e.FullName, "[Content_Types].xml", StringComparison.OrdinalIgnoreCase));
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                if (originalPos.HasValue && fileStream.CanSeek)
+                {
+                    fileStream.Position = originalPos.Value;
+                }
+            }
         }
     }
 }

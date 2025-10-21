@@ -72,7 +72,7 @@ public class PermissionService : IPermissionService
             // 评分管理权限
             "GradeExam" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
             "ViewAllGrades" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
-            "ViewOwnGrades" => true, // 所有用户都可以查看自己的成绩
+            PermissionKeys.ViewOwnGrades => true, // 所有用户都可以查看自己的成绩
 
             // 统计报表权限
             "ViewStatistics" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
@@ -114,7 +114,7 @@ public class PermissionService : IPermissionService
             "UserManagement" => userRole == UserRole.Admin,
             "QuestionBankManagement" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
             "ExamPaperManagement" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
-            "ExamManagement" => true, // 所有用户都可以访问考试模块
+            ModuleKeys.ExamManagement => true, // 所有用户都可以访问考试模块
             "GradeManagement" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
             "StatisticsReports" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
             "SystemSettings" => userRole == UserRole.Admin,
@@ -138,7 +138,7 @@ public class PermissionService : IPermissionService
         permissions.AddRange(new[]
         {
             "ViewQuestionBank",
-            "ViewOwnGrades",
+            PermissionKeys.ViewOwnGrades,
             PermissionKeys.ViewNotification,
             PermissionKeys.ViewResource
         });
@@ -207,7 +207,7 @@ public class PermissionService : IPermissionService
     {
         var modules = new List<string>
         {
-            "ExamManagement", // 所有用户都可以访问考试模块
+            ModuleKeys.ExamManagement, // 所有用户都可以访问考试模块
             ModuleKeys.MessageCenter,
             ModuleKeys.LearningResources
         };

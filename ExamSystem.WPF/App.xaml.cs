@@ -31,12 +31,16 @@ namespace ExamSystem.WPF
             Services = _host.Services;
             await _host.StartAsync();
 
-            // 初始化数据库种子数据
+            // 初始化数据库（迁移 + 种子数据）
             try
             {
                 using var scope = Services.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<ExamDbContext>();
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<DatabaseSeeder>>();
+
+                // 确保数据库迁移已应用（避免缺失列导致运行时错误，如 IsPublished）
+                await context.Database.MigrateAsync();
+
                 var seeder = new DatabaseSeeder(context, logger);
                 await seeder.SeedAsync();
             }
@@ -65,7 +69,7 @@ namespace ExamSystem.WPF
                 {
                     // 数据库上下文
                     services.AddDbContext<ExamDbContext>(options =>
-                        options.UseSqlite("Data Source=exam_system.db"));
+                        options.UseSqlite("Data Source=exam_system.db", b => b.MigrationsAssembly("ExamSystem.Infrastructure")));
 
                     // Repository层
                     services.AddScoped<IUserRepository, UserRepository>();
@@ -73,6 +77,9 @@ namespace ExamSystem.WPF
                     services.AddScoped<IQuestionBankRepository, QuestionBankRepository>();
                     services.AddScoped<IExamPaperRepository, ExamPaperRepository>();
                     services.AddScoped<IExamRecordRepository, ExamRecordRepository>();
+                    // 新增通知模块 Repository
+                    services.AddScoped<INotificationRepository, NotificationRepository>();
+                    services.AddScoped<INotificationRecipientRepository, NotificationRecipientRepository>();
 
                     // Service层
                     services.AddScoped<IUserService, UserService>();
@@ -82,6 +89,8 @@ namespace ExamSystem.WPF
                     services.AddScoped<IExamPaperService, ExamPaperService>();
                     services.AddScoped<IExamService, ExamService>();
                     services.AddScoped<IPermissionService, PermissionService>();
+                    // 新增通知服务
+                    services.AddScoped<INotificationService, NotificationService>();
                     services.AddScoped<IExcelImportService, ExcelImportService>();
                     services.AddScoped<IExcelExportService, ExcelExportService>();
                     services.AddScoped<ExamSystem.WPF.Services.IStatisticsService, ExamSystem.WPF.Services.StatisticsService>();
@@ -99,6 +108,14 @@ namespace ExamSystem.WPF
                     services.AddTransient<QuestionBankViewModel>();
                     services.AddTransient<StatisticsViewModel>();
                     services.AddTransient<UserManagementViewModel>();
+                    // 新增通知相关 ViewModel
+                    services.AddTransient<MessageCenterViewModel>();
+                    services.AddTransient<NotificationSendViewModel>();
+                    // 新增学生相关 ViewModel
+                    services.AddTransient<StudentExamListViewModel>();
+                    services.AddTransient<StudentExamResultViewModel>();
+                    services.AddTransient<FullScreenExamViewModel>();
+                    services.AddTransient<ExamResultDetailViewModel>();
 
                     // Views
                     services.AddTransient<LoginWindow>();
@@ -108,7 +125,11 @@ namespace ExamSystem.WPF
                     services.AddTransient<DatabaseSeeder>();
                     services.AddTransient<DashboardView>();
                     services.AddTransient<ExamView>();
-                    services.AddTransient<ExamPaperView>();
+                    services.AddTransient<ExamPaperView>(provider =>
+                    {
+                        var viewModel = provider.GetRequiredService<ExamPaperViewModel>();
+                        return new ExamPaperView(viewModel);
+                    });
                     services.AddTransient<ExamResultView>();
                     services.AddTransient<LoginWindow>();
                     services.AddTransient<QuestionBankView>(provider =>
@@ -118,6 +139,25 @@ namespace ExamSystem.WPF
                     });
                     services.AddTransient<StatisticsView>();
                     services.AddTransient<UserManagementView>();
+
+                    // 新增视图
+                    services.AddTransient<MessageCenterView>();
+                    services.AddTransient<LearningResourcesView>();
+                    // 新增学生相关视图
+                    services.AddTransient<StudentExamListView>(provider =>
+                    {
+                        var vm = provider.GetRequiredService<StudentExamListViewModel>();
+                        return new StudentExamListView(vm);
+                    });
+                     services.AddTransient<StudentExamResultView>();
+                     services.AddTransient<ExamResultDetailView>();
+                     services.AddTransient<FullScreenExamWindow>();
+                    // 新增通知发送视图（注入 ViewModel）
+                    services.AddTransient<NotificationSendView>(provider =>
+                    {
+                        var vm = provider.GetRequiredService<NotificationSendViewModel>();
+                        return new NotificationSendView(vm);
+                    });
                     
                     // Dialogs
                     services.AddTransient<ExamPaperEditDialog>();

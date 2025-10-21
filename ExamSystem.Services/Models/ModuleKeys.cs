@@ -7,5 +7,6 @@ namespace ExamSystem.Services.Models
     {
         public const string MessageCenter = "MessageCenter";       // 消息中心：老师/学生/管理员
         public const string LearningResources = "LearningResources"; // 学习资源：老师/学生/管理员
+        public const string ExamManagement = "ExamManagement";     // 考试管理：所有角色
     }
 }

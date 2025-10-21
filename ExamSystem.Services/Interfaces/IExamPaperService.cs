@@ -167,5 +167,11 @@ namespace ExamSystem.Services.Interfaces
     /// <param name="status">状态（可选）</param>
     /// <returns>试卷列表</returns>
     Task<List<ExamPaper>> SearchExamPapersAsync(string? keyword = null, int? creatorId = null, string? status = null);
+
+    /// <summary>
+    /// 获取已发布的试卷列表
+    /// </summary>
+    /// <returns>已发布的试卷列表</returns>
+    Task<List<ExamPaper>> GetPublishedPapersAsync();
     }
 }

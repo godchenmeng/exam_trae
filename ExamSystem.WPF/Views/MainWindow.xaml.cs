@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using ExamSystem.Domain.Entities;
 using ExamSystem.WPF.ViewModels;
 using ExamSystem.Services.Interfaces;
+using ExamSystem.Services.Models;
 
 namespace ExamSystem.WPF.Views
 {
@@ -15,7 +16,8 @@ namespace ExamSystem.WPF.Views
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<MainWindow> _logger;
-        private User _currentUser;
+        private readonly IPermissionService _permissionService;
+        private User? _currentUser;
 
         // 供 XAML 绑定显示的属性（改为依赖属性，确保 UI 能实时更新）
         public static readonly DependencyProperty CurrentUsernameProperty = DependencyProperty.Register(
@@ -34,41 +36,80 @@ namespace ExamSystem.WPF.Views
             set => SetValue(PreviousLoginAtProperty, value);
         }
 
-        public MainWindow(IServiceProvider serviceProvider, ILogger<MainWindow> logger)
+        public MainWindow(IServiceProvider serviceProvider, ILogger<MainWindow> logger, IPermissionService permissionService)
         {
             InitializeComponent();
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _permissionService = permissionService;
             
             _logger.LogInformation("MainWindow 构造函数完成，延迟加载页面直到用户登录");
             // 不在构造函数中加载页面，等待用户登录后再加载
         }
 
+        private void ApplyModuleVisibility()
+        {
+            if (_currentUser == null)
+            {
+                // 未登录用户不显示任何业务模块
+                TabDashboard.Visibility = Visibility.Collapsed;
+                TabQuestionBank.Visibility = Visibility.Collapsed;
+                TabExamPaper.Visibility = Visibility.Collapsed;
+                TabExamManagement.Visibility = Visibility.Collapsed;
+                TabExamResult.Visibility = Visibility.Collapsed;
+                TabStatistics.Visibility = Visibility.Collapsed;
+                TabUserManagement.Visibility = Visibility.Collapsed;
+                TabMessageCenter.Visibility = Visibility.Collapsed;
+                TabLearningResources.Visibility = Visibility.Collapsed;
+                // 新增：成绩管理入口
+                if (TabGradeManagement != null)
+                {
+                    TabGradeManagement.Visibility = Visibility.Collapsed;
+                }
+                return;
+            }
+        
+            var role = _currentUser.Role;
+        
+            // 旧模块：如果已有模块键值常量，建议后续替换为常量
+            TabDashboard.Visibility = Visibility.Visible; // 仪表板默认所有角色可见
+            TabQuestionBank.Visibility = _permissionService.HasModuleAccess(role, "QuestionBankManagement") ? Visibility.Visible : Visibility.Collapsed;
+            TabExamPaper.Visibility = _permissionService.HasModuleAccess(role, "ExamPaperManagement") ? Visibility.Visible : Visibility.Collapsed;
+            // 考试中心仅学生可见
+            TabExamManagement.Visibility = (_currentUser.Role == ExamSystem.Domain.Enums.UserRole.Student
+                                            && _permissionService.HasModuleAccess(role, ModuleKeys.ExamManagement))
+                                            ? Visibility.Visible : Visibility.Collapsed;
+            // 成绩查询仅学生可见（使用权限键 ViewOwnGrades）
+            TabExamResult.Visibility = (_currentUser.Role == ExamSystem.Domain.Enums.UserRole.Student
+                                        && _permissionService.HasPermission(role, PermissionKeys.ViewOwnGrades))
+                                        ? Visibility.Visible : Visibility.Collapsed;
+            TabStatistics.Visibility = _permissionService.HasModuleAccess(role, "StatisticsReports") ? Visibility.Visible : Visibility.Collapsed;
+            TabUserManagement.Visibility = _permissionService.HasModuleAccess(role, "UserManagement") ? Visibility.Visible : Visibility.Collapsed;
+            
+            // 新增模块：使用常量类
+            TabMessageCenter.Visibility = _permissionService.HasModuleAccess(role, ModuleKeys.MessageCenter) ? Visibility.Visible : Visibility.Collapsed;
+            TabLearningResources.Visibility = _permissionService.HasModuleAccess(role, ModuleKeys.LearningResources) ? Visibility.Visible : Visibility.Collapsed;
+            
+            // 新增：成绩管理入口仅教师/管理员可见
+            if (TabGradeManagement != null)
+            {
+                TabGradeManagement.Visibility = _permissionService.HasModuleAccess(role, "GradeManagement") ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
         public void SetCurrentUser(User user)
         {
             _currentUser = user;
-            _logger.LogInformation($"=== MainWindow.SetCurrentUser ===");
+            CurrentUsername = _currentUser?.Username ?? "未登录";
             
-            if (user != null)
-            {
-                _logger.LogInformation($"设置当前用户: {user.Username} ({user.Role})");
-                _logger.LogInformation($"用户ID: {user.UserId}");
-                _logger.LogInformation($"用户对象是否为null: false");
-
-                // 更新顶部显示用户名
-                CurrentUsername = user.Username;
-                
-                // 用户登录后才加载页面
-                _logger.LogInformation("开始加载页面...");
-                LoadPages();
-                
-                // 将用户信息传递给各个ViewModel
-                UpdateViewModelsWithCurrentUser();
-            }
-            else
-            {
-                _logger.LogWarning($"用户对象是否为null: true");
-            }
+            // 根据当前用户角色应用模块可见性
+            ApplyModuleVisibility();
+            
+            // 登录后再加载页面，避免无权用户加载不必要资源
+            LoadPages();
+            
+            // 更新 ViewModel 的用户上下文
+            UpdateViewModelsWithCurrentUser();
         }
 
         private void LoadPages()
@@ -93,11 +134,59 @@ namespace ExamSystem.WPF.Views
                 var examPaperView = _serviceProvider.GetRequiredService<ExamPaperView>();
                 ExamPaperFrame.Content = examPaperView;
 
-                var examView = _serviceProvider.GetRequiredService<ExamView>();
-                ExamFrame.Content = examView;
+                // 根据用户角色加载不同的考试管理视图
+                if (_currentUser != null && _currentUser.Role == ExamSystem.Domain.Enums.UserRole.Student)
+                {
+                    // 学生：加载学生考试列表视图
+                    var studentExamListView = _serviceProvider.GetRequiredService<StudentExamListView>();
+                    ExamFrame.Content = studentExamListView;
+                }
+                else
+                {
+                    // 教师/管理员：加载管理员考试视图
+                    var examView = _serviceProvider.GetRequiredService<ExamView>();
+                    ExamFrame.Content = examView;
+                }
 
-                var examResultView = _serviceProvider.GetRequiredService<ExamResultView>();
-                ExamResultFrame.Content = examResultView;
+                // 根据用户角色加载不同的考试结果视图
+                if (_currentUser != null && _currentUser.Role == ExamSystem.Domain.Enums.UserRole.Student)
+                {
+                    // 学生：加载学生考试结果视图
+                    var studentExamResultView = _serviceProvider.GetRequiredService<StudentExamResultView>();
+                    ExamResultFrame.Content = studentExamResultView;
+                }
+                else
+                {
+                    // 教师/管理员：加载管理员考试结果视图
+                    var examResultView = _serviceProvider.GetRequiredService<ExamResultView>();
+                    ExamResultFrame.Content = examResultView;
+                }
+
+                // 新增：消息中心
+                if (_currentUser != null && _currentUser.Role == ExamSystem.Domain.Enums.UserRole.Student)
+                {
+                    // 学生：加载消息中心查看页
+                    var mcView = _serviceProvider.GetRequiredService<MessageCenterView>();
+                    MessageCenterFrame.Content = mcView;
+                    // 注入 ViewModel 并设置当前用户
+                    var mcVm = _serviceProvider.GetRequiredService<MessageCenterViewModel>();
+                    mcView.DataContext = mcVm;
+                    mcVm.SetCurrentUser(_currentUser);
+                }
+                else
+                {
+                    // 教师/管理员：加载通知发送页
+                    var sendView = _serviceProvider.GetRequiredService<NotificationSendView>();
+                    MessageCenterFrame.Content = sendView;
+                    if (sendView.DataContext is NotificationSendViewModel sendVm && _currentUser != null)
+                    {
+                        sendVm.SetCurrentUser(_currentUser);
+                    }
+                }
+
+                // 新增：学习资源
+                var learningResourcesView = _serviceProvider.GetRequiredService<LearningResourcesView>();
+                LearningResourcesFrame.Content = learningResourcesView;
 
                 // 加载统计报表
                 var statisticsView = _serviceProvider.GetRequiredService<StatisticsView>();
@@ -175,6 +264,56 @@ namespace ExamSystem.WPF.Views
                 else
                 {
                     _logger.LogWarning("QuestionBankFrame为null");
+                }
+
+                // 同步更新 ExamPaperViewModel 的用户信息
+                _logger.LogInformation($"ExamPaperFrame是否为null: {ExamPaperFrame == null}");
+                if (ExamPaperFrame != null)
+                {
+                    _logger.LogInformation($"ExamPaperFrame.Content是否为null: {ExamPaperFrame.Content == null}");
+                    if (ExamPaperFrame.Content is ExamPaperView examPaperView)
+                    {
+                        _logger.LogInformation("ExamPaperFrame.Content是ExamPaperView类型");
+                        if (examPaperView.DataContext is ExamPaperViewModel examPaperViewModel)
+                        {
+                            _logger.LogInformation("找到ExamPaperViewModel，正在设置用户信息");
+                            examPaperViewModel.SetCurrentUser(_currentUser);
+                            _logger.LogInformation("ExamPaperViewModel用户信息设置完成");
+                        }
+                        else
+                        {
+                            _logger.LogWarning("ExamPaperView.DataContext不是ExamPaperViewModel类型或为null");
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogWarning("ExamPaperFrame.Content不是ExamPaperView类型或为null");
+                    }
+                }
+
+                // 同步更新 学生考试列表 StudentExamListViewModel 的用户信息
+                _logger.LogInformation($"ExamFrame是否为null: {ExamFrame == null}");
+                if (ExamFrame != null)
+                {
+                    _logger.LogInformation($"ExamFrame.Content是否为null: {ExamFrame.Content == null}");
+                    if (ExamFrame.Content is StudentExamListView studentExamListView)
+                    {
+                        _logger.LogInformation("ExamFrame.Content是StudentExamListView类型");
+                        if (studentExamListView.DataContext is StudentExamListViewModel studentVm)
+                        {
+                            _logger.LogInformation("找到StudentExamListViewModel，正在设置用户信息");
+                            studentVm.SetCurrentUser(_currentUser);
+                            _logger.LogInformation("StudentExamListViewModel用户信息设置完成");
+                        }
+                        else
+                        {
+                            _logger.LogWarning("StudentExamListView.DataContext不是StudentExamListViewModel类型或为null");
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation("ExamFrame.Content不是StudentExamListView类型（可能为教师/管理员视图）");
+                    }
                 }
 
                 // 可以在这里添加其他需要用户信息的ViewModel更新

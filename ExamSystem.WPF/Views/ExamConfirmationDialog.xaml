@@ -1,0 +1,181 @@
+<Window x:Class="ExamSystem.WPF.Views.ExamConfirmationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="考试确认" 
+        Height="600" 
+        Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow">
+    
+    <Window.Resources>
+        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
+        </Style>
+        
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#34495E"/>
+            <Setter Property="Margin" Value="0,15,0,10"/>
+        </Style>
+        
+        <Style x:Key="InfoTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="Margin" Value="0,5,0,5"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        
+        <Style x:Key="RuleTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#7F8C8D"/>
+            <Setter Property="Margin" Value="15,3,0,3"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        
+        <Style x:Key="WarningTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#E74C3C"/>
+            <Setter Property="Margin" Value="0,10,0,10"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="Margin" Value="10,0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="StartButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Background" Value="#27AE60"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <Style x:Key="CancelButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Background" Value="#95A5A6"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- 标题 -->
+        <TextBlock Grid.Row="0" 
+                   Text="{Binding PaperTitle}" 
+                   Style="{StaticResource HeaderTextStyle}"/>
+        
+        <!-- 内容区域 -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- 考试信息 -->
+                <TextBlock Text="考试信息" Style="{StaticResource SectionHeaderStyle}"/>
+                
+                <Grid Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="考试时长：" Style="{StaticResource InfoTextStyle}" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource InfoTextStyle}">
+                        <Run Text="{Binding Duration}"/>
+                        <Run Text=" 分钟"/>
+                    </TextBlock>
+                    
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="总分：" Style="{StaticResource InfoTextStyle}" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TotalScore}" Style="{StaticResource InfoTextStyle}"/>
+                    
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="题目数量：" Style="{StaticResource InfoTextStyle}" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource InfoTextStyle}">
+                        <Run Text="{Binding QuestionCount}"/>
+                        <Run Text=" 题"/>
+                    </TextBlock>
+                    
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="考试说明：" Style="{StaticResource InfoTextStyle}" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Description}" Style="{StaticResource InfoTextStyle}"/>
+                </Grid>
+                
+                <!-- 考试规则 -->
+                <TextBlock Text="考试规则" Style="{StaticResource SectionHeaderStyle}"/>
+                
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="1. 考试开始后，系统将自动计时，请合理安排答题时间。" Style="{StaticResource RuleTextStyle}"/>
+                    <TextBlock Text="2. 考试过程中请保持网络连接稳定，避免因网络问题导致答案丢失。" Style="{StaticResource RuleTextStyle}"/>
+                    <TextBlock Text="3. 考试期间请勿切换到其他应用程序或网页，系统会记录异常行为。" Style="{StaticResource RuleTextStyle}"/>
+                    <TextBlock Text="4. 每道题目的答案会自动保存，您可以随时修改已答题目。" Style="{StaticResource RuleTextStyle}"/>
+                    <TextBlock Text="5. 考试时间结束后，系统将自动提交试卷，请注意时间管理。" Style="{StaticResource RuleTextStyle}"/>
+                    <TextBlock Text="6. 提交试卷后无法再次修改答案，请仔细检查后再提交。" Style="{StaticResource RuleTextStyle}"/>
+                    <TextBlock Text="7. 如遇技术问题，请及时联系监考老师或技术支持。" Style="{StaticResource RuleTextStyle}"/>
+                </StackPanel>
+                
+                <!-- 注意事项 -->
+                <TextBlock Text="注意事项" Style="{StaticResource SectionHeaderStyle}"/>
+                
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="• 请确保您的设备电量充足，建议连接电源适配器。" Style="{StaticResource RuleTextStyle}"/>
+                    <TextBlock Text="• 建议使用稳定的网络环境，避免使用移动热点。" Style="{StaticResource RuleTextStyle}"/>
+                    <TextBlock Text="• 考试过程中请保持安静，避免干扰其他考生。" Style="{StaticResource RuleTextStyle}"/>
+                    <TextBlock Text="• 严禁使用任何作弊工具或与他人交流答案。" Style="{StaticResource RuleTextStyle}"/>
+                </StackPanel>
+                
+                <!-- 警告信息 -->
+                <TextBlock Text="⚠️ 点击&quot;开始考试&quot;后，考试将立即开始计时，请确保您已准备就绪！" 
+                           Style="{StaticResource WarningTextStyle}"/>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- 按钮区域 -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center" 
+                    Margin="0,20,0,0">
+            <Button Content="取消" 
+                    Style="{StaticResource CancelButtonStyle}"
+                    Click="CancelButton_Click"/>
+            <Button Content="开始考试" 
+                    Style="{StaticResource StartButtonStyle}"
+                    Click="StartExamButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

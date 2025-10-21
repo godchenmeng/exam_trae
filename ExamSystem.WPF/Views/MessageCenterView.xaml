@@ -1,0 +1,109 @@
+<UserControl x:Class="ExamSystem.WPF.Views.MessageCenterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="5*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 顶部：标题 + 筛选 + 刷新 -->
+        <DockPanel Grid.Row="0" Grid.ColumnSpan="2" LastChildFill="False" Margin="0,0,0,8">
+            <TextBlock Text="消息中心" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" DockPanel.Dock="Left"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                <TextBlock Text="筛选：" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ComboBox SelectedIndex="{Binding SelectedFilterIndex}" MinWidth="140" Margin="0,0,12,0">
+                    <ComboBoxItem Content="全部"/>
+                    <ComboBoxItem Content="未读"/>
+                    <ComboBoxItem Content="已读"/>
+                </ComboBox>
+                <Button Content="刷新" Command="{Binding RefreshCommand}" Style="{StaticResource SecondaryButtonStyle}" MinWidth="100"/>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- 左侧：通知列表 -->
+        <Border Grid.Row="1" Grid.Column="0" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,0,8,0">
+            <Grid>
+                <ListView ItemsSource="{Binding Notifications}" SelectedItem="{Binding SelectedNotification}">
+                    <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{StaticResource CardBackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8" Margin="6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- 已读状态标记 -->
+                                <Ellipse Width="10" Height="10" VerticalAlignment="Center" Fill="{Binding IsRead, Converter={StaticResource BooleanToBrushConverter}}"/>
+                                <!-- 标题与发送者 -->
+                                <StackPanel Grid.Column="1" Margin="8,0,8,0">
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Foreground="{StaticResource TextSecondaryBrush}" FontSize="12">
+                                        <Run Text="发送者："/>
+                                        <Run Text="{Binding SenderName}"/>
+                                        <Run Text="  ·  时间："/>
+                                        <Run Text="{Binding CreatedAt, StringFormat=yyyy-MM-dd HH:mm}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                                <!-- 优先级 -->
+                                <TextBlock Grid.Column="2" Text="{Binding Priority, Converter={StaticResource NotificationPriorityToTextConverter}}" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Border>
+
+        <!-- 右侧：详情 -->
+        <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource CardBackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding SelectedNotification.Title}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock Grid.Row="1" Foreground="{StaticResource TextSecondaryBrush}">
+                        <Run Text="发送者："/>
+                        <Run Text="{Binding SelectedNotification.SenderName}"/>
+                        <Run Text="  ·  时间："/>
+                        <Run Text="{Binding SelectedNotification.CreatedAt, StringFormat=yyyy-MM-dd HH:mm}"/>
+                        <Run Text="  ·  优先级："/>
+                        <Run Text="{Binding SelectedNotification.Priority, Converter={StaticResource NotificationPriorityToTextConverter}}"/>
+                    </TextBlock>
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                        <Border Background="{StaticResource PrimaryLightBrush}" CornerRadius="8" Padding="12">
+                            <TextBlock Text="{Binding SelectedNotification.Content}" TextWrapping="Wrap" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </Border>
+                    </ScrollViewer>
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                        <Button Content="标记为已读" Command="{Binding MarkAsReadCommand}" IsEnabled="{Binding SelectedNotification.IsRead, Converter={StaticResource InverseBooleanConverter}}" Style="{StaticResource PrimaryButtonStyle}" MinWidth="140"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+        <!-- 底部：分页 -->
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="上一页" Command="{Binding PrevPageCommand}" Style="{StaticResource SecondaryButtonStyle}" MinWidth="100" Margin="0,0,12,0"/>
+                <TextBlock Margin="12,0,12,0" VerticalAlignment="Center">
+                    <Run Text="页码："/>
+                    <Run Text="{Binding PageIndex}"/>
+                    <Run Text="/"/>
+                    <Run Text="{Binding TotalPages, Mode=OneWay}"/>
+                </TextBlock>
+                <Button Content="下一页" Command="{Binding NextPageCommand}" Style="{StaticResource PrimaryButtonStyle}" MinWidth="100" Margin="12,0,0,0"/>
+            </StackPanel>
+    </Grid>
+</UserControl>

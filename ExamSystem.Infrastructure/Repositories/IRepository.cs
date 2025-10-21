@@ -59,6 +59,12 @@ namespace ExamSystem.Infrastructure.Repositories
         void Update(T entity);
 
         /// <summary>
+        /// 异步更新实体
+        /// </summary>
+        /// <param name="entity">要更新的实体</param>
+        Task UpdateAsync(T entity);
+
+        /// <summary>
         /// 删除实体
         /// </summary>
         /// <param name="entity">要删除的实体</param>

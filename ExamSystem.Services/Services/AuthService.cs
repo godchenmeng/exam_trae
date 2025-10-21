@@ -23,6 +23,7 @@ namespace ExamSystem.Services.Services
     private readonly ExamDbContext _context;
     private const int MaxLoginAttempts = 5;
     private const int LockoutMinutes = 30;
+    private User? _currentUser;
 
     public AuthService(IUserRepository userRepository, ILogger<AuthService> logger, ExamDbContext context)
     {
@@ -226,6 +227,7 @@ namespace ExamSystem.Services.Services
             _logger.LogInformation("用户信息更新完成");
 
             _logger.LogInformation("用户登录成功 - {Username}", username);
+            _currentUser = user; // 记录当前登录用户
             return (true, user, previousLoginAt, "登录成功");
         }
         catch (Exception ex)
@@ -442,13 +444,13 @@ namespace ExamSystem.Services.Services
 
     public User? GetCurrentUser()
     {
-        // TODO: 实现获取当前用户的逻辑
-        return null;
+        return _currentUser;
     }
 
     public void Logout()
     {
-        // TODO: 实现登出逻辑
+        _currentUser = null;
+        _logger.LogInformation("用户已退出登录，清空当前用户状态");
     }
-    }
+}
 }

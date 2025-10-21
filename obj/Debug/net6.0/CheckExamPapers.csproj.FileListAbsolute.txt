@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net6.0\CheckExamPapers.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net6.0\CheckExamPapers.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net6.0\CheckExamPapers.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net6.0\CheckExamPapers.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net6.0\CheckExamPapers.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net6.0\CheckExamPapers.sourcelink.json

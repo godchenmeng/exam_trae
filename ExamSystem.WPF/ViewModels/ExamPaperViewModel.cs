@@ -26,6 +26,10 @@ public class ExamPaperViewModel : BaseViewModel
     private readonly ILogger<ExamPaperViewModel> _logger;
     private readonly IQuestionService _questionService;
     private readonly ILoggerFactory _loggerFactory;
+    // 新增：认证服务，用于获取当前登录用户
+    private readonly IAuthService _authService;
+    // 新增：当前用户缓存（优先使用MainWindow传入的用户）
+    private User? _currentUser;
 
     #region 属性
 
@@ -140,13 +144,16 @@ public class ExamPaperViewModel : BaseViewModel
         IQuestionBankService questionBankService,
         IQuestionService questionService,
         ILogger<ExamPaperViewModel> logger,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        // 新增：注入认证服务
+        IAuthService authService)
     {
         _examPaperService = examPaperService;
         _questionBankService = questionBankService;
         _logger = logger;
         _questionService = questionService;
         _loggerFactory = loggerFactory;
+        _authService = authService;
 
         // 初始化命令
         LoadExamPapersCommand = new RelayCommand(async () => await LoadExamPapersAsync());
@@ -163,6 +170,19 @@ public class ExamPaperViewModel : BaseViewModel
         // 初始化数据
         _ = LoadExamPapersAsync();
     }
+
+    #region 公共方法
+
+    /// <summary>
+    /// 由主窗口传入当前登录用户上下文
+    /// </summary>
+    public void SetCurrentUser(User user)
+    {
+        _currentUser = user;
+        _logger.LogInformation("ExamPaperViewModel 已接收当前登录用户: {Username} (Id={UserId})", user.Username, user.UserId);
+    }
+
+    #endregion
 
     #region 方法
 
@@ -286,7 +306,11 @@ public class ExamPaperViewModel : BaseViewModel
         try
         {
             var viewModel = new ExamPaperEditViewModel(_examPaperService);
-            viewModel.InitializeForCreate(1); // TODO: 使用当前用户ID
+            // 优先使用MainWindow传入的当前用户；若不可用，再尝试AuthService；最后兜底为1
+            var currentUserId = _currentUser?.UserId
+                                ?? _authService.GetCurrentUser()?.UserId
+                                ?? 1;
+            viewModel.InitializeForCreate(currentUserId);
             
             var dialog = new Views.ExamPaperEditDialog(viewModel);
             var result = dialog.ShowDialog();

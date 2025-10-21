@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net6.0\TestImportFunction.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net6.0\TestImportFunction.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net6.0\TestImportFunction.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net6.0\TestImportFunction.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net6.0\TestImportFunction.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net6.0\TestImportFunction.sourcelink.json

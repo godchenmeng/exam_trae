@@ -51,6 +51,8 @@ public class QuestionBankViewModel : BaseViewModel
                 OnPropertyChanged(nameof(IsQuestionBankSelected));
                 OnPropertyChanged(nameof(CanEditQuestionBank));
                 OnPropertyChanged(nameof(CanDeleteQuestionBank));
+                OnPropertyChanged(nameof(CanImportQuestions));
+                OnPropertyChanged(nameof(CanExportQuestions));
                 LoadQuestionsCommand?.Execute(null);
             }
         }
@@ -320,7 +322,10 @@ public class QuestionBankViewModel : BaseViewModel
         try
         {
             var editViewModel = new QuestionBankEditViewModel(_questionBankService, _loggerFactory.CreateLogger<QuestionBankEditViewModel>());
-            editViewModel.SetCurrentUser(CurrentUser); // 使用SetCurrentUser方法
+            if (CurrentUser != null)
+            {
+                editViewModel.SetCurrentUser(CurrentUser); // 使用SetCurrentUser方法（避免传入 null）
+            }
             editViewModel.SetQuestionBank(null!); // 新建模式
             
             var dialog = new Views.QuestionBankEditDialog(editViewModel);
@@ -355,10 +360,13 @@ public class QuestionBankViewModel : BaseViewModel
         try
         {
             var editViewModel = new QuestionBankEditViewModel(_questionBankService, _loggerFactory.CreateLogger<QuestionBankEditViewModel>());
-            editViewModel.SetCurrentUser(CurrentUser); // 使用SetCurrentUser方法
-            editViewModel.SetQuestionBank(SelectedQuestionBank);
-            
-            var dialog = new Views.QuestionBankEditDialog(editViewModel);
+            if (CurrentUser != null)
+            {
+                editViewModel.SetCurrentUser(CurrentUser); // 使用SetCurrentUser方法（避免传入 null）
+            }
+             editViewModel.SetQuestionBank(SelectedQuestionBank);
+             
+             var dialog = new Views.QuestionBankEditDialog(editViewModel);
             
             // 安全设置Owner属性
             var mainWindow = Application.Current.MainWindow;
@@ -694,6 +702,9 @@ public class QuestionBankViewModel : BaseViewModel
 
         try
         {
+            _logger.LogInformation("开始导入题目流程，选中题库: {BankName} (ID: {BankId})", 
+                SelectedQuestionBank.Name, SelectedQuestionBank.BankId);
+
             // 打开文件选择对话框
             var openFileDialog = new OpenFileDialog
             {
@@ -704,12 +715,19 @@ public class QuestionBankViewModel : BaseViewModel
 
             if (openFileDialog.ShowDialog() == true)
             {
+                _logger.LogInformation("用户选择了文件: {FileName}", openFileDialog.FileName);
+                
                 IsLoading = true;
                 StatusMessage = "正在导入题目...";
 
                 // 使用Excel导入服务导入题目
                 using var fileStream = File.OpenRead(openFileDialog.FileName);
+                _logger.LogInformation("开始调用Excel导入服务");
+                
                 var importResult = await _excelImportService.ImportQuestionsFromExcelAsync(fileStream, SelectedQuestionBank.BankId);
+                
+                _logger.LogInformation("Excel导入服务返回结果: 总数={TotalCount}, 成功={SuccessCount}, 失败={FailureCount}", 
+                    importResult.TotalCount, importResult.SuccessCount, importResult.FailureCount);
 
                 StatusMessage = $"导入完成：成功 {importResult.SuccessCount} 题，失败 {importResult.FailureCount} 题";
                 
@@ -717,7 +735,12 @@ public class QuestionBankViewModel : BaseViewModel
                 await LoadQuestionsAsync();
 
                 // 显示导入结果报告
+                _logger.LogInformation("准备显示导入结果对话框");
                 ShowImportResultDialog(importResult);
+            }
+            else
+            {
+                _logger.LogInformation("用户取消了文件选择");
             }
         }
         catch (Exception ex)
@@ -738,6 +761,9 @@ public class QuestionBankViewModel : BaseViewModel
     {
         try
         {
+            _logger.LogInformation("开始创建导入结果对话框，结果: 总数={TotalCount}, 成功={SuccessCount}, 失败={FailureCount}", 
+                importResult.TotalCount, importResult.SuccessCount, importResult.FailureCount);
+
             // 转换为视图模型
             var viewModel = new ImportResultViewModel
             {
@@ -762,17 +788,30 @@ public class QuestionBankViewModel : BaseViewModel
                 }).ToList() ?? new List<ImportFailureInfo>()
             };
 
+            _logger.LogInformation("创建ImportResultViewModel完成，成功题目数: {SuccessfulCount}, 失败题目数: {FailedCount}", 
+                viewModel.SuccessfulQuestions.Count, viewModel.FailedQuestions.Count);
+
             // 显示对话框
             var dialog = new Views.ImportResultDialog(viewModel);
+            
+            _logger.LogInformation("创建ImportResultDialog完成，准备显示对话框");
             
             // 安全设置Owner属性
             var mainWindow = Application.Current.MainWindow;
             if (mainWindow != null && mainWindow.IsLoaded && mainWindow != dialog)
             {
                 dialog.Owner = mainWindow;
+                _logger.LogInformation("设置对话框Owner为主窗口");
+            }
+            else
+            {
+                _logger.LogWarning("无法设置对话框Owner，主窗口状态: MainWindow={MainWindow}, IsLoaded={IsLoaded}", 
+                    mainWindow != null, mainWindow?.IsLoaded);
             }
             
+            _logger.LogInformation("准备显示导入结果对话框");
             dialog.ShowDialog();
+            _logger.LogInformation("导入结果对话框已关闭");
         }
         catch (Exception ex)
         {

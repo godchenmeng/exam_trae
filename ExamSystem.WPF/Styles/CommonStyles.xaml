@@ -9,6 +9,9 @@
     <converters:BooleanToFalseConverter x:Key="BooleanToFalseConverter"/>
     <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
     <converters:PassedFailedStyleConverter x:Key="PassedFailedStyleConverter"/>
+    <!-- 新增：通知模块枚举中文显示转换器 -->
+    <converters:NotificationPriorityToTextConverter x:Key="NotificationPriorityToTextConverter"/>
+    <converters:NotificationScopeToTextConverter x:Key="NotificationScopeToTextConverter"/>
 
     <!-- 颜色定义 -->
     <SolidColorBrush x:Key="PrimaryBrush" Color="#2196F3"/>

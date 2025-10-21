@@ -14,11 +14,14 @@
             <converters:LoadingTextConverter x:Key="LoadingTextConverter"/>
             <converters:QuestionTypeConverter x:Key="QuestionTypeConverter"/>
             <converters:DifficultyConverter x:Key="DifficultyConverter"/>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:BooleanToBackgroundConverter x:Key="BooleanToBackgroundConverter"/>
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
             <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
             <converters:PassedFailedStyleConverter x:Key="PassedFailedStyleConverter"/>
+            <!-- 消息中心相关转换器 -->
+            <converters:BooleanToBrushConverter x:Key="BooleanToBrushConverter"/>
+            <converters:ReadStatusConverter x:Key="ReadStatusConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

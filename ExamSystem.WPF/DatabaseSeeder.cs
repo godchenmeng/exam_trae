@@ -24,8 +24,8 @@ namespace ExamSystem.WPF
         {
             try
             {
-                // 确保数据库已创建
-                await _context.Database.EnsureCreatedAsync();
+                // 应用EF迁移，确保最新架构（包含通知相关表）
+                await _context.Database.MigrateAsync();
 
                 // 检查是否已有管理员用户
                 if (!await _context.Users.AnyAsync(u => u.Role == UserRole.Admin))

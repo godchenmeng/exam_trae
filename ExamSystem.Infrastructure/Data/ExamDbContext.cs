@@ -18,6 +18,8 @@ namespace ExamSystem.Data
         public DbSet<PaperQuestion> PaperQuestions { get; set; } = null!;
         public DbSet<ExamRecord> ExamRecords { get; set; } = null!;
         public DbSet<AnswerRecord> AnswerRecords { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
+        public DbSet<NotificationRecipient> NotificationRecipients { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -131,6 +133,37 @@ namespace ExamSystem.Data
                       .WithMany()
                       .HasForeignKey(e => e.GraderId)
                       .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // 配置通知表
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.NotificationId);
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Content).IsRequired();
+                entity.Property(e => e.Priority).HasConversion<int>();
+                entity.Property(e => e.Status).HasConversion<int>();
+                entity.Property(e => e.Scope).HasConversion<int>();
+                entity.HasOne(e => e.Sender)
+                      .WithMany()
+                      .HasForeignKey(e => e.SenderId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 配置通知接收人表
+            modelBuilder.Entity<NotificationRecipient>(entity =>
+            {
+                entity.HasKey(e => e.NotificationRecipientId);
+                entity.Property(e => e.DeliveryStatus).HasConversion<int>();
+                entity.HasIndex(e => new { e.NotificationId, e.ReceiverId }).IsUnique();
+                entity.HasOne(e => e.Notification)
+                      .WithMany(e => e.Recipients)
+                      .HasForeignKey(e => e.NotificationId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Receiver)
+                      .WithMany()
+                      .HasForeignKey(e => e.ReceiverId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             // 种子数据

@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net6.0\CheckWpfDbStructure.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net6.0\CheckWpfDbStructure.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net6.0\CheckWpfDbStructure.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net6.0\CheckWpfDbStructure.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net6.0\CheckWpfDbStructure.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net6.0\CheckWpfDbStructure.sourcelink.json

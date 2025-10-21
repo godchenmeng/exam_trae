@@ -12,8 +12,8 @@ namespace ExamSystem.WPF.ViewModels
         private int _totalCount;
         private int _successCount;
         private int _failureCount;
-        private List<ImportedQuestionInfo> _successfulQuestions;
-        private List<ImportFailureInfo> _failedQuestions;
+        private List<ImportedQuestionInfo> _successfulQuestions = new();
+        private List<ImportFailureInfo> _failedQuestions = new();
 
         public int TotalCount
         {
@@ -71,11 +71,11 @@ namespace ExamSystem.WPF.ViewModels
             FailedQuestions = new List<ImportFailureInfo>();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName ?? string.Empty));
         }
     }
 
@@ -85,11 +85,11 @@ namespace ExamSystem.WPF.ViewModels
     public class ImportedQuestionInfo
     {
         public int RowNumber { get; set; }
-        public string Title { get; set; }
-        public string QuestionType { get; set; }
-        public string Difficulty { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string QuestionType { get; set; } = string.Empty;
+        public string Difficulty { get; set; } = string.Empty;
         public int Score { get; set; }
-        public string Tags { get; set; }
+        public string Tags { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -98,8 +98,8 @@ namespace ExamSystem.WPF.ViewModels
     public class ImportFailureInfo
     {
         public int RowNumber { get; set; }
-        public string Title { get; set; }
-        public string ErrorMessage { get; set; }
-        public string RawData { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string ErrorMessage { get; set; } = string.Empty;
+        public string RawData { get; set; } = string.Empty;
     }
 }

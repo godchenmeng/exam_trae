@@ -1,0 +1,1 @@
+   4:6>e:\Project\exam_trae\ExamSystem.Services\Services\NotificationService.cs(212,38): error CS1061: “INotificationRecipientRepository”未包含“UpdateAsync”的定义，并且找不到可接受第一个“INotificationRecipientRepository”类型参数的可访问扩展方法“UpdateAsync”(是否缺少 using 指令或程序集引用?) [e:\Project\exam_trae\ExamSystem.Services\ExamSystem.Services.csproj]

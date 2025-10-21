@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Data;
-
 using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Infrastructure.Repositories;
 using ExamSystem.Services.Interfaces;
+using ExamSystem.Services.Models;
 using Microsoft.Extensions.Logging;
 
 namespace ExamSystem.Services.Services
@@ -91,6 +91,15 @@ public class ExamService : IExamService
 
             await _context.SaveChangesAsync();
 
+            // 关键：重新加载考试记录，包含题目及其选项，确保前端可用
+            examRecord = await _context.ExamRecords
+                .Include(r => r.ExamPaper)
+                    .ThenInclude(p => p.PaperQuestions)
+                .Include(r => r.AnswerRecords)
+                    .ThenInclude(ar => ar.Question)
+                        .ThenInclude(q => q.Options)
+                .FirstOrDefaultAsync(r => r.RecordId == examRecord.RecordId) ?? examRecord;
+
             _logger.LogInformation("用户 {UserId} 开始考试，试卷ID: {PaperId}，记录ID: {RecordId}", 
                 userId, paperId, examRecord.RecordId);
 
@@ -114,7 +123,8 @@ public class ExamService : IExamService
                 .Include(r => r.ExamPaper)
                 .Include(r => r.User)
                 .Include(r => r.AnswerRecords)
-                .ThenInclude(ar => ar.Question)
+                    .ThenInclude(ar => ar.Question)
+                        .ThenInclude(q => q.Options)
                 .FirstOrDefaultAsync(r => r.RecordId == recordId);
 
             return examRecord;
@@ -210,7 +220,8 @@ public class ExamService : IExamService
                 .Include(r => r.ExamPaper)
                 .Include(r => r.User)
                 .Include(r => r.AnswerRecords)
-                .ThenInclude(ar => ar.Question)
+                    .ThenInclude(ar => ar.Question)
+                        .ThenInclude(q => q.Options)
                 .FirstOrDefaultAsync(r => r.RecordId == recordId);
         }
         catch (Exception ex)
@@ -351,6 +362,7 @@ public class ExamService : IExamService
         {
             return await _context.AnswerRecords
                 .Include(ar => ar.Question)
+                    .ThenInclude(q => q.Options)
                 .Where(ar => ar.RecordId == recordId)
                 .OrderBy(ar => ar.Question.QuestionId)
                 .ToListAsync();
@@ -499,56 +511,98 @@ public class ExamService : IExamService
     /// </summary>
     public async Task<bool> CanUserTakeExamAsync(int userId, int paperId)
     {
-        try
+        var result = await ValidateUserExamEligibilityAsync(userId, paperId);
+        return result.IsValid;
+    }
+
+    /// <summary>
+    /// 验证用户考试资格（详细版本）
+    /// </summary>
+    public async Task<ExamValidationResult> ValidateUserExamEligibilityAsync(int userId, int paperId)
+    {
+        _logger.LogInformation("开始检查用户考试资格 - UserId: {UserId}, PaperId: {PaperId}", userId, paperId);
+        
+        // 检查试卷是否存在
+        var paper = await _context.ExamPapers
+            .Include(p => p.PaperQuestions)
+            .ThenInclude(pq => pq.Question)
+            .FirstOrDefaultAsync(p => p.PaperId == paperId);
+        
+        if (paper == null)
         {
-            // 检查试卷是否存在且已发布
-            var examPaper = await _examPaperRepository.GetByIdAsync(paperId);
-
-            if (examPaper == null || examPaper.Status != "已发布")
+            _logger.LogWarning("试卷不存在 - PaperId: {PaperId}", paperId);
+            return ExamValidationResult.Failure("试卷不存在，请联系管理员。", ExamValidationErrorType.PaperNotFound);
+        }
+        
+        _logger.LogInformation("试卷信息 - Name: {Name}, IsPublished: {IsPublished}, Status: {Status}", 
+            paper.Name, paper.IsPublished, paper.Status);
+    
+        // 检查试卷是否已发布（兼容两种标识方式）
+        bool isPublished = paper.IsPublished || paper.Status == "已发布";
+        if (!isPublished)
+        {
+            _logger.LogWarning("试卷未发布 - PaperId: {PaperId}, IsPublished: {IsPublished}, Status: {Status}", 
+                paperId, paper.IsPublished, paper.Status);
+            return ExamValidationResult.Failure("试卷尚未发布，暂时无法参加考试。", ExamValidationErrorType.PaperNotPublished);
+        }
+        
+        _logger.LogInformation("试卷发布状态检查通过");
+    
+        // 检查考试时间窗口
+        var now = DateTime.Now;
+        if (paper.StartTime.HasValue && now < paper.StartTime.Value)
+        {
+            _logger.LogWarning("考试尚未开始 - 当前时间: {Now}, 开始时间: {StartTime}", 
+                now, paper.StartTime.Value);
+            return ExamValidationResult.Failure(
+                $"考试尚未开始，开始时间为：{paper.StartTime.Value:yyyy-MM-dd HH:mm:ss}。", 
+                ExamValidationErrorType.ExamNotStarted);
+        }
+    
+        if (paper.EndTime.HasValue && now > paper.EndTime.Value)
+        {
+            _logger.LogWarning("考试已结束 - 当前时间: {Now}, 结束时间: {EndTime}", 
+                now, paper.EndTime.Value);
+            return ExamValidationResult.Failure(
+                $"考试已结束，结束时间为：{paper.EndTime.Value:yyyy-MM-dd HH:mm:ss}。", 
+                ExamValidationErrorType.ExamEnded);
+        }
+        
+        _logger.LogInformation("考试时间窗口检查通过 - 开始时间: {StartTime}, 结束时间: {EndTime}", 
+            paper.StartTime, paper.EndTime);
+    
+        // 检查用户是否已参加过考试
+        var existingRecord = await _context.ExamRecords
+            .FirstOrDefaultAsync(r => r.UserId == userId && r.PaperId == paperId);
+    
+        if (existingRecord != null)
+        {
+            _logger.LogInformation("找到现有考试记录 - RecordId: {RecordId}, Status: {Status}, AllowRetake: {AllowRetake}", 
+                existingRecord.RecordId, existingRecord.Status, paper.AllowRetake);
+            
+            // 如果不允许重考且已完成考试，则不能再次参加
+            if (!paper.AllowRetake && existingRecord.Status == ExamStatus.Completed)
             {
-                return false;
+                _logger.LogWarning("不允许重考且用户已完成考试 - UserId: {UserId}, PaperId: {PaperId}", 
+                    userId, paperId);
+                return ExamValidationResult.Failure("您已完成此考试，不允许重复参加。", ExamValidationErrorType.RetakeNotAllowed);
             }
-
-            // 检查考试时间
-            var now = DateTime.Now;
-            if (examPaper.StartTime.HasValue && now < examPaper.StartTime.Value)
-            {
-                return false; // 考试未开始
-            }
-
-            if (examPaper.EndTime.HasValue && now > examPaper.EndTime.Value)
-            {
-                return false; // 考试已结束
-            }
-
-            // 检查用户是否已经参加过考试
-            var existingRecord = await _examRecordRepository.GetLatestRecordByUserAsync(userId, paperId);
-
-            // 如果允许重考或者没有考试记录，则可以参加
-            if (existingRecord == null)
-            {
-                return true;
-            }
-
-            // 检查是否允许重考
-            if (examPaper.AllowRetake && existingRecord.Status != ExamStatus.InProgress)
-            {
-                return true;
-            }
-
-            // 如果有进行中的考试，可以继续
+        
+            // 如果有进行中的考试，允许继续
             if (existingRecord.Status == ExamStatus.InProgress)
             {
-                return true;
+                _logger.LogInformation("用户有进行中的考试，允许继续 - RecordId: {RecordId}", 
+                    existingRecord.RecordId);
+                return ExamValidationResult.Success();
             }
-
-            return false;
         }
-        catch (Exception ex)
+        else
         {
-            _logger.LogError(ex, "检查用户考试权限失败，用户ID: {UserId}，试卷ID: {PaperId}", userId, paperId);
-            return false;
+            _logger.LogInformation("未找到现有考试记录，用户可以开始新考试");
         }
+    
+        _logger.LogInformation("用户考试资格检查通过 - UserId: {UserId}, PaperId: {PaperId}", userId, paperId);
+        return ExamValidationResult.Success();
     }
 
     /// <summary>
@@ -639,6 +693,231 @@ public class ExamService : IExamService
             default:
                 return false;
         }
+    }
+
+    #endregion
+
+    #region 学生相关服务方法
+
+    /// <summary>
+    /// 获取学生可参加的考试列表
+    /// </summary>
+    public async Task<List<StudentExamInfo>> GetAvailableExamsForStudentAsync(int userId)
+    {
+        try
+        {
+            var currentTime = DateTime.Now;
+            
+            // 获取用户信息
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                throw new ArgumentException("用户不存在", nameof(userId));
+            }
+
+            // 获取可参加的考试（根据用户角色和考试状态）
+            var availableExams = await _context.ExamPapers
+                .Where(ep => (ep.IsPublished || ep.Status == "已发布") && 
+                           ep.StartTime <= currentTime && 
+                           ep.EndTime >= currentTime)
+                .Select(ep => new StudentExamInfo
+                {
+                    PaperId = ep.PaperId,
+                    Title = ep.Name,
+                    Subject = "通用", // 暂时设置为通用，需要根据实际业务调整
+                    Duration = ep.Duration,
+                    TotalQuestions = ep.PaperQuestions.Count,
+                    StartTime = ep.StartTime ?? DateTime.Now,
+                    EndTime = ep.EndTime ?? DateTime.Now.AddDays(30),
+                    Description = ep.Description ?? string.Empty,
+                    // 检查是否已参加过考试
+                    HasTaken = _context.ExamRecords.Any(er => er.UserId == userId && er.PaperId == ep.PaperId)
+                })
+                .OrderBy(e => e.StartTime)
+                .ToListAsync();
+
+            return availableExams;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取学生可参加考试列表失败，用户ID: {UserId}", userId);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// 获取学生考试结果列表
+    /// </summary>
+    public async Task<List<StudentExamResult>> GetStudentExamResultsAsync(int userId, string? searchKeyword = null, 
+        string? subjectFilter = null, string? timeRangeFilter = null)
+    {
+        try
+        {
+            var query = _context.ExamRecords
+                .Include(er => er.ExamPaper)
+                .Where(er => er.UserId == userId && er.Status == ExamStatus.Completed);
+
+            // 按搜索关键词筛选
+            if (!string.IsNullOrEmpty(searchKeyword))
+            {
+                query = query.Where(er => er.ExamPaper.Name.Contains(searchKeyword) || 
+                                        er.ExamPaper.Description.Contains(searchKeyword));
+            }
+
+            // 按科目筛选
+            if (!string.IsNullOrEmpty(subjectFilter) && subjectFilter != "全部")
+            {
+                // 由于ExamPaper没有Subject属性，暂时跳过科目筛选
+                // query = query.Where(er => er.ExamPaper.Subject == subjectFilter);
+            }
+
+            // 按时间范围筛选
+            if (!string.IsNullOrEmpty(timeRangeFilter) && timeRangeFilter != "全部")
+            {
+                var now = DateTime.Now;
+                DateTime? startDate = null;
+
+                switch (timeRangeFilter)
+                {
+                    case "最近一周":
+                        startDate = now.AddDays(-7);
+                        break;
+                    case "最近一月":
+                        startDate = now.AddMonths(-1);
+                        break;
+                    case "最近三月":
+                        startDate = now.AddMonths(-3);
+                        break;
+                    case "最近半年":
+                        startDate = now.AddMonths(-6);
+                        break;
+                    case "最近一年":
+                        startDate = now.AddYears(-1);
+                        break;
+                }
+
+                if (startDate.HasValue)
+                {
+                    query = query.Where(er => er.StartTime >= startDate.Value);
+                }
+            }
+
+            var examResults = await query
+                .Select(er => new StudentExamResult
+                {
+                    RecordId = er.RecordId,
+                    ExamTitle = er.ExamPaper.Name,
+                    Subject = "通用", // 暂时使用固定值，后续可根据需要调整
+                    ExamDate = er.StartTime ?? DateTime.MinValue,
+                    Duration = er.EndTime.HasValue && er.StartTime.HasValue ? 
+                        $"{(int)(er.EndTime.Value - er.StartTime.Value).TotalMinutes}分钟" : "未完成",
+                    QuestionCount = er.ExamPaper.PaperQuestions.Count,
+                    TotalScore = er.ExamPaper.TotalScore,
+                    Score = er.TotalScore,
+                    Status = er.Status == ExamStatus.Completed ? "已完成" : "进行中",
+                    HasWrongAnswers = er.CorrectCount < er.TotalCount
+                })
+                .OrderByDescending(r => r.ExamDate)
+                .ToListAsync();
+
+            return examResults;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取学生考试结果列表失败，用户ID: {UserId}", userId);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// 获取考试结果详情
+    /// </summary>
+    public async Task<ExamResultDetail> GetExamResultDetailAsync(int recordId)
+    {
+        try
+        {
+            var examRecord = await _context.ExamRecords
+                .Include(er => er.ExamPaper)
+                .ThenInclude(ep => ep.PaperQuestions)
+                .ThenInclude(pq => pq.Question)
+                .ThenInclude(q => q.Options)
+                .Include(er => er.AnswerRecords)
+                .FirstOrDefaultAsync(er => er.RecordId == recordId);
+
+            if (examRecord == null)
+            {
+                throw new ArgumentException($"考试记录不存在: {recordId}");
+            }
+
+            var examDetail = new ExamResultDetail
+            {
+                RecordId = examRecord.RecordId,
+                ExamTitle = examRecord.ExamPaper.Name,
+                ExamDate = examRecord.StartTime ?? DateTime.MinValue,
+                Duration = examRecord.EndTime.HasValue && examRecord.StartTime.HasValue ? 
+                    $"{(int)(examRecord.EndTime.Value - examRecord.StartTime.Value).TotalMinutes}分钟" : "未完成",
+                TotalQuestions = examRecord.TotalCount,
+                Status = examRecord.Status == ExamStatus.Completed ? "已完成" : "进行中",
+                TotalScore = examRecord.ExamPaper.PaperQuestions.Sum(pq => pq.Score),
+                Score = examRecord.TotalScore,
+                CorrectCount = examRecord.CorrectCount,
+                WrongCount = examRecord.TotalCount - examRecord.CorrectCount,
+                TeacherComment = null, // ExamRecord中没有TeacherComment属性，暂时设为null
+                QuestionDetails = new List<QuestionDetail>()
+            };
+
+            // 构建题目详情
+            var paperQuestions = examRecord.ExamPaper.PaperQuestions.OrderBy(pq => pq.OrderIndex);
+            foreach (var paperQuestion in paperQuestions)
+            {
+                var answerRecord = examRecord.AnswerRecords.FirstOrDefault(ar => ar.QuestionId == paperQuestion.QuestionId);
+                var question = paperQuestion.Question;
+
+                var questionDetail = new QuestionDetail
+                {
+                    QuestionNumber = paperQuestion.OrderIndex,
+                    QuestionType = GetQuestionTypeDisplayName(question.QuestionType),
+                    Score = paperQuestion.Score,
+                    EarnedScore = answerRecord?.Score ?? 0,
+                    Content = question.Content,
+                    CorrectAnswer = question.Answer,
+                    StudentAnswer = answerRecord?.UserAnswer ?? string.Empty,
+                    Explanation = question.Analysis,
+                    Options = question.Options.Select(o => new OptionDetail
+                    {
+                        Text = o.Content,
+                        IsCorrect = o.IsCorrect,
+                        IsStudentAnswer = !string.IsNullOrEmpty(answerRecord?.UserAnswer) && 
+                                        answerRecord.UserAnswer.Contains(o.OptionLabel)
+                    }).ToList()
+                };
+
+                examDetail.QuestionDetails.Add(questionDetail);
+            }
+
+            return examDetail;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "获取考试结果详情失败，记录ID: {RecordId}", recordId);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// 获取题目类型显示名称
+    /// </summary>
+    private static string GetQuestionTypeDisplayName(QuestionType questionType)
+    {
+        return questionType switch
+        {
+            QuestionType.SingleChoice => "单选题",
+            QuestionType.MultipleChoice => "多选题",
+            QuestionType.TrueFalse => "判断题",
+            QuestionType.FillInBlank => "填空题",
+            QuestionType.Essay => "问答题",
+            _ => "未知类型"
+        };
     }
 
     #endregion

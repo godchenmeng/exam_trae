@@ -1,0 +1,29 @@
+<UserControl x:Class="ExamSystem.WPF.Views.LearningResourcesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="学习资源"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Margin="0,0,0,12"/>
+
+        <Border Grid.Row="1" Padding="12" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="6">
+            <StackPanel>
+                <TextBlock Text="这里将展示课程相关的学习资料与下载入口。"
+                           Foreground="#616161"/>
+                <TextBlock Text="（占位视图：后续将根据权限实现上传、管理、查看与下载资源的交互）"
+                           Margin="0,6,0,0"
+                           Foreground="#9E9E9E"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

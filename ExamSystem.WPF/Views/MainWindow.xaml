@@ -71,12 +71,13 @@
         </Border>
 
         <!-- 主内容区域 -->
-        <TabControl Grid.Row="1" 
+        <TabControl x:Name="MainTabControl"
+                    Grid.Row="1" 
                     Style="{StaticResource ModernTabControl}"
                     Margin="16">
             
             <!-- 仪表板 -->
-            <TabItem Header="仪表板" Style="{StaticResource ModernTabItem}" IsSelected="True">
+            <TabItem x:Name="TabDashboard" Header="仪表板" Style="{StaticResource ModernTabItem}" IsSelected="True">
                 <TabItem.HeaderTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -92,7 +93,7 @@
             </TabItem>
             
             <!-- 题库管理 -->
-            <TabItem Header="题库管理" Style="{StaticResource ModernTabItem}">
+            <TabItem x:Name="TabQuestionBank" Header="题库管理" Style="{StaticResource ModernTabItem}">
                 <TabItem.HeaderTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -108,7 +109,7 @@
             </TabItem>
 
             <!-- 试卷管理 -->
-            <TabItem Header="试卷管理" Style="{StaticResource ModernTabItem}">
+            <TabItem x:Name="TabExamPaper" Header="试卷管理" Style="{StaticResource ModernTabItem}">
                 <TabItem.HeaderTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -124,7 +125,7 @@
             </TabItem>
 
             <!-- 考试管理 -->
-            <TabItem Header="考试管理" Style="{StaticResource ModernTabItem}">
+            <TabItem x:Name="TabExamManagement" Header="考试管理" Style="{StaticResource ModernTabItem}">
                 <TabItem.HeaderTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -140,7 +141,7 @@
             </TabItem>
 
             <!-- 考试结果 -->
-            <TabItem Header="考试结果" Style="{StaticResource ModernTabItem}">
+            <TabItem x:Name="TabExamResult" Header="考试结果" Style="{StaticResource ModernTabItem}">
                 <TabItem.HeaderTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -155,8 +156,56 @@
                 <Frame Name="ExamResultFrame" NavigationUIVisibility="Hidden"/>
             </TabItem>
 
+            <!-- 成绩管理（教师/管理员） -->
+            <TabItem x:Name="TabGradeManagement" Header="成绩管理" Style="{StaticResource ModernTabItem}">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🏫" 
+                                      FontSize="16" 
+                                      VerticalAlignment="Center" 
+                                      Margin="0,0,4,0"/>
+                            <TextBlock Text="成绩管理" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <Frame Name="GradeManagementFrame" NavigationUIVisibility="Hidden"/>
+            </TabItem>
+
+            <!-- 消息中心 -->
+            <TabItem x:Name="TabMessageCenter" Header="消息中心" Style="{StaticResource ModernTabItem}">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="💬" 
+                                      FontSize="16" 
+                                      VerticalAlignment="Center" 
+                                      Margin="0,0,4,0"/>
+                            <TextBlock Text="消息中心" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <Frame Name="MessageCenterFrame" NavigationUIVisibility="Hidden"/>
+            </TabItem>
+
+            <!-- 学习资源 -->
+            <TabItem x:Name="TabLearningResources" Header="学习资源" Style="{StaticResource ModernTabItem}">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📚" 
+                                      FontSize="16" 
+                                      VerticalAlignment="Center" 
+                                      Margin="0,0,4,0"/>
+                            <TextBlock Text="学习资源" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <Frame Name="LearningResourcesFrame" NavigationUIVisibility="Hidden"/>
+            </TabItem>
+
             <!-- 统计报表 -->
-            <TabItem Header="统计报表" Style="{StaticResource ModernTabItem}">
+            <TabItem x:Name="TabStatistics" Header="统计报表" Style="{StaticResource ModernTabItem}">
                 <TabItem.HeaderTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -172,7 +221,7 @@
             </TabItem>
 
             <!-- 用户管理 -->
-            <TabItem Header="用户管理" Style="{StaticResource ModernTabItem}">
+            <TabItem x:Name="TabUserManagement" Header="用户管理" Style="{StaticResource ModernTabItem}">
                 <TabItem.HeaderTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">

@@ -79,6 +79,11 @@ public class ExamPaper
     public bool IsActive { get; set; } = true;
 
     /// <summary>
+    /// 是否已发布
+    /// </summary>
+    public bool IsPublished { get; set; } = false;
+
+    /// <summary>
     /// 是否随机出题
     /// </summary>
     public bool IsRandomOrder { get; set; } = false;

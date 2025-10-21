@@ -19,6 +19,11 @@ namespace ExamSystem.Domain.Entities
     public int UserId { get; set; }
 
     /// <summary>
+    /// 通用ID属性（为了兼容性）
+    /// </summary>
+    public int Id => UserId;
+
+    /// <summary>
     /// 用户名
     /// </summary>
     [Required]

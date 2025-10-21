@@ -149,6 +149,12 @@ namespace ExamSystem.WPF.ViewModels
                     success = await _examPaperService.UpdateExamPaperAsync(ExamPaper);
                 }
 
+                if (!success)
+                {
+                    // 服务返回失败但未抛异常，给出通用失败提示
+                    ValidationMessages.General = "保存失败，请稍后重试或联系管理员。";
+                }
+
                 SaveCompleted?.Invoke(this, success);
             }
             catch (Exception ex)

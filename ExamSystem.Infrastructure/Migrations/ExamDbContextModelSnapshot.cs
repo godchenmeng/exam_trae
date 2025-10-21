@@ -94,6 +94,9 @@ namespace ExamSystem.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsRandomOrder")
                         .HasColumnType("INTEGER");
 
@@ -189,6 +192,74 @@ namespace ExamSystem.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ExamRecords");
+                });
+
+            modelBuilder.Entity("ExamSystem.Domain.Entities.Notification", b =>
+                {
+                    b.Property<int>("NotificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Scope")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("NotificationId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("ExamSystem.Domain.Entities.NotificationRecipient", b =>
+                {
+                    b.Property<int>("NotificationRecipientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DeliveryStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NotificationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("NotificationRecipientId");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("NotificationId", "ReceiverId")
+                        .IsUnique();
+
+                    b.ToTable("NotificationRecipients");
                 });
 
             modelBuilder.Entity("ExamSystem.Domain.Entities.PaperQuestion", b =>
@@ -309,12 +380,12 @@ namespace ExamSystem.Infrastructure.Migrations
                         new
                         {
                             BankId = 1,
-                            CreatedAt = new DateTime(2025, 10, 17, 11, 22, 41, 220, DateTimeKind.Local).AddTicks(3938),
+                            CreatedAt = new DateTime(2025, 10, 21, 10, 58, 29, 885, DateTimeKind.Local).AddTicks(3725),
                             CreatorId = 1,
                             Description = "系统默认题库",
                             IsActive = true,
                             Name = "默认题库",
-                            UpdatedAt = new DateTime(2025, 10, 17, 11, 22, 41, 220, DateTimeKind.Local).AddTicks(4049)
+                            UpdatedAt = new DateTime(2025, 10, 21, 10, 58, 29, 885, DateTimeKind.Local).AddTicks(3797)
                         });
                 });
 
@@ -409,7 +480,7 @@ namespace ExamSystem.Infrastructure.Migrations
                         new
                         {
                             UserId = 1,
-                            CreatedAt = new DateTime(2025, 10, 17, 11, 22, 41, 219, DateTimeKind.Local).AddTicks(5357),
+                            CreatedAt = new DateTime(2025, 10, 21, 10, 58, 29, 884, DateTimeKind.Local).AddTicks(7690),
                             Email = "admin@exam.com",
                             IsActive = true,
                             LoginFailCount = 0,
@@ -483,6 +554,36 @@ namespace ExamSystem.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ExamSystem.Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("ExamSystem.Domain.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("ExamSystem.Domain.Entities.NotificationRecipient", b =>
+                {
+                    b.HasOne("ExamSystem.Domain.Entities.Notification", "Notification")
+                        .WithMany("Recipients")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ExamSystem.Domain.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Notification");
+
+                    b.Navigation("Receiver");
+                });
+
             modelBuilder.Entity("ExamSystem.Domain.Entities.PaperQuestion", b =>
                 {
                     b.HasOne("ExamSystem.Domain.Entities.ExamPaper", "ExamPaper")
@@ -545,6 +646,11 @@ namespace ExamSystem.Infrastructure.Migrations
             modelBuilder.Entity("ExamSystem.Domain.Entities.ExamRecord", b =>
                 {
                     b.Navigation("AnswerRecords");
+                });
+
+            modelBuilder.Entity("ExamSystem.Domain.Entities.Notification", b =>
+                {
+                    b.Navigation("Recipients");
                 });
 
             modelBuilder.Entity("ExamSystem.Domain.Entities.Question", b =>

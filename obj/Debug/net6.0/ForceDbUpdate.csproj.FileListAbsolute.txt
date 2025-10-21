@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net6.0\ForceDbUpdate.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net6.0\ForceDbUpdate.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net6.0\ForceDbUpdate.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net6.0\ForceDbUpdate.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net6.0\ForceDbUpdate.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net6.0\ForceDbUpdate.sourcelink.json

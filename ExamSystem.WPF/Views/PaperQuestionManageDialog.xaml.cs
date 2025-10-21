@@ -16,13 +16,13 @@ namespace ExamSystem.WPF.Views
             viewModel.SaveCompleted += OnSaveCompleted;
         }
         
-        private void OnSaveCompleted(object sender, System.EventArgs e)
+        private void OnSaveCompleted(object? sender, System.EventArgs e)
         {
             DialogResult = true;
             Close();
         }
         
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private void CancelButton_Click(object? sender, RoutedEventArgs e)
         {
             DialogResult = false;
             Close();

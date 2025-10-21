@@ -10,10 +10,11 @@ using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using ExamSystem.WPF.ViewModels.Base;
 
 namespace ExamSystem.WPF.ViewModels
 {
-    public class StatisticsViewModel : INotifyPropertyChanged
+    public class StatisticsViewModel : BaseViewModel
     {
         private readonly IExamService _examService;
         private readonly IExamPaperService _examPaperService;
@@ -60,14 +61,14 @@ namespace ExamSystem.WPF.ViewModels
             set => SetProperty(ref _endDate, value);
         }
 
-        private ExamPaper _selectedExamPaper;
-        public ExamPaper SelectedExamPaper
+        private ExamPaper? _selectedExamPaper;
+        public ExamPaper? SelectedExamPaper
         {
             get => _selectedExamPaper;
             set => SetProperty(ref _selectedExamPaper, value);
         }
 
-        private string _selectedClass;
+        private string _selectedClass = string.Empty;
         public string SelectedClass
         {
             get => _selectedClass;
@@ -146,7 +147,7 @@ namespace ExamSystem.WPF.ViewModels
         {
             try
             {
-                var examPapers = await _examPaperService.GetAllExamPapersAsync();
+                var examPapers = await _examPaperService.GetAllExamPapersAsync() ?? Enumerable.Empty<ExamPaper>();
                 
                 ExamPapers.Clear();
                 foreach (var paper in examPapers)
@@ -385,52 +386,33 @@ namespace ExamSystem.WPF.ViewModels
         }
 
         #endregion
-
-        #region INotifyPropertyChanged
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (Equals(field, value)) return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
-        }
-
-        #endregion
     }
 
     // 题目分析模型
     public class QuestionAnalysisModel
     {
         public int QuestionNumber { get; set; }
-        public string QuestionType { get; set; }
-        public string QuestionContent { get; set; }
+        public string QuestionType { get; set; } = string.Empty;
+        public string QuestionContent { get; set; } = string.Empty;
         public double CorrectRate { get; set; }
         public double DifficultyCoefficient { get; set; }
         public double Discrimination { get; set; }
-        public string DifficultyLevel { get; set; }
+        public string DifficultyLevel { get; set; } = string.Empty;
     }
 
     // 学生排名模型
     public class StudentRankingModel
     {
         public int Rank { get; set; }
-        public string StudentId { get; set; }
-        public string StudentName { get; set; }
-        public string ClassName { get; set; }
+        public string StudentId { get; set; } = string.Empty;
+        public string StudentName { get; set; } = string.Empty;
+        public string ClassName { get; set; } = string.Empty;
         public double TotalScore { get; set; }
         public double ObjectiveScore { get; set; }
         public double SubjectiveScore { get; set; }
         public TimeSpan ExamDuration { get; set; }
         public DateTime SubmitTime { get; set; }
-        public string Grade { get; set; }
+        public string Grade { get; set; } = string.Empty;
 
         public string ExamDurationDisplay => $"{ExamDuration.Hours:D2}:{ExamDuration.Minutes:D2}:{ExamDuration.Seconds:D2}";
         public string SubmitTimeDisplay => SubmitTime.ToString("yyyy-MM-dd HH:mm:ss");

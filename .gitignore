@@ -23,3 +23,14 @@
 /ExamSystem.Domain/obj
 /.vscode
 errors.txt
+/ExamSystem.Domain/bin
+/ExamSystem.Infrastructure/bin
+/ExamSystem.Infrastructure/obj
+/ExamSystem.Services/bin
+/ExamSystem.WPF/bin
+/ExamSystem.WPF/obj
+/ExamSystem.WPF/obj
+/ExamSystem.WPF/obj/Debug
+ExamSystem.WPF/obj/Debug/net5.0-windows/ExamSystem.WPF.AssemblyInfo.cs
+/ExamSystem.WPF/obj/Debug
+/ExamSystem.WPF/obj

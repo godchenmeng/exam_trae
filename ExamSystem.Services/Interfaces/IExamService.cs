@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
+using ExamSystem.Services.Models;
 
 namespace ExamSystem.Services.Interfaces
 {
@@ -116,6 +116,14 @@ namespace ExamSystem.Services.Interfaces
     /// <param name="paperId">试卷ID</param>
     /// <returns>是否可以参加</returns>
     Task<bool> CanUserTakeExamAsync(int userId, int paperId);
+
+    /// <summary>
+    /// 验证用户考试资格（详细版本）
+    /// </summary>
+    /// <param name="userId">用户ID</param>
+    /// <param name="paperId">试卷ID</param>
+    /// <returns>验证结果</returns>
+    Task<ExamValidationResult> ValidateUserExamEligibilityAsync(int userId, int paperId);
     
     /// <summary>
     /// 获取考试统计信息
@@ -123,46 +131,168 @@ namespace ExamSystem.Services.Interfaces
     /// <param name="paperId">试卷ID</param>
     /// <returns>统计信息</returns>
     Task<ExamStatistics> GetExamStatisticsAsync(int paperId);
+    
+    /// <summary>
+    /// 获取学生可参加的考试列表
+    /// </summary>
+    /// <param name="userId">学生用户ID</param>
+    /// <returns>可参加的试卷列表</returns>
+    Task<List<StudentExamInfo>> GetAvailableExamsForStudentAsync(int userId);
+    
+    /// <summary>
+    /// 获取学生考试结果列表
+    /// </summary>
+    /// <param name="userId">学生用户ID</param>
+    /// <param name="searchKeyword">搜索关键词</param>
+    /// <param name="subjectFilter">科目筛选</param>
+    /// <param name="timeRangeFilter">时间范围筛选</param>
+    /// <returns>考试结果列表</returns>
+    Task<List<StudentExamResult>> GetStudentExamResultsAsync(int userId, string? searchKeyword = null, 
+        string? subjectFilter = null, string? timeRangeFilter = null);
+    
+    /// <summary>
+    /// 获取考试结果详情
+    /// </summary>
+    /// <param name="recordId">考试记录ID</param>
+    /// <returns>考试结果详情</returns>
+    Task<ExamResultDetail> GetExamResultDetailAsync(int recordId);
 }
 
 /// <summary>
-/// 考试统计信息
+/// 考试结果详情
 /// </summary>
-public class ExamStatistics
+public class ExamResultDetail
 {
     /// <summary>
-    /// 参考人数
+    /// 考试记录ID
     /// </summary>
-    public int TotalParticipants { get; set; }
+    public int RecordId { get; set; }
     
     /// <summary>
-    /// 已完成人数
+    /// 考试标题
     /// </summary>
-    public int CompletedCount { get; set; }
+    public string ExamTitle { get; set; } = string.Empty;
     
     /// <summary>
-    /// 通过人数
+    /// 考试时间
     /// </summary>
-    public int PassedCount { get; set; }
+    public DateTime ExamDate { get; set; }
     
     /// <summary>
-    /// 平均分
+    /// 考试用时
     /// </summary>
-    public decimal AverageScore { get; set; }
+    public string Duration { get; set; } = string.Empty;
     
     /// <summary>
-    /// 最高分
+    /// 题目总数
     /// </summary>
-    public decimal MaxScore { get; set; }
+    public int TotalQuestions { get; set; }
     
     /// <summary>
-    /// 最低分
+    /// 考试状态
     /// </summary>
-    public decimal MinScore { get; set; }
+    public string Status { get; set; } = string.Empty;
     
     /// <summary>
-    /// 通过率
+    /// 总分
     /// </summary>
-    public decimal PassRate { get; set; }
-    }
+    public decimal TotalScore { get; set; }
+    
+    /// <summary>
+    /// 得分
+    /// </summary>
+    public decimal Score { get; set; }
+    
+    /// <summary>
+    /// 正确题数
+    /// </summary>
+    public int CorrectCount { get; set; }
+    
+    /// <summary>
+    /// 错误题数
+    /// </summary>
+    public int WrongCount { get; set; }
+    
+    /// <summary>
+    /// 教师评语
+    /// </summary>
+    public string? TeacherComment { get; set; }
+    
+    /// <summary>
+    /// 题目详情列表
+    /// </summary>
+    public List<QuestionDetail> QuestionDetails { get; set; } = new List<QuestionDetail>();
+}
+
+/// <summary>
+/// 题目详情
+/// </summary>
+public class QuestionDetail
+{
+    /// <summary>
+    /// 题目序号
+    /// </summary>
+    public int QuestionNumber { get; set; }
+    
+    /// <summary>
+    /// 题目类型
+    /// </summary>
+    public string QuestionType { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// 题目分数
+    /// </summary>
+    public decimal Score { get; set; }
+    
+    /// <summary>
+    /// 获得分数
+    /// </summary>
+    public decimal EarnedScore { get; set; }
+    
+    /// <summary>
+    /// 题目内容
+    /// </summary>
+    public string Content { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// 标准答案
+    /// </summary>
+    public string CorrectAnswer { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// 学生答案
+    /// </summary>
+    public string StudentAnswer { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// 题目解析
+    /// </summary>
+    public string? Explanation { get; set; }
+    
+    /// <summary>
+    /// 选项列表（选择题）
+    /// </summary>
+    public List<OptionDetail> Options { get; set; } = new List<OptionDetail>();
+}
+
+/// <summary>
+/// 选项详情
+/// </summary>
+public class OptionDetail
+{
+    /// <summary>
+    /// 选项文本
+    /// </summary>
+    public string Text { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// 是否为正确答案
+    /// </summary>
+    public bool IsCorrect { get; set; }
+    
+    /// <summary>
+    /// 是否为学生选择的答案
+    /// </summary>
+    public bool IsStudentAnswer { get; set; }
+}
 }
