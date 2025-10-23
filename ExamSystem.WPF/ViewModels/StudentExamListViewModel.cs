@@ -208,7 +208,9 @@ namespace ExamSystem.WPF.ViewModels
         /// <summary>
         /// 开始考试事件
         /// </summary>
+#pragma warning disable CS0067 // 事件从未使用
         public event EventHandler<ExamStartEventArgs>? ExamStartRequested;
+#pragma warning restore CS0067
 
         #endregion
 

@@ -76,7 +76,7 @@ namespace ExamSystem.WPF.ViewModels
             set => SetProperty(ref _examRecordCount, value);
         }
 
-        private string _welcomeMessage;
+        private string _welcomeMessage = string.Empty;
         public string WelcomeMessage
         {
             get => _welcomeMessage;
@@ -118,26 +118,9 @@ namespace ExamSystem.WPF.ViewModels
                 WelcomeMessage = $"{greeting}，欢迎使用在线考试系统！";
 
                 // 加载统计数据
-                await LoadStatisticsAsync();
-                
-                // 加载最近活动
-                await LoadRecentActivitiesAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "加载仪表板数据时发生错误");
-            }
-        }
-
-        private async Task LoadStatisticsAsync()
-        {
-            try
-            {
-                // 获取题库数量
                 var questionBanks = await _questionBankService.GetAllQuestionBanksAsync();
                 QuestionBankCount = questionBanks.Count;
-
-                // 获取题目数量 - 通过获取所有题库的题目来统计
+                
                 var allQuestions = new List<Question>();
                 foreach (var bank in questionBanks)
                 {
@@ -145,136 +128,88 @@ namespace ExamSystem.WPF.ViewModels
                     allQuestions.AddRange(questions);
                 }
                 QuestionCount = allQuestions.Count;
-
-                // 获取试卷数量
+                
                 var examPapers = await _examPaperService.GetAllExamPapersAsync();
                 ExamPaperCount = examPapers.Count;
-
-                // 获取考试记录数量 - 暂时设为0，因为没有获取所有记录的方法
+                
+                // 暂时没有获取所有考试记录的方法，设为 0
                 ExamRecordCount = 0;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "加载统计数据时发生错误");
-            }
-        }
-
-        private async Task LoadRecentActivitiesAsync()
-        {
-            try
-            {
+                
+                // 加载最近活动（示例数据）
                 RecentActivities.Clear();
-
-                // TODO: 从服务获取真实的最近活动数据
-                // 模拟数据
-                RecentActivities.Add(new RecentActivityModel
-                {
-                    Icon = "📚",
-                    Title = "创建了新题库",
-                    Description = "数学基础题库",
-                    Time = "2小时前"
-                });
-
-                RecentActivities.Add(new RecentActivityModel
-                {
-                    Icon = "📝",
-                    Title = "添加了新题目",
-                    Description = "单选题：函数的定义域",
-                    Time = "3小时前"
-                });
-
-                RecentActivities.Add(new RecentActivityModel
-                {
-                    Icon = "📄",
-                    Title = "创建了新试卷",
-                    Description = "期中考试试卷",
-                    Time = "1天前"
-                });
-
-                RecentActivities.Add(new RecentActivityModel
-                {
-                    Icon = "👥",
-                    Title = "学生完成考试",
-                    Description = "张三完成了数学测试",
-                    Time = "2天前"
-                });
-
-                RecentActivities.Add(new RecentActivityModel
-                {
-                    Icon = "📊",
-                    Title = "生成了统计报表",
-                    Description = "第一次月考成绩统计",
-                    Time = "3天前"
-                });
+                RecentActivities.Add(new RecentActivityModel { Icon = "📚", Title = "创建题库", Description = "创建了新的数学题库", Time = "2024-05-01 10:00" });
+                RecentActivities.Add(new RecentActivityModel { Icon = "📝", Title = "新增试题", Description = "添加了5道选择题", Time = "2024-05-02 14:30" });
+                RecentActivities.Add(new RecentActivityModel { Icon = "📄", Title = "生成试卷", Description = "生成了期中考试试卷", Time = "2024-05-03 09:15" });
+                RecentActivities.Add(new RecentActivityModel { Icon = "📊", Title = "查看统计", Description = "查看了最近考试统计数据", Time = "2024-05-04 16:45" });
 
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "加载最近活动时发生错误");
+                _logger.LogError(ex, "加载仪表盘数据时发生错误");
             }
         }
 
         private void CreateQuestionBank()
         {
-            // TODO: 实现创建题库功能
-            _logger.LogInformation("创建题库功能被调用");
+            // TODO: 跳转到题库管理页面
+            _logger.LogInformation("跳转到题库管理页面");
         }
 
         private void AddQuestion()
         {
-            // TODO: 实现添加题目功能
-            _logger.LogInformation("添加题目功能被调用");
+            // TODO: 跳转到添加试题页面
+            _logger.LogInformation("跳转到添加试题页面");
         }
 
         private void CreateExamPaper()
         {
-            // TODO: 实现创建试卷功能
-            _logger.LogInformation("创建试卷功能被调用");
+            // TODO: 跳转到试卷创建页面
+            _logger.LogInformation("跳转到试卷创建页面");
         }
 
         private void ViewStatistics()
         {
-            // TODO: 实现查看统计功能
-            _logger.LogInformation("查看统计功能被调用");
+            // TODO: 跳转到统计分析页面
+            _logger.LogInformation("跳转到统计分析页面");
         }
 
         private void UserManagement()
         {
-            // TODO: 实现用户管理功能
-            _logger.LogInformation("用户管理功能被调用");
+            // TODO: 跳转到用户管理页面
+            _logger.LogInformation("跳转到用户管理页面");
         }
 
         private void SystemSettings()
         {
-            // TODO: 实现系统设置功能
-            _logger.LogInformation("系统设置功能被调用");
+            // TODO: 跳转到系统设置页面
+            _logger.LogInformation("跳转到系统设置页面");
         }
 
         private void DataBackup()
         {
-            // TODO: 实现数据备份功能
-            _logger.LogInformation("数据备份功能被调用");
+            // TODO: 执行数据备份
+            _logger.LogInformation("执行数据备份");
         }
 
         private void HelpDocument()
         {
-            // TODO: 实现帮助文档功能
-            _logger.LogInformation("帮助文档功能被调用");
+            // TODO: 打开帮助文档
+            _logger.LogInformation("打开帮助文档");
         }
 
         #endregion
 
         #region INotifyPropertyChanged
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
             if (Equals(field, value)) return false;
             field = value;
@@ -288,10 +223,10 @@ namespace ExamSystem.WPF.ViewModels
     // 最近活动模型
     public class RecentActivityModel
     {
-        public string Icon { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public string Time { get; set; }
+        public string Icon { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Time { get; set; } = string.Empty;
     }
 
 }

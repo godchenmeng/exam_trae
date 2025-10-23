@@ -188,7 +188,7 @@ namespace ExamSystem.WPF.Views
         /// <summary>
         /// 窗口关闭事件处理
         /// </summary>
-        private void FullScreenExamWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void FullScreenExamWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             // 如果是通过ViewModel的退出命令关闭，则允许关闭
             if (DataContext is FullScreenExamViewModel viewModel && viewModel.IsExitConfirmed)

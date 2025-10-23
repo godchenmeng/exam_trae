@@ -177,7 +177,7 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        private void OnCurrentQuestionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnCurrentQuestionPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(ExamQuestionViewModel.FillInBlankAnswer) ||
                 e.PropertyName == nameof(ExamQuestionViewModel.EssayAnswer) ||
@@ -459,6 +459,7 @@ namespace ExamSystem.WPF.ViewModels
                 OnPropertyChanged(nameof(UnansweredCount));
                 
                 System.Diagnostics.Debug.WriteLine($"LoadQuestionAsync: 完成加载题目 {questionIndex}");
+                await Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -619,7 +620,7 @@ namespace ExamSystem.WPF.ViewModels
         /// <summary>
         /// 导航到指定题目（对象参数重载）
         /// </summary>
-        private async void NavigateToQuestion(object? parameter)
+        private void NavigateToQuestion(object? parameter)
         {
             if (parameter != null && int.TryParse(parameter.ToString(), out int questionIndex))
             {

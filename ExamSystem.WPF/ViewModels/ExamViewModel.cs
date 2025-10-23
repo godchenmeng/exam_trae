@@ -516,8 +516,12 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        private void SelectSingleOption(QuestionOptionViewModel option)
+        private void SelectSingleOption(QuestionOptionViewModel? option)
         {
+            if (option == null)
+            {
+                return;
+            }
             if (CurrentQuestion?.Options != null)
             {
                 foreach (var opt in CurrentQuestion.Options)
@@ -527,8 +531,9 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        private void SelectMultipleOption(QuestionOptionViewModel option)
+        private void SelectMultipleOption(QuestionOptionViewModel? option)
         {
+            if (option == null) return;
             option.IsSelected = !option.IsSelected;
         }
 

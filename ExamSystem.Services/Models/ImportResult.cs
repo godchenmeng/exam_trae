@@ -64,11 +64,11 @@ namespace ExamSystem.Services.Models
     public class ImportedQuestionInfo
     {
         public int RowNumber { get; set; }
-        public string Title { get; set; }
-        public string QuestionType { get; set; }
-        public string Difficulty { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string QuestionType { get; set; } = string.Empty;
+        public string Difficulty { get; set; } = string.Empty;
         public int Score { get; set; }
-        public string Tags { get; set; }
+        public string Tags { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -77,8 +77,8 @@ namespace ExamSystem.Services.Models
     public class ImportFailureInfo
     {
         public int RowNumber { get; set; }
-        public string Title { get; set; }
-        public string ErrorMessage { get; set; }
-        public string RawData { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string ErrorMessage { get; set; } = string.Empty;
+        public string RawData { get; set; } = string.Empty;
     }
 }

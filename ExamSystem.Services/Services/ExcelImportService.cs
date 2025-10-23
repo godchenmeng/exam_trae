@@ -44,7 +44,7 @@ namespace ExamSystem.Services.Services
                 // 预检测：文件是否为有效的 .xlsx（Open XML Zip 包）
                 if (!IsOpenXmlZip(fileStream))
                 {
-                    result.ErrorMessages.Add("提供的文件不是有效的 Excel 2007+ 工作簿 (.xlsx)。请确保使用 .xlsx 格式，或将 .xls/.csv 通过 Excel 另存为 .xlsx 后再导入。");
+                    result.ErrorMessages.Add("提供的文件不是有效的 Excel 2007+ 工作簿 (.xlsx)。请确保使用 .xlsx 格式，或在 .xls/.csv 通过 Excel 另存为 .xlsx 后再导入。");
                     _logger.LogWarning("Excel文件不是有效的Open XML包，终止导入");
                     return result;
                 }
@@ -82,9 +82,9 @@ namespace ExamSystem.Services.Services
                             result.FailedQuestions.Add(new ImportFailureInfo
                             {
                                 RowNumber = questionDto.RowNumber,
-                                Title = questionDto.Content?.Length > 50 ? questionDto.Content.Substring(0, 50) + "..." : questionDto.Content,
+                                Title = questionDto.Content?.Length > 50 ? questionDto.Content.Substring(0, 50) + "..." : (questionDto.Content ?? string.Empty),
                                 ErrorMessage = string.Join("; ", validationResult.ErrorMessages),
-                                RawData = $"题型:{questionDto.QuestionType}, 内容:{questionDto.Content}"
+                                RawData = $"题型:{questionDto.QuestionType}, 内容:{(questionDto.Content ?? string.Empty)}"
                             });
                             result.FailureCount++;
                             continue;
@@ -99,11 +99,11 @@ namespace ExamSystem.Services.Services
                             result.SuccessfulQuestions.Add(new ImportedQuestionInfo
                             {
                                 RowNumber = questionDto.RowNumber,
-                                Title = questionDto.Content?.Length > 50 ? questionDto.Content.Substring(0, 50) + "..." : questionDto.Content,
+                                Title = questionDto.Content?.Length > 50 ? questionDto.Content.Substring(0, 50) + "..." : (questionDto.Content ?? string.Empty),
                                 QuestionType = questionDto.QuestionType,
                                 Difficulty = questionDto.Difficulty,
                                 Score = int.TryParse(questionDto.Points, out var score) ? score : 0,
-                                Tags = questionDto.Tags
+                                Tags = questionDto.Tags ?? string.Empty
                             });
                             _logger.LogDebug("成功导入题目，行号: {RowNumber}", questionDto.RowNumber);
                         }
@@ -113,9 +113,9 @@ namespace ExamSystem.Services.Services
                             result.FailedQuestions.Add(new ImportFailureInfo
                             {
                                 RowNumber = questionDto.RowNumber,
-                                Title = questionDto.Content?.Length > 50 ? questionDto.Content.Substring(0, 50) + "..." : questionDto.Content,
+                                Title = questionDto.Content?.Length > 50 ? questionDto.Content.Substring(0, 50) + "..." : (questionDto.Content ?? string.Empty),
                                 ErrorMessage = "保存题目到数据库失败",
-                                RawData = $"题型:{questionDto.QuestionType}, 内容:{questionDto.Content}"
+                                RawData = $"题型:{questionDto.QuestionType}, 内容:{(questionDto.Content ?? string.Empty)}"
                             });
                             result.FailureCount++;
                         }
@@ -127,9 +127,9 @@ namespace ExamSystem.Services.Services
                         result.FailedQuestions.Add(new ImportFailureInfo
                         {
                             RowNumber = questionDto.RowNumber,
-                            Title = questionDto.Content?.Length > 50 ? questionDto.Content.Substring(0, 50) + "..." : questionDto.Content,
+                            Title = questionDto.Content?.Length > 50 ? questionDto.Content.Substring(0, 50) + "..." : (questionDto.Content ?? string.Empty),
                             ErrorMessage = $"导入异常: {ex.Message}",
-                            RawData = $"题型:{questionDto.QuestionType}, 内容:{questionDto.Content}"
+                            RawData = $"题型:{questionDto.QuestionType}, 内容:{(questionDto.Content ?? string.Empty)}"
                         });
                         result.FailureCount++;
                     }
@@ -205,6 +205,7 @@ namespace ExamSystem.Services.Services
                 result.ErrorMessages.Add($"验证异常: {ex.Message}");
             }
 
+            await Task.CompletedTask;
             return result;
         }
 

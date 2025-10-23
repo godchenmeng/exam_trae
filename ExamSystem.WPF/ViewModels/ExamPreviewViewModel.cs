@@ -211,6 +211,7 @@ namespace ExamSystem.WPF.ViewModels
                 // 例如检查用户是否已经参加过考试等
 
                 OnStartExamRequested();
+                await Task.CompletedTask;
             }
             catch (Exception ex)
             {

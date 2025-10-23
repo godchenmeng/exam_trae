@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IO;
-using ExamSystem.Data;
 
 namespace ExamSystem.Services.Services
 {
@@ -51,7 +50,7 @@ public class UserService : IUserService
     public async Task<List<User>> GetUsersByRoleAsync(UserRole role)
     {
         var users = await _userRepository.GetUsersByRoleAsync(role);
-        return users.OrderBy(u => u.CreatedAt).ToList();
+        return (users ?? Enumerable.Empty<User>()).OrderBy(u => u.CreatedAt).ToList();
     }
 
     public async Task<(List<User> Users, int TotalCount)> GetUsersPagedAsync(int pageIndex, int pageSize, string? searchKeyword = null, UserRole? role = null)
@@ -60,13 +59,13 @@ public class UserService : IUserService
             pageIndex, 
             pageSize, 
             u => (string.IsNullOrWhiteSpace(searchKeyword) || 
-                  u.Username.Contains(searchKeyword) ||
-                  u.RealName.Contains(searchKeyword) ||
-                  (u.Email != null && u.Email.Contains(searchKeyword))) &&
+                  u.Username.Contains(searchKeyword ?? string.Empty) ||
+                  (u.RealName != null && u.RealName.Contains(searchKeyword ?? string.Empty)) ||
+                  (u.Email != null && u.Email.Contains(searchKeyword ?? string.Empty))) &&
                  (!role.HasValue || u.Role == role.Value),
             u => u.CreatedAt);
 
-        return (users.ToList(), totalCount);
+        return ((users ?? Enumerable.Empty<User>()).ToList(), totalCount);
     }
 
     public async Task<(bool Success, string Message)> CreateUserAsync(User user)

@@ -21,13 +21,13 @@ namespace ExamSystem.WPF.ViewModels
         private readonly IQuestionService _questionService;
         private readonly ILogger<PaperQuestionManageViewModel> _logger;
         
-        private ExamPaper _examPaper;
+        private ExamPaper? _examPaper;
         private bool _isLoading;
-        private string _validationMessage;
-        private QuestionBank _selectedQuestionBank;
-        private Question _selectedAvailableQuestion;
-        private PaperQuestion _selectedPaperQuestion;
-        private string _searchKeyword;
+        private string _validationMessage = string.Empty;
+        private QuestionBank? _selectedQuestionBank;
+        private Question? _selectedAvailableQuestion;
+        private PaperQuestion? _selectedPaperQuestion;
+        private string _searchKeyword = string.Empty;
         private Difficulty? _selectedDifficulty;
         private QuestionType? _selectedQuestionType;
         
@@ -76,9 +76,9 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
         
-        public ObservableCollection<QuestionBank> QuestionBanks { get; }
+        public ObservableCollection<QuestionBank> QuestionBanks { get; } = new();
         
-        public QuestionBank SelectedQuestionBank
+        public QuestionBank? SelectedQuestionBank
         {
             get => _selectedQuestionBank;
             set
@@ -89,9 +89,9 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
         
-        public ObservableCollection<Question> AvailableQuestions { get; }
+        public ObservableCollection<Question> AvailableQuestions { get; } = new();
         
-        public Question SelectedAvailableQuestion
+        public Question? SelectedAvailableQuestion
         {
             get => _selectedAvailableQuestion;
             set
@@ -101,9 +101,9 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
         
-        public ObservableCollection<PaperQuestion> PaperQuestions { get; }
+        public ObservableCollection<PaperQuestion> PaperQuestions { get; } = new();
         
-        public PaperQuestion SelectedPaperQuestion
+        public PaperQuestion? SelectedPaperQuestion
         {
             get => _selectedPaperQuestion;
             set
@@ -146,24 +146,24 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
         
-        public List<Difficulty?> DifficultyOptions { get; private set; }
-        public List<QuestionType?> QuestionTypeOptions { get; private set; }
+        public List<Difficulty?> DifficultyOptions { get; private set; } = new();
+        public List<QuestionType?> QuestionTypeOptions { get; private set; } = new();
         
         #endregion
         
         #region Commands
         
-        public ICommand AddQuestionCommand { get; private set; }
-        public ICommand RemoveQuestionCommand { get; private set; }
-        public ICommand MoveUpCommand { get; private set; }
-        public ICommand MoveDownCommand { get; private set; }
-        public ICommand SaveCommand { get; private set; }
+        public ICommand AddQuestionCommand { get; private set; } = null!;
+        public ICommand RemoveQuestionCommand { get; private set; } = null!;
+        public ICommand MoveUpCommand { get; private set; } = null!;
+        public ICommand MoveDownCommand { get; private set; } = null!;
+        public ICommand SaveCommand { get; private set; } = null!;
         
         #endregion
         
         #region Events
         
-        public event EventHandler SaveCompleted;
+        public event EventHandler? SaveCompleted;
         
         #endregion
         
@@ -177,13 +177,13 @@ namespace ExamSystem.WPF.ViewModels
                 ValidationMessage = "";
                 
                 // 加载试卷信息
-                _examPaper = await _examPaperService.GetExamPaperByIdAsync(examPaperId);
-                if (_examPaper == null)
+                var examPaper = await _examPaperService.GetExamPaperByIdAsync(examPaperId);
+                if (examPaper == null)
                 {
                     ValidationMessage = "试卷不存在";
                     return;
                 }
-                
+                _examPaper = examPaper;
                 OnPropertyChanged(nameof(ExamPaperName));
                 
                 // 加载题库列表
@@ -302,6 +302,11 @@ namespace ExamSystem.WPF.ViewModels
         {
             try
             {
+                if (_examPaper == null)
+                {
+                    ValidationMessage = "试卷未加载";
+                    return;
+                }
                 var paperQuestions = await _examPaperService.GetPaperQuestionsAsync(_examPaper.PaperId);
                 PaperQuestions.Clear();
                 foreach (var pq in paperQuestions.OrderBy(x => x.OrderIndex))
@@ -327,6 +332,11 @@ namespace ExamSystem.WPF.ViewModels
                 IsLoading = true;
                 ValidationMessage = "";
                 
+                if (_examPaper == null)
+                {
+                    ValidationMessage = "试卷未加载";
+                    return;
+                }
                 var nextOrder = PaperQuestions.Count + 1;
                 await _examPaperService.AddQuestionAsync(
                     _examPaper.PaperId, 
@@ -360,6 +370,11 @@ namespace ExamSystem.WPF.ViewModels
                 IsLoading = true;
                 ValidationMessage = "";
                 
+                if (_examPaper == null)
+                {
+                    ValidationMessage = "试卷未加载";
+                    return;
+                }
                 await _examPaperService.RemoveQuestionAsync(_examPaper.PaperId, SelectedPaperQuestion.QuestionId);
                 await LoadPaperQuestionsAsync();
                 
@@ -387,6 +402,11 @@ namespace ExamSystem.WPF.ViewModels
                 IsLoading = true;
                 ValidationMessage = "";
                 
+                if (_examPaper == null)
+                {
+                    ValidationMessage = "试卷未加载";
+                    return;
+                }
                 var currentIndex = SelectedPaperQuestion.OrderIndex;
                 var targetIndex = currentIndex - 1;
                 
@@ -418,6 +438,11 @@ namespace ExamSystem.WPF.ViewModels
                 IsLoading = true;
                 ValidationMessage = "";
                 
+                if (_examPaper == null)
+                {
+                    ValidationMessage = "试卷未加载";
+                    return;
+                }
                 var currentIndex = SelectedPaperQuestion.OrderIndex;
                 var targetIndex = currentIndex + 1;
                 
@@ -446,6 +471,11 @@ namespace ExamSystem.WPF.ViewModels
                 IsLoading = true;
                 ValidationMessage = "";
                 
+                if (_examPaper == null)
+                {
+                    ValidationMessage = "试卷未加载";
+                    return;
+                }
                 // 更新所有题目的分值
                 foreach (var paperQuestion in PaperQuestions)
                 {
@@ -477,9 +507,9 @@ namespace ExamSystem.WPF.ViewModels
         
         #region INotifyPropertyChanged
         
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

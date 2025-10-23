@@ -44,16 +44,21 @@ namespace ExamSystem.WPF.Converters
             {
                 if (input.StartsWith("#", StringComparison.Ordinal))
                 {
-                    var color = (Color)ColorConverter.ConvertFromString(input);
-                    brush = new SolidColorBrush(color);
-                    return true;
+                    var obj = ColorConverter.ConvertFromString(input);
+                    if (obj is Color color)
+                    {
+                        brush = new SolidColorBrush(color);
+                        return true;
+                    }
                 }
-                var prop = typeof(Colors).GetProperty(input);
-                if (prop != null)
+                else
                 {
-                    var color = (Color)prop.GetValue(null);
-                    brush = new SolidColorBrush(color);
-                    return true;
+                    var prop = typeof(Colors).GetProperty(input);
+                    if (prop?.GetValue(null) is Color namedColor)
+                    {
+                        brush = new SolidColorBrush(namedColor);
+                        return true;
+                    }
                 }
             }
             catch { }

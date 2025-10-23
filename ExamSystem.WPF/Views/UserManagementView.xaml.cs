@@ -14,8 +14,8 @@ namespace ExamSystem.WPF.Views
 {
     public partial class UserManagementView : UserControl
     {
-        private readonly IUserService _userService;
-        private readonly ILogger<UserManagementView> _logger;
+        private readonly IUserService? _userService;
+        private readonly ILogger<UserManagementView>? _logger;
 
         public ObservableCollection<UserDisplayModel> Users { get; set; }
         
@@ -149,7 +149,7 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private async void ResetPasswordButton_Click(object sender, RoutedEventArgs e)
+        private void ResetPasswordButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is UserDisplayModel user)
             {
@@ -170,7 +170,7 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private async void ToggleStatusButton_Click(object sender, RoutedEventArgs e)
+        private void ToggleStatusButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is UserDisplayModel user)
             {
@@ -202,15 +202,22 @@ namespace ExamSystem.WPF.Views
                 {
                     try
                     {
+                        if (_userService == null)
+                        {
+                            _logger?.LogWarning("UserService 未初始化，无法删除用户");
+                            MessageBox.Show("服务未初始化，无法删除用户。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                            return;
+                        }
+
                         await _userService.DeleteUserAsync(user.Id);
                         Users.Remove(user);
                         MessageBox.Show("用户删除成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (Exception ex)
-                {
-                    _logger?.LogError(ex, "删除用户时发生错误");
-                    MessageBox.Show("删除用户时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                    {
+                        _logger?.LogError(ex, "删除用户时发生错误");
+                        MessageBox.Show("删除用户时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
         }
@@ -292,8 +299,8 @@ namespace ExamSystem.WPF.Views
 
         public int Id => _user.UserId;
         public string Username => _user.Username;
-        public string FullName => _user.RealName;
-        public string Email => _user.Email;
+        public string FullName => _user.RealName ?? string.Empty;
+        public string Email => _user.Email ?? string.Empty;
         public UserRole Role => _user.Role;
         public DateTime CreatedAt => _user.CreatedAt;
         public DateTime? LastLoginAt => _user.LastLoginAt;

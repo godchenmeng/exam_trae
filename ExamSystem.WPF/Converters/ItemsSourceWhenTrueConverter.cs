@@ -5,7 +5,7 @@ using System.Windows.Data;
 namespace ExamSystem.WPF.Converters
 {
     /// <summary>
-    /// 返回第一个绑定的集合值，仅当第二个绑定的布尔值为 true 时；否则返回 null。
+    /// 返回第一个绑定的集合值，仅当第二个绑定的布尔值为 true 时；否则返回 Binding.DoNothing。
     /// 用于按条件提供 ItemsControl 的 ItemsSource，从而避免隐藏控件被实例化并参与逻辑。
     /// </summary>
     public class ItemsSourceWhenTrueConverter : IMultiValueConverter
@@ -13,11 +13,11 @@ namespace ExamSystem.WPF.Converters
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values == null || values.Length < 2)
-                return null;
+                return Binding.DoNothing;
 
             var items = values[0];
             var flag = values[1] is bool b && b;
-            return flag ? items : null;
+            return flag ? items : Binding.DoNothing;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

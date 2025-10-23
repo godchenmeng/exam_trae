@@ -189,6 +189,7 @@ namespace ExamSystem.WPF.ViewModels
                     return;
 
                 ViewExamPaperRequested?.Invoke(this, ExamRecord.PaperId);
+                await Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -205,6 +206,7 @@ namespace ExamSystem.WPF.ViewModels
                     return;
 
                 RetakeExamRequested?.Invoke(this, ExamRecord.PaperId);
+                await Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -220,6 +222,7 @@ namespace ExamSystem.WPF.ViewModels
                 // TODO: 实现导出功能
                 // 可以导出为PDF或Excel格式
                 _logger.LogInformation("导出考试结果功能待实现");
+                await Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -251,7 +254,6 @@ namespace ExamSystem.WPF.ViewModels
             // 优先使用全局资源中的主题色，以确保代码层与XAML主题一致
             SolidColorBrush Primary() => TryGetBrushResource("PrimaryBrush") ?? new SolidColorBrush(Color.FromRgb(255, 59, 48));
             SolidColorBrush Success() => new SolidColorBrush(Color.FromRgb(39, 174, 96));   // #27AE60
-            SolidColorBrush Warning() => new SolidColorBrush(Color.FromRgb(255, 152, 0));   // #FF9800
             SolidColorBrush Danger() => new SolidColorBrush(Color.FromRgb(231, 76, 60));    // #E74C3C
             SolidColorBrush Neutral() => new SolidColorBrush(Color.FromRgb(149, 165, 166)); // #95A5A6
             SolidColorBrush Default() => new SolidColorBrush(Color.FromRgb(127, 140, 141)); // #7F8C8D

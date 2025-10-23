@@ -381,7 +381,7 @@ namespace ExamSystem.WPF.Views
         }
 
         // 修改密码按钮事件
-        private async void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
+        private void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {

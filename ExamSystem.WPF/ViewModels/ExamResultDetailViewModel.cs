@@ -17,17 +17,17 @@ namespace ExamSystem.WPF.ViewModels
         private readonly IExamService _examService;
         private readonly IServiceProvider _serviceProvider;
 
-        private string _examTitle;
+        private string _examTitle = string.Empty;
         private DateTime _examDate;
-        private string _duration;
+        private string _duration = string.Empty;
         private int _totalQuestions;
-        private string _status;
+        private string _status = string.Empty;
         private double _totalScore;
         private double _score;
         private double _accuracyRate;
         private int _correctCount;
         private int _wrongCount;
-        private string _teacherComment;
+        private string _teacherComment = string.Empty;
         private bool _hasTeacherComment;
         private bool _isLoading;
 
@@ -139,13 +139,19 @@ namespace ExamSystem.WPF.ViewModels
         public ICommand BackCommand { get; }
         public ICommand ExportReportCommand { get; }
 
+        public event EventHandler? BackRequested;
+
+        private void ExecuteBack()
+        {
+            BackRequested?.Invoke(this, EventArgs.Empty);
+        }
+
         #endregion
 
         #region Events
-
-        public event EventHandler BackRequested;
-
-        #endregion
+// Duplicate BackRequested event removed; using the nullable event declared in Commands region
+// public event EventHandler BackRequested;
+#endregion
 
         #region Public Methods
 
@@ -232,11 +238,6 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        private void ExecuteBack()
-        {
-            BackRequested?.Invoke(this, EventArgs.Empty);
-        }
-
         private void ExecuteExportReport()
         {
             // 实现导出报告功能
@@ -248,14 +249,14 @@ namespace ExamSystem.WPF.ViewModels
 
         #region INotifyPropertyChanged
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
             if (Equals(field, value)) return false;
             field = value;
@@ -271,13 +272,13 @@ namespace ExamSystem.WPF.ViewModels
     public class QuestionDetailViewModel : INotifyPropertyChanged
     {
         private int _questionNumber;
-        private string _questionType;
+        private string _questionType = string.Empty;
         private double _score;
         private double _earnedScore;
-        private string _content;
-        private string _correctAnswer;
-        private string _studentAnswer;
-        private string _explanation;
+        private string _content = string.Empty;
+        private string _correctAnswer = string.Empty;
+        private string _studentAnswer = string.Empty;
+        private string _explanation = string.Empty;
 
         public QuestionDetailViewModel()
         {
@@ -349,14 +350,14 @@ namespace ExamSystem.WPF.ViewModels
         public bool IsFullScore => Math.Abs(EarnedScore - Score) < 0.01;
         public bool IsZeroScore => Math.Abs(EarnedScore) < 0.01;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
             if (Equals(field, value)) return false;
             field = value;
@@ -367,7 +368,7 @@ namespace ExamSystem.WPF.ViewModels
 
     public class OptionDetailViewModel : INotifyPropertyChanged
     {
-        private string _text;
+        private string _text = string.Empty;
         private bool _isCorrect;
         private bool _isStudentAnswer;
 
@@ -389,14 +390,14 @@ namespace ExamSystem.WPF.ViewModels
             set => SetProperty(ref _isStudentAnswer, value);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
             if (Equals(field, value)) return false;
             field = value;

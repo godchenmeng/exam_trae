@@ -245,16 +245,18 @@ namespace ExamSystem.WPF.ViewModels
             };
         }
 
-        private async Task ViewRecordAsync(ExamRecordItemViewModel? item)
+        private Task ViewRecordAsync(ExamRecordItemViewModel? item)
         {
-            if (item == null) return;
+            if (item == null) return Task.CompletedTask;
             ViewRecordRequested?.Invoke(this, item.RecordId);
+            return Task.CompletedTask;
         }
 
-        private async Task GradeRecordAsync(ExamRecordItemViewModel? item)
+        private Task GradeRecordAsync(ExamRecordItemViewModel? item)
         {
-            if (item == null) return;
+            if (item == null) return Task.CompletedTask;
             GradeRecordRequested?.Invoke(this, item.RecordId);
+            return Task.CompletedTask;
         }
     }
 

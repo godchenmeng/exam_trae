@@ -67,7 +67,7 @@ public class ExamService : IExamService
                 PaperId = paperId,
                 StartTime = DateTime.Now,
                 Status = ExamStatus.InProgress,
-                TotalCount = examPaper.PaperQuestions.Count,
+                TotalCount = examPaper.PaperQuestions != null ? examPaper.PaperQuestions.Count : 0,
                 RemainingTime = examPaper.Duration * 60, // 转换为秒
                 CreatedAt = DateTime.Now
             };
@@ -75,7 +75,7 @@ public class ExamService : IExamService
             await _examRecordRepository.AddAsync(examRecord);
 
             // 创建答题记录
-            foreach (var paperQuestion in examPaper.PaperQuestions.OrderBy(pq => pq.OrderIndex))
+            foreach (var paperQuestion in (examPaper.PaperQuestions ?? Enumerable.Empty<PaperQuestion>()).OrderBy(pq => pq.OrderIndex))
             {
                 var answerRecord = new AnswerRecord
                 {
@@ -247,8 +247,10 @@ public class ExamService : IExamService
                 return false;
             }
 
-            var elapsedTime = DateTime.Now - examRecord.StartTime.Value;
-            var timeLimit = TimeSpan.FromMinutes(examRecord.ExamPaper.Duration);
+            var startTime = examRecord.StartTime ?? DateTime.Now;
+            var durationMinutes = examRecord.ExamPaper?.Duration ?? 0;
+            var elapsedTime = DateTime.Now - startTime;
+            var timeLimit = TimeSpan.FromMinutes(durationMinutes);
 
             if (elapsedTime >= timeLimit)
             {
@@ -591,7 +593,7 @@ public class ExamService : IExamService
             // 如果有进行中的考试，允许继续
             if (existingRecord.Status == ExamStatus.InProgress)
             {
-                _logger.LogInformation("用户有进行中的考试，允许继续 - RecordId: {RecordId}", 
+                _logger.LogInformation("用户有进行中的考试，允许继续 -RecordId: {RecordId}", 
                     existingRecord.RecordId);
                 return ExamValidationResult.Success();
             }
@@ -726,7 +728,7 @@ public class ExamService : IExamService
                     Title = ep.Name,
                     Subject = "通用", // 暂时设置为通用，需要根据实际业务调整
                     Duration = ep.Duration,
-                    TotalQuestions = ep.PaperQuestions.Count,
+                    TotalQuestions = ep.PaperQuestions != null ? ep.PaperQuestions.Count : 0,
                     StartTime = ep.StartTime ?? DateTime.Now,
                     EndTime = ep.EndTime ?? DateTime.Now.AddDays(30),
                     Description = ep.Description ?? string.Empty,
@@ -769,8 +771,9 @@ public class ExamService : IExamService
             // 按搜索关键词筛选
             if (!string.IsNullOrEmpty(searchKeyword))
             {
-                query = query.Where(er => er.ExamPaper.Name.Contains(searchKeyword) || 
-                                        er.ExamPaper.Description.Contains(searchKeyword));
+                query = query.Where(er => er.ExamPaper != null &&
+                                        ((er.ExamPaper.Name ?? string.Empty).Contains(searchKeyword) ||
+                                         (er.ExamPaper.Description ?? string.Empty).Contains(searchKeyword)));
             }
 
             // 按科目筛选
@@ -827,7 +830,7 @@ public class ExamService : IExamService
                     else if (er.StartTime.HasValue)
                     {
                         // 使用试卷时长减去剩余时间来估算已用时，避免出现始终为0的情况
-                        var used = er.ExamPaper.Duration - (er.RemainingTime > 0 ? er.RemainingTime / 60 : 0);
+                        var used = (er.ExamPaper?.Duration ?? 0) - (er.RemainingTime > 0 ? er.RemainingTime / 60 : 0);
                         if (used < 0) used = 0;
                         durationMinutes = used;
                     }
@@ -835,12 +838,12 @@ public class ExamService : IExamService
                     return new StudentExamResult
                     {
                         RecordId = er.RecordId,
-                        ExamTitle = er.ExamPaper.Name,
+                        ExamTitle = er.ExamPaper?.Name ?? string.Empty,
                         Subject = "通用", // 暂时使用固定值，后续可根据需要调整
                         ExamDate = er.StartTime ?? DateTime.MinValue,
                         Duration = er.StartTime.HasValue ? $"{durationMinutes}分钟" : "未完成",
-                        QuestionCount = er.ExamPaper.PaperQuestions.Count,
-                        TotalScore = er.ExamPaper.PaperQuestions.Sum(pq => pq.Score),
+                        QuestionCount = er.ExamPaper?.PaperQuestions != null ? er.ExamPaper.PaperQuestions.Count : 0,
+                        TotalScore = er.ExamPaper?.PaperQuestions != null ? er.ExamPaper.PaperQuestions.Sum(pq => pq.Score) : 0,
                         Score = er.TotalScore,
                         // 状态基于评分情况：Graded=已评分，或存在评分时间/评分者则视为已评分
                         Status = (er.Status == ExamStatus.Graded || er.GradedAt.HasValue || er.GraderId.HasValue) ? "已评分" : "未评分",
@@ -882,13 +885,13 @@ public class ExamService : IExamService
             var examDetail = new ExamResultDetail
             {
                 RecordId = examRecord.RecordId,
-                ExamTitle = examRecord.ExamPaper.Name,
+                ExamTitle = examRecord.ExamPaper?.Name ?? string.Empty,
                 ExamDate = examRecord.StartTime ?? DateTime.MinValue,
                 Duration = examRecord.EndTime.HasValue && examRecord.StartTime.HasValue ? 
                     $"{(int)(examRecord.EndTime.Value - examRecord.StartTime.Value).TotalMinutes}分钟" : "未完成",
                 TotalQuestions = examRecord.TotalCount,
                 Status = examRecord.Status == ExamStatus.Completed ? "已完成" : "进行中",
-                TotalScore = examRecord.ExamPaper.PaperQuestions.Sum(pq => pq.Score),
+                TotalScore = examRecord.ExamPaper?.PaperQuestions != null ? examRecord.ExamPaper.PaperQuestions.Sum(pq => pq.Score) : 0,
                 Score = examRecord.TotalScore,
                 CorrectCount = examRecord.CorrectCount,
                 WrongCount = examRecord.TotalCount - examRecord.CorrectCount,
@@ -897,7 +900,7 @@ public class ExamService : IExamService
             };
 
             // 构建题目详情
-            var paperQuestions = examRecord.ExamPaper.PaperQuestions.OrderBy(pq => pq.OrderIndex);
+            var paperQuestions = (examRecord.ExamPaper?.PaperQuestions ?? new List<PaperQuestion>()).OrderBy(pq => pq.OrderIndex);
             foreach (var paperQuestion in paperQuestions)
             {
                 var answerRecord = examRecord.AnswerRecords.FirstOrDefault(ar => ar.QuestionId == paperQuestion.QuestionId);

@@ -6,7 +6,6 @@ using ExamSystem.Data;
 
 using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
-using ExamSystem.Data;
 using ExamSystem.Infrastructure.Repositories;
 using ExamSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +42,7 @@ public class QuestionService : IQuestionService
             {
                 return (await _questionRepository.SearchQuestionsAsync(
                     bankId: bankId,
-                    keyword: filter.Keyword,
+                    keyword: filter.Keyword ?? string.Empty,
                     questionType: filter.QuestionType,
                     difficulty: filter.Difficulty
                 )).ToList();
@@ -227,7 +226,7 @@ public class QuestionService : IQuestionService
         try
         {
             return (await _questionRepository.SearchQuestionsAsync(
-                keyword: searchCriteria.Keyword,
+                keyword: searchCriteria.Keyword ?? string.Empty,
                 bankId: searchCriteria.BankId,
                 questionType: searchCriteria.QuestionType,
                 difficulty: searchCriteria.Difficulty
@@ -249,7 +248,7 @@ public class QuestionService : IQuestionService
         try
         {
             return (await _questionRepository.SearchQuestionsAsync(
-                keyword: keyword,
+                keyword: keyword ?? string.Empty,
                 bankId: bankId,
                 questionType: questionType,
                 difficulty: difficulty
@@ -311,24 +310,33 @@ public class QuestionService : IQuestionService
                     result.AddError("选择题选项不能超过10个");
 
                 // 验证选项内容
-                foreach (var option in question.Options)
+                if (question.Options != null)
                 {
-                    if (string.IsNullOrWhiteSpace(option.Content))
-                        result.AddError("选项内容不能为空");
-                    else if (option.Content.Length > 500)
-                        result.AddError("选项内容长度不能超过500个字符");
+                    foreach (var option in question.Options)
+                    {
+                        if (string.IsNullOrWhiteSpace(option.Content))
+                            result.AddError("选项内容不能为空");
+                        else if (option.Content.Length > 500)
+                            result.AddError("选项内容长度不能超过500个字符");
+                    }
                 }
 
                 // 验证答案格式
                 if (question.QuestionType == QuestionType.SingleChoice)
                 {
-                    if (!Regex.IsMatch(question.Answer, @"^[A-Z]$"))
-                        result.AddError("单选题答案格式应为单个大写字母（如：A）");
+                    if (!string.IsNullOrWhiteSpace(question.Answer))
+                    {
+                        if (!Regex.IsMatch(question.Answer, @"^[A-Z]$"))
+                            result.AddError("单选题答案格式应为单个大写字母（如：A）");
+                    }
                 }
                 else if (question.QuestionType == QuestionType.MultipleChoice)
                 {
-                    if (!Regex.IsMatch(question.Answer, @"^[A-Z]+(,[A-Z]+)*$"))
-                        result.AddError("多选题答案格式应为大写字母用逗号分隔（如：A,C,D）");
+                    if (!string.IsNullOrWhiteSpace(question.Answer))
+                    {
+                        if (!Regex.IsMatch(question.Answer, @"^[A-Z]+(,[A-Z]+)*$"))
+                            result.AddError("多选题答案格式应为大写字母用逗号分隔（如：A,C,D）");
+                    }
                 }
             }
 
@@ -388,15 +396,19 @@ public class QuestionService : IQuestionService
                 IsActive = true
             };
 
-            // 复制选项
-            foreach (var option in sourceQuestion.Options)
+            // 复制选项（保护空引用）
+            if (sourceQuestion.Options != null && sourceQuestion.Options.Count > 0)
             {
-                newQuestion.Options.Add(new QuestionOption
+                newQuestion.Options = newQuestion.Options ?? new List<QuestionOption>();
+                foreach (var option in sourceQuestion.Options)
                 {
-                    Content = option.Content,
-                    OptionLabel = option.OptionLabel,
-                    IsCorrect = option.IsCorrect
-                });
+                    newQuestion.Options.Add(new QuestionOption
+                    {
+                        Content = option.Content,
+                        OptionLabel = option.OptionLabel,
+                        IsCorrect = option.IsCorrect
+                    });
+                }
             }
 
             _context.Questions.Add(newQuestion);

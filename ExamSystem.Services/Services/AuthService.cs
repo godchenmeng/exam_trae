@@ -54,7 +54,7 @@ namespace ExamSystem.Services.Services
             try
             {
                 _logger.LogInformation("测试数据库连接...");
-                var canConnect = await _context.Database.CanConnectAsync();
+                var canConnect = await _context!.Database.CanConnectAsync();
                 _logger.LogInformation($"数据库连接测试结果: {canConnect}");
                 
                 if (!canConnect)
@@ -79,14 +79,15 @@ namespace ExamSystem.Services.Services
                 return (false, null, null, "数据库连接异常，请稍后再试");
             }
             
-            var user = await _userRepository.GetByUsernameAsync(username);
+            var user = await _userRepository!.GetByUsernameAsync(username);
 
             _logger.LogInformation($"用户查询结果: {(user == null ? "未找到用户" : "找到用户")}");
             if (user != null)
             {
-                _logger.LogInformation($"用户ID: {user.UserId}, 用户名: {user.Username}, 角色: {user.Role}");
-                _logger.LogInformation($"用户是否激活: {user.IsActive}");
-                _logger.LogInformation($"登录失败次数: {user.LoginFailCount}");
+                var u = user!;
+                _logger.LogInformation($"用户ID: {u.UserId}, 用户名: {u.Username}, 角色: {u.Role}");
+                _logger.LogInformation($"用户是否激活: {u.IsActive}");
+                _logger.LogInformation($"登录失败次数: {u.LoginFailCount}");
             }
 
             if (user == null)
@@ -154,7 +155,7 @@ namespace ExamSystem.Services.Services
                     try
                     {
                         // 为测试用户重新生成正确的密码哈希
-                        string newPasswordHash = null;
+                        string? newPasswordHash = null;
                         if (username == "admin")
                         {
                             newPasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123", 12);

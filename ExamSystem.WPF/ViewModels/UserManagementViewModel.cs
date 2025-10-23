@@ -16,8 +16,8 @@ namespace ExamSystem.WPF.ViewModels
 {
     public class UserManagementViewModel : INotifyPropertyChanged
     {
-        private readonly IUserService _userService;
-        private readonly ILogger<UserManagementViewModel> _logger;
+        private readonly IUserService? _userService;
+        private readonly ILogger<UserManagementViewModel>? _logger;
 
         // 无参构造函数，用于 XAML 设计时支持
         public UserManagementViewModel()
@@ -94,7 +94,7 @@ namespace ExamSystem.WPF.ViewModels
         public ObservableCollection<UserDisplayModel> Users { get; }
         public ObservableCollection<UserDisplayModel> FilteredUsers { get; }
 
-        private string _searchKeyword;
+        private string _searchKeyword = string.Empty;
         public string SearchKeyword
         {
             get => _searchKeyword;
@@ -108,7 +108,7 @@ namespace ExamSystem.WPF.ViewModels
             set => SetProperty(ref _selectedRole, value);
         }
 
-        private string _selectedStatus;
+        private string _selectedStatus = "全部";
         public string SelectedStatus
         {
             get => _selectedStatus;
@@ -285,14 +285,14 @@ namespace ExamSystem.WPF.ViewModels
             _logger?.LogInformation("导出用户功能被调用");
         }
 
-        private void EditUser(UserDisplayModel user)
+        private void EditUser(UserDisplayModel? user)
         {
             if (user == null) return;
             // TODO: 实现编辑用户功能
             _logger?.LogInformation($"编辑用户功能被调用，用户ID: {user.Id}");
         }
 
-        private async void ResetPassword(UserDisplayModel user)
+        private async void ResetPassword(UserDisplayModel? user)
         {
             if (user == null) return;
             
@@ -308,7 +308,7 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        private async void ToggleStatus(UserDisplayModel user)
+        private async void ToggleStatus(UserDisplayModel? user)
         {
             if (user == null) return;
 
@@ -327,7 +327,7 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        private async void DeleteUser(UserDisplayModel user)
+        private async void DeleteUser(UserDisplayModel? user)
         {
             if (user == null) return;
 
@@ -388,14 +388,14 @@ namespace ExamSystem.WPF.ViewModels
 
         #region INotifyPropertyChanged
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
             if (Equals(field, value)) return false;
             field = value;
@@ -410,14 +410,14 @@ namespace ExamSystem.WPF.ViewModels
     public class UserDisplayModel : INotifyPropertyChanged
     {
         private bool _isActive;
-        private string _statusDisplay;
+        private string _statusDisplay = string.Empty;
 
         public int Id { get; set; }
-        public string Username { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public UserRole Role { get; set; }
-        public string RoleDisplay { get; set; }
+        public string RoleDisplay { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLoginAt { get; set; }
 
@@ -433,14 +433,14 @@ namespace ExamSystem.WPF.ViewModels
             set => SetProperty(ref _statusDisplay, value);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
             if (Equals(field, value)) return false;
             field = value;

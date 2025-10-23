@@ -86,8 +86,8 @@ namespace ExamSystem.WPF.ViewModels
 
         #region Events
 
-        public event EventHandler<LoginSuccessEventArgs> LoginSuccess;
-        public event EventHandler CloseRequested;
+        public event EventHandler<LoginSuccessEventArgs>? LoginSuccess;
+        public event EventHandler? CloseRequested;
 
         #endregion
 
@@ -205,14 +205,14 @@ namespace ExamSystem.WPF.ViewModels
 
         #region INotifyPropertyChanged
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
         {
             if (Equals(field, value)) return false;
             field = value;

@@ -12,7 +12,7 @@ namespace ExamSystem.WPF.ViewModels
     public class ExamPaperEditViewModel : INotifyPropertyChanged
     {
         private readonly IExamPaperService _examPaperService;
-        private ExamPaper _examPaper;
+        private ExamPaper _examPaper = new ExamPaper();
         private bool _isLoading;
         private ValidationMessages _validationMessages;
 
@@ -68,7 +68,7 @@ namespace ExamSystem.WPF.ViewModels
 
         #region 事件
 
-        public event EventHandler<bool> SaveCompleted;
+        public event EventHandler<bool>? SaveCompleted;
 
         #endregion
 
@@ -234,9 +234,9 @@ namespace ExamSystem.WPF.ViewModels
 
         #region INotifyPropertyChanged
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -249,13 +249,13 @@ namespace ExamSystem.WPF.ViewModels
     /// </summary>
     public class ValidationMessages : INotifyPropertyChanged
     {
-        private string _name;
-        private string _description;
-        private string _duration;
-        private string _passScore;
-        private string _startTime;
-        private string _endTime;
-        private string _general;
+        private string _name = string.Empty;
+        private string _description = string.Empty;
+        private string _duration = string.Empty;
+        private string _passScore = string.Empty;
+        private string _startTime = string.Empty;
+        private string _endTime = string.Empty;
+        private string _general = string.Empty;
 
         public string Name
         {
@@ -329,18 +329,18 @@ namespace ExamSystem.WPF.ViewModels
 
         public void Clear()
         {
-            Name = null;
-            Description = null;
-            Duration = null;
-            PassScore = null;
-            StartTime = null;
-            EndTime = null;
-            General = null;
+            Name = string.Empty;
+            Description = string.Empty;
+            Duration = string.Empty;
+            PassScore = string.Empty;
+            StartTime = string.Empty;
+            EndTime = string.Empty;
+            General = string.Empty;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

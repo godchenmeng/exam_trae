@@ -56,7 +56,7 @@ namespace ExamSystem.Services.Services
                     var row = i + 2; // 从第2行开始（第1行是表头）
 
                     worksheet.Cells[row, 1].Value = question.Title;
-                    worksheet.Cells[row, 3].Value = GetQuestionTypeDisplayName(question.QuestionType);
+                    worksheet.Cells[row, 2].Value = GetQuestionTypeDisplayName(question.QuestionType);
                     worksheet.Cells[row, 3].Value = FormatQuestionOptions(question);
                     worksheet.Cells[row, 4].Value = question.Answer;
                 worksheet.Cells[row, 5].Value = question.Analysis ?? "";
@@ -318,6 +318,7 @@ namespace ExamSystem.Services.Services
                 statsWorksheet.Cells[startRow + 1 + i, 1].Value = difficultyStats[i].Difficulty;
                 statsWorksheet.Cells[startRow + 1 + i, 2].Value = difficultyStats[i].Count;
             }
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -353,6 +354,7 @@ namespace ExamSystem.Services.Services
             worksheet.Cells[10, 2].Value = totalScore;
             worksheet.Cells[11, 1].Value = "平均分值：";
             worksheet.Cells[11, 2].Value = Math.Round(avgScore, 2);
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -450,7 +452,7 @@ namespace ExamSystem.Services.Services
             // 统计标签使用情况
             var allTags = questionList
                 .Where(q => !string.IsNullOrEmpty(q.Tags))
-                .SelectMany(q => q.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                .SelectMany(q => (q.Tags ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
                 .Select(tag => tag.Trim())
                 .Where(tag => !string.IsNullOrEmpty(tag))
                 .ToList();

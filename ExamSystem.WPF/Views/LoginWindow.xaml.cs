@@ -10,9 +10,9 @@ namespace ExamSystem.WPF.Views
 {
     public partial class LoginWindow : Window
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<LoginWindow> _logger;
-        private readonly LoginViewModel _viewModel;
+        private readonly IServiceProvider? _serviceProvider;
+        private readonly ILogger<LoginWindow>? _logger;
+        private readonly LoginViewModel? _viewModel;
 
         // 无参构造函数，用于XAML设计时支持
         public LoginWindow()
@@ -97,7 +97,7 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private void OnLoginSuccess(object sender, LoginSuccessEventArgs e)
+        private void OnLoginSuccess(object? sender, LoginSuccessEventArgs e)
         {
             try
             {
@@ -105,6 +105,13 @@ namespace ExamSystem.WPF.Views
                 _logger?.LogInformation($"登录成功的用户: {e.User?.Username} ({e.User?.Role})");
                 _logger?.LogInformation($"用户ID: {e.User?.UserId}");
                 _logger?.LogInformation($"用户对象是否为null: {e.User == null}");
+
+                if (e.User == null)
+                {
+                    _logger?.LogError("登录成功事件未包含用户信息");
+                    MessageBox.Show("登录用户信息缺失，请重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
                 // 打开主窗口
                 var mainWindow = _serviceProvider?.GetRequiredService<MainWindow>();
@@ -137,7 +144,7 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private void OnCloseRequested(object sender, EventArgs e)
+        private void OnCloseRequested(object? sender, EventArgs e)
         {
             Application.Current.Shutdown();
         }
