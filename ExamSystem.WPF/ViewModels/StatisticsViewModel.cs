@@ -14,7 +14,7 @@ using ExamSystem.WPF.ViewModels.Base;
 
 namespace ExamSystem.WPF.ViewModels
 {
-    public class StatisticsViewModel : BaseViewModel
+    public class StatisticsViewModel : ExamSystem.WPF.ViewModels.Base.BaseViewModel
     {
         private readonly IExamService _examService;
         private readonly IExamPaperService _examPaperService;

@@ -11,6 +11,7 @@ using ExamSystem.Services.Services;
 using ExamSystem.WPF.Views;
 using ExamSystem.WPF.ViewModels;
 using Serilog;
+using System.IO;
 
 namespace ExamSystem.WPF
 {
@@ -37,6 +38,12 @@ namespace ExamSystem.WPF
                 using var scope = Services.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<ExamDbContext>();
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<DatabaseSeeder>>();
+
+                // 记录实际使用的数据库路径，避免路径不一致导致数据不显示
+                var appLogger = scope.ServiceProvider.GetRequiredService<ILogger<App>>();
+                var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                var dbPath = Path.Combine(baseDir, "exam_system.db");
+                appLogger.LogInformation("SQLite 数据库路径: {DbPath}", dbPath);
 
                 // 确保数据库迁移已应用（避免缺失列导致运行时错误，如 IsPublished）
                 await context.Database.MigrateAsync();
@@ -68,8 +75,10 @@ namespace ExamSystem.WPF
                 .ConfigureServices((context, services) =>
                 {
                     // 数据库上下文
+                    var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                    var dbPath = Path.Combine(baseDir, "exam_system.db");
                     services.AddDbContext<ExamDbContext>(options =>
-                        options.UseSqlite("Data Source=exam_system.db", b => b.MigrationsAssembly("ExamSystem.Infrastructure")));
+                        options.UseSqlite($"Data Source={dbPath}", b => b.MigrationsAssembly("ExamSystem.Infrastructure")));
 
                     // Repository层
                     services.AddScoped<IUserRepository, UserRepository>();
@@ -116,6 +125,8 @@ namespace ExamSystem.WPF
                     services.AddTransient<StudentExamResultViewModel>();
                     services.AddTransient<FullScreenExamViewModel>();
                     services.AddTransient<ExamResultDetailViewModel>();
+                    // 新增成绩管理 ViewModel
+                    services.AddTransient<GradeManagementViewModel>();
 
                     // Views
                     services.AddTransient<LoginWindow>();
@@ -149,9 +160,18 @@ namespace ExamSystem.WPF
                         var vm = provider.GetRequiredService<StudentExamListViewModel>();
                         return new StudentExamListView(vm);
                     });
-                     services.AddTransient<StudentExamResultView>();
+                     // 为学生考试结果视图注入对应的 ViewModel 并设置 DataContext
+                     services.AddTransient<StudentExamResultView>(provider =>
+                    {
+                        var vm = provider.GetRequiredService<StudentExamResultViewModel>();
+                        var view = new StudentExamResultView();
+                        view.DataContext = vm;
+                        return view;
+                    });
                      services.AddTransient<ExamResultDetailView>();
                      services.AddTransient<FullScreenExamWindow>();
+                     // 新增成绩管理视图
+                     services.AddTransient<GradeManagementView>();
                     // 新增通知发送视图（注入 ViewModel）
                     services.AddTransient<NotificationSendView>(provider =>
                     {

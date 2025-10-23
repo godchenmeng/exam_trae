@@ -226,4 +226,119 @@ namespace ExamSystem.WPF.Converters
             return false;
         }
     }
+
+    // 新增：布尔/字符串 true/false 到中文“正确/错误”文本转换器
+    public class TrueFalseToChineseTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null) return string.Empty;
+
+            if (value is bool b)
+            {
+                return b ? "正确" : "错误";
+            }
+
+            if (value is string s)
+            {
+                var v = s.Trim();
+                if (string.Equals(v, "true", StringComparison.OrdinalIgnoreCase) || v == "1")
+                    return "正确";
+                if (string.Equals(v, "false", StringComparison.OrdinalIgnoreCase) || v == "0")
+                    return "错误";
+                return v; // 其它字符串原样返回
+            }
+
+            return value.ToString() ?? string.Empty;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string s)
+            {
+                var v = s.Trim();
+                if (v == "正确") return true;
+                if (v == "错误") return false;
+            }
+            return Binding.DoNothing;
+        }
+    }
+
+    // 新增：分数百分比颜色转换器（>=80% 绿 #52c41a，60-79% 蓝 #1890ff，<60% 红 #f5222d）
+    public class ScorePercentageBrushConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values == null || values.Length < 2) return new SolidColorBrush(Colors.Gray);
+            if (values[0] == null || values[1] == null) return new SolidColorBrush(Colors.Gray);
+    
+            try
+            {
+                var score = System.Convert.ToDecimal(values[0]);
+                var max = System.Convert.ToDecimal(values[1]);
+                if (max <= 0) return new SolidColorBrush(Colors.Gray);
+                var percent = (double)(score / max * 100m);
+    
+                // 颜色：#52c41a (82,196,26), #1890ff (24,144,255), #f5222d (245,34,45)
+                if (percent >= 80.0) return new SolidColorBrush(Color.FromRgb(82, 196, 26));
+                if (percent >= 60.0) return new SolidColorBrush(Color.FromRgb(24, 144, 255));
+                return new SolidColorBrush(Color.FromRgb(245, 34, 45));
+            }
+            catch
+            {
+                return new SolidColorBrush(Colors.Gray);
+            }
+        }
+    
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return new object[] { Binding.DoNothing, Binding.DoNothing };
+        }
+    }
+    
+    // 新增：分数显示为 “X/Y” 的转换器
+    public class ScoreFractionTextConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values == null || values.Length < 2) return "-/-";
+            if (values[0] == null || values[1] == null) return "-/-";
+            try
+            {
+                var score = System.Convert.ToDecimal(values[0]);
+                var max = System.Convert.ToDecimal(values[1]);
+                return string.Format(culture, "{0:0.##}/{1:0.##}", score, max);
+            }
+            catch
+            {
+                return "-/-";
+            }
+        }
+    
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return new object[] { Binding.DoNothing, Binding.DoNothing };
+        }
+    }
+
+    // 新增：选择题可见性转换器
+    public class ChoiceQuestionVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is ExamSystem.Domain.Enums.QuestionType questionType)
+            {
+                return questionType == ExamSystem.Domain.Enums.QuestionType.SingleChoice || 
+                       questionType == ExamSystem.Domain.Enums.QuestionType.MultipleChoice
+                    ? Visibility.Visible 
+                    : Visibility.Collapsed;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
 }

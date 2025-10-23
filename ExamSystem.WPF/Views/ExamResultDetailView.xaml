@@ -45,8 +45,8 @@
 
         <!-- 标准答案样式 -->
         <Style x:Key="StandardAnswerStyle" TargetType="Border">
-            <Setter Property="Background" Value="#E3F2FD"/>
-            <Setter Property="BorderBrush" Value="#2196F3"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryLightBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Padding" Value="8"/>
@@ -119,7 +119,7 @@
 
                     <Button Grid.Column="2" Content="导出报告" 
                             Command="{Binding ExportReportCommand}"
-                            Background="#2196F3" Foreground="White" 
+                            Background="{StaticResource PrimaryBrush}" Foreground="White" 
                             BorderThickness="0" Padding="12,6" 
                             FontSize="12" Cursor="Hand"/>
                 </Grid>
@@ -173,12 +173,12 @@
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="1" Background="#E3F2FD" BorderBrush="#2196F3" BorderThickness="1" 
+                    <Border Grid.Column="1" Background="{StaticResource PrimaryLightBrush}" BorderBrush="{StaticResource PrimaryBrush}" BorderThickness="1" 
                             CornerRadius="8" Padding="16" Margin="0,0,8,0">
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                             <TextBlock Text="得分" FontSize="12" Foreground="#666" HorizontalAlignment="Center"/>
                             <TextBlock Text="{Binding Score}" FontSize="20" FontWeight="Bold" 
-                                       Foreground="#2196F3" HorizontalAlignment="Center"/>
+                                       Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 

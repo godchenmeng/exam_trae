@@ -1,0 +1,126 @@
+<Window x:Class="ExamSystem.WPF.Dialogs.ExamRecordViewDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="试卷查看" Height="700" Width="1000" WindowStartupLocation="CenterOwner"
+        Icon="pack://siteoforigin:,,,/logo.png">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8" VerticalAlignment="Center">
+            <TextBlock Text="试卷："/>
+            <TextBlock Text="{Binding ExamPaperTitle}" FontWeight="Bold" Margin="4,0,16,0"/>
+            <TextBlock Text="考生："/>
+            <TextBlock Text="{Binding UserName}" FontWeight="Bold" Margin="4,0,16,0"/>
+            <TextBlock Text="分数："/>
+            <TextBlock Text="{Binding TotalScore}" FontWeight="Bold" Margin="4,0,16,0"/>
+            <TextBlock Text="状态："/>
+            <TextBlock Text="{Binding Status}" FontWeight="Bold" Margin="4,0,16,0"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Questions}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="1" BorderBrush="#DDD" Padding="8" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Header}" FontWeight="Bold" Margin="0,0,0,4"/>
+                                <!-- 显示中文题型 -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="题型："/>
+                                    <TextBlock Text="{Binding QuestionType, Converter={StaticResource QuestionTypeConverter}}" FontWeight="SemiBold"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding Content}" TextWrapping="Wrap"/>
+                                
+                                <!-- 显示选择题选项 -->
+                                <StackPanel Margin="0,8,0,0" Visibility="{Binding QuestionType, Converter={StaticResource ChoiceQuestionVisibilityConverter}}">
+                                    <TextBlock Text="选项：" FontWeight="Bold" Margin="0,0,0,4"/>
+                                    <ItemsControl ItemsSource="{Binding Options}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="12,2,0,2">
+                                                    <TextBlock Text="{Binding OptionLabel}" FontWeight="Bold" Margin="0,0,4,0"/>
+                                                    <TextBlock Text=". " Margin="0,0,4,0"/>
+                                                    <TextBlock Text="{Binding Content}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                                
+                                <StackPanel Margin="0,8,0,0">
+                                    <TextBlock Text="题目与作答详情" FontWeight="Bold" Margin="0,0,0,8"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                            <TextBlock Text="标准答案：" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding StandardAnswer, Converter={StaticResource TrueFalseToChineseTextConverter}}" TextWrapping="Wrap" Foreground="#D97706"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="我的作答：" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding UserAnswer, Converter={StaticResource TrueFalseToChineseTextConverter}}" TextWrapping="Wrap" Foreground="#2563EB"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                                <!-- 正确性与得分并排展示 -->
+                                <Grid Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="0,0,16,0">
+                                        <TextBlock Text="是否正确："/>
+                                        <TextBlock x:Name="CorrectText" Text="{Binding IsCorrect, Converter={StaticResource TrueFalseToChineseTextConverter}}" FontWeight="Bold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#DC2626"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCorrect}" Value="True">
+                                                            <Setter Property="Foreground" Value="#16A34A"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                        <TextBlock Text="得分："/>
+                                        <TextBlock x:Name="ScoreText" Text="{Binding Score}" FontWeight="Bold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#DC2626"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCorrect}" Value="True">
+                                                            <Setter Property="Foreground" Value="#16A34A"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text=" / " />
+                                        <TextBlock Text="{Binding MaxScore}"/>
+                                    </StackPanel>
+                                    
+                                    <!-- 移除无效的 StackPanel.Style 和嵌套触发器，转为针对具体 TextBlock 的样式绑定 -->
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button Content="导出PDF" Width="100" Margin="0,0,8,0" Command="{Binding ExportPdfCommand}"/>
+            <Button Content="打印" Width="80" Margin="0,0,8,0" Command="{Binding PrintCommand}"/>
+            <Button Content="关闭" Width="80" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

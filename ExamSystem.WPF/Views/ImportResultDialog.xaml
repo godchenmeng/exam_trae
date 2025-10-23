@@ -95,7 +95,7 @@
                             <DataGridTextColumn Header="行号" Binding="{Binding RowNumber}" Width="60"/>
                             <DataGridTextColumn Header="题目标题" Binding="{Binding Title}" Width="200"/>
                             <DataGridTextColumn Header="题目类型" Binding="{Binding QuestionType}" Width="100"/>
-                            <DataGridTextColumn Header="难度" Binding="{Binding Difficulty}" Width="80"/>
+                            <DataGridTextColumn Header="难度" Binding="{Binding Difficulty, Converter={StaticResource DifficultyConverter}}" Width="80"/>
                             <DataGridTextColumn Header="分值" Binding="{Binding Score}" Width="60"/>
                         </DataGrid.Columns>
                     </DataGrid>

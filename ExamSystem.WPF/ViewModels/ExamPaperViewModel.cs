@@ -19,7 +19,7 @@ namespace ExamSystem.WPF.ViewModels;
 /// <summary>
 /// 试卷管理ViewModel
 /// </summary>
-public class ExamPaperViewModel : BaseViewModel
+public class ExamPaperViewModel : ExamSystem.WPF.ViewModels.Base.BaseViewModel
 {
     private readonly IExamPaperService _examPaperService;
     private readonly IQuestionBankService _questionBankService;

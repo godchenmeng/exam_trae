@@ -115,6 +115,10 @@ namespace ExamSystem.WPF.Views
                     mainWindow.SetCurrentUser(e.User);
                     // 传递上次登录时间
                     mainWindow.PreviousLoginAt = e.PreviousLoginAt;
+
+                    // 关键修复：将 Application.Current.MainWindow 指向真正的主窗口
+                    Application.Current.MainWindow = mainWindow;
+
                     _logger?.LogInformation("用户信息设置完成，显示主窗口");
                     mainWindow.Show();
                 }

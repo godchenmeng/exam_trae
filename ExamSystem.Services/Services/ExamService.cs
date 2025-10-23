@@ -655,8 +655,8 @@ public class ExamService : IExamService
     {
         return questionType == QuestionType.SingleChoice ||
                questionType == QuestionType.MultipleChoice ||
-               questionType == QuestionType.TrueFalse ||
-               questionType == QuestionType.FillInBlank;
+               questionType == QuestionType.TrueFalse;
+        // 注意：填空题现在被归类为主观题，需要人工评分
     }
 
     /// <summary>
@@ -746,16 +746,25 @@ public class ExamService : IExamService
     }
 
     /// <summary>
-    /// 获取学生考试结果列表
+    /// 获取学生考试结果列表（只返回已交卷试卷）
     /// </summary>
     public async Task<List<StudentExamResult>> GetStudentExamResultsAsync(int userId, string? searchKeyword = null, 
         string? subjectFilter = null, string? timeRangeFilter = null)
     {
         try
         {
+            // 只返回已交卷的试卷：Submitted（已提交）、Completed（已完成）、Graded（已评分）
+            // 为避免使用长生命周期 DbContext 的跟踪缓存导致数据不实时（例如得分一直为 0），在查询前清空跟踪器，并使用 AsNoTracking。
+            _context.ChangeTracker.Clear();
+
             var query = _context.ExamRecords
+                .AsNoTracking()
                 .Include(er => er.ExamPaper)
-                .Where(er => er.UserId == userId && er.Status == ExamStatus.Completed);
+                .ThenInclude(ep => ep.PaperQuestions)
+                .Where(er => er.UserId == userId && 
+                            (er.Status == ExamStatus.Submitted || 
+                             er.Status == ExamStatus.Completed || 
+                             er.Status == ExamStatus.Graded));
 
             // 按搜索关键词筛选
             if (!string.IsNullOrEmpty(searchKeyword))
@@ -802,23 +811,44 @@ public class ExamService : IExamService
                 }
             }
 
-            var examResults = await query
-                .Select(er => new StudentExamResult
+            // 先拉取到内存，再计算用时与评分状态
+            var examRecords = await query
+                .OrderByDescending(er => er.StartTime)
+                .ToListAsync();
+
+            var examResults = examRecords
+                .Select(er =>
                 {
-                    RecordId = er.RecordId,
-                    ExamTitle = er.ExamPaper.Name,
-                    Subject = "通用", // 暂时使用固定值，后续可根据需要调整
-                    ExamDate = er.StartTime ?? DateTime.MinValue,
-                    Duration = er.EndTime.HasValue && er.StartTime.HasValue ? 
-                        $"{(int)(er.EndTime.Value - er.StartTime.Value).TotalMinutes}分钟" : "未完成",
-                    QuestionCount = er.ExamPaper.PaperQuestions.Count,
-                    TotalScore = er.ExamPaper.TotalScore,
-                    Score = er.TotalScore,
-                    Status = er.Status == ExamStatus.Completed ? "已完成" : "进行中",
-                    HasWrongAnswers = er.CorrectCount < er.TotalCount
+                    int durationMinutes = 0;
+                    if (er.EndTime.HasValue && er.StartTime.HasValue)
+                    {
+                        durationMinutes = (int)(er.EndTime.Value - er.StartTime.Value).TotalMinutes;
+                    }
+                    else if (er.StartTime.HasValue)
+                    {
+                        // 使用试卷时长减去剩余时间来估算已用时，避免出现始终为0的情况
+                        var used = er.ExamPaper.Duration - (er.RemainingTime > 0 ? er.RemainingTime / 60 : 0);
+                        if (used < 0) used = 0;
+                        durationMinutes = used;
+                    }
+
+                    return new StudentExamResult
+                    {
+                        RecordId = er.RecordId,
+                        ExamTitle = er.ExamPaper.Name,
+                        Subject = "通用", // 暂时使用固定值，后续可根据需要调整
+                        ExamDate = er.StartTime ?? DateTime.MinValue,
+                        Duration = er.StartTime.HasValue ? $"{durationMinutes}分钟" : "未完成",
+                        QuestionCount = er.ExamPaper.PaperQuestions.Count,
+                        TotalScore = er.ExamPaper.PaperQuestions.Sum(pq => pq.Score),
+                        Score = er.TotalScore,
+                        // 状态基于评分情况：Graded=已评分，或存在评分时间/评分者则视为已评分
+                        Status = (er.Status == ExamStatus.Graded || er.GradedAt.HasValue || er.GraderId.HasValue) ? "已评分" : "未评分",
+                        HasWrongAnswers = er.CorrectCount < er.TotalCount
+                    };
                 })
                 .OrderByDescending(r => r.ExamDate)
-                .ToListAsync();
+                .ToList();
 
             return examResults;
         }
@@ -921,4 +951,152 @@ public class ExamService : IExamService
     }
 
     #endregion
-}}
+
+    // ... existing code ...
+
+    // 新增：搜索考试记录（教师侧）
+    public async Task<List<ExamRecord>> SearchExamRecordsAsync(string keyword, int? userId = null, int? paperId = null, DateTime? startDate = null, DateTime? endDate = null)
+    {
+        try
+        {
+            var results = await _examRecordRepository.SearchExamRecordsAsync(keyword, userId, paperId, startDate, endDate);
+            return results.ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "搜索考试记录失败，关键词: {Keyword}", keyword);
+            throw;
+        }
+    }
+
+    // 新增：主观题人工评分（教师侧）
+    public async Task<bool> GradeSubjectiveAnswerAsync(int recordId, int questionId, decimal score, string? comment, int graderId)
+    {
+        try
+        {
+            // 获取答题记录
+            var answerRecord = await _examRecordRepository.GetAnswerRecordAsync(recordId, questionId);
+            if (answerRecord == null)
+            {
+                _logger.LogWarning("未找到答题记录，RecordId={RecordId}, QuestionId={QuestionId}", recordId, questionId);
+                return false;
+            }
+
+            // 更新评分信息
+            answerRecord.Score = score;
+            answerRecord.Comment = comment;
+            answerRecord.IsGraded = true;
+            answerRecord.GradeTime = DateTime.Now;
+            answerRecord.GraderId = graderId;
+
+            await _examRecordRepository.UpdateAnswerRecordAsync(answerRecord);
+
+            // 重新计算总分
+            var total = await CalculateTotalScoreAsync(recordId);
+
+            // 如果全部题目都已评分，则更新考试状态为 Graded
+            var examRecord = await _examRecordRepository.GetRecordWithAnswersAsync(recordId);
+            if (examRecord != null)
+            {
+                // 记录最后评分教师
+                examRecord.GraderId = graderId;
+
+                var allGraded = examRecord.AnswerRecords.All(ar => ar.IsGraded);
+                // 同步更新主观题分数，便于统计与展示
+                var subjectiveScore = examRecord.AnswerRecords
+                    .Where(ar => ar.IsGraded && ar.Question != null && !IsObjectiveQuestion(ar.Question.QuestionType))
+                    .Sum(ar => ar.Score);
+
+                examRecord.TotalScore = total;
+                examRecord.SubjectiveScore = subjectiveScore;
+                if (allGraded)
+                {
+                    examRecord.Status = ExamStatus.Graded;
+                    examRecord.GradedAt = DateTime.Now;
+                    var passScore = (examRecord.ExamPaper?.PassScore ?? 0) > 0
+                        ? examRecord.ExamPaper!.PassScore
+                        : (examRecord.ExamPaper!.TotalScore * 0.6m);
+                    examRecord.IsPassed = examRecord.TotalScore >= passScore;
+                }
+                await _examRecordRepository.UpdateAsync(examRecord);
+            }
+
+            _logger.LogInformation("人工评分成功：RecordId={RecordId}, QuestionId={QuestionId}, Score={Score}", recordId, questionId, score);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "人工评分失败：RecordId={RecordId}, QuestionId={QuestionId}", recordId, questionId);
+            return false;
+        }
+    }
+
+    // 新增：根据 AnswerRecords 回写/同步 ExamRecords（总分、主观分、状态）
+    public async Task<bool> SyncExamRecordFromAnswerRecordsAsync(int recordId)
+    {
+        try
+        {
+            // 读取考试记录及答题记录
+            var examRecord = await _examRecordRepository.GetRecordWithAnswersAsync(recordId);
+            if (examRecord == null)
+            {
+                _logger.LogWarning("Sync失败，未找到考试记录，RecordId={RecordId}", recordId);
+                return false;
+            }
+
+            // 重新计算客观题与主观题分数
+            decimal objectiveScore = 0m;
+            decimal subjectiveScore = 0m;
+            int correctCount = 0;
+
+            foreach (var ar in examRecord.AnswerRecords)
+            {
+                var type = ar.Question?.QuestionType ?? QuestionType.SingleChoice;
+                var isObjective = IsObjectiveQuestion(type);
+
+                if (ar.IsGraded)
+                {
+                    if (isObjective)
+                    {
+                        objectiveScore += ar.Score;
+                        if (ar.IsCorrect) correctCount++;
+                    }
+                    else
+                    {
+                        subjectiveScore += ar.Score;
+                    }
+                }
+            }
+
+            var total = objectiveScore + subjectiveScore;
+            examRecord.ObjectiveScore = objectiveScore;
+            examRecord.SubjectiveScore = subjectiveScore;
+            examRecord.TotalScore = total;
+            examRecord.CorrectCount = correctCount;
+
+            // 只要所有题目都已评分，则设置为已评分
+            var allGraded = examRecord.AnswerRecords.All(x => x.IsGraded);
+            if (allGraded)
+            {
+                examRecord.Status = ExamStatus.Graded;
+                examRecord.GradedAt = examRecord.GradedAt ?? DateTime.Now;
+
+                // 计算是否通过
+                var passScore = (examRecord.ExamPaper?.PassScore ?? 0) > 0
+                    ? examRecord.ExamPaper!.PassScore
+                    : (examRecord.ExamPaper!.TotalScore * 0.6m);
+                examRecord.IsPassed = examRecord.TotalScore >= passScore;
+            }
+
+            await _examRecordRepository.UpdateAsync(examRecord);
+            _logger.LogInformation("已同步考试总表：RecordId={RecordId}，Objective={Objective}，Subjective={Subjective}，Total={Total}，AllGraded={AllGraded}", recordId, objectiveScore, subjectiveScore, total, allGraded);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "同步考试总表失败：RecordId={RecordId}", recordId);
+            return false;
+        }
+    }
+}
+}

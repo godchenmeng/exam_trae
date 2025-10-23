@@ -15,8 +15,8 @@
         
         <!-- 渐变背景 -->
         <LinearGradientBrush x:Key="BackgroundGradient" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#667eea" Offset="0"/>
-            <GradientStop Color="#764ba2" Offset="1"/>
+            <GradientStop Color="#FF6A5E" Offset="0"/>
+            <GradientStop Color="#C62828" Offset="1"/>
         </LinearGradientBrush>
         
         <!-- LOGO样式 -->
@@ -24,8 +24,8 @@
             <Setter Property="Fill">
                 <Setter.Value>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#4CAF50" Offset="0"/>
-                        <GradientStop Color="#2196F3" Offset="1"/>
+                        <GradientStop Color="#FF8A80" Offset="0"/>
+                        <GradientStop Color="#FF3B30" Offset="1"/>
                     </LinearGradientBrush>
                 </Setter.Value>
             </Setter>
@@ -110,10 +110,8 @@
                         <!-- LOGO区域 -->
                         <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <!-- LOGO图标 -->
-                            <Grid Width="120" Height="120" Margin="0,0,0,20">
-                                <Ellipse Style="{StaticResource LogoStyle}"/>
-                                <TextBlock Text="📚" FontSize="60" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
-                            </Grid>
+                            <!-- 替换原椭圆+emoji 为项目根目录 logo.png -->
+                            <Image Source="pack://application:,,,/logo.png" Width="120" Height="120" Stretch="Uniform" Margin="0,0,0,20" Effect="{StaticResource DropShadowEffect}"/>
                             
                             <!-- 系统名称 -->
                             <TextBlock Text="在线考试系统" 
@@ -210,7 +208,7 @@
                                         </Setter>
                                         <Style.Triggers>
                                             <Trigger Property="IsFocused" Value="True">
-                                                <Setter Property="BorderBrush" Value="#667eea"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
                                                 <Setter Property="BorderThickness" Value="2"/>
                                             </Trigger>
                                             <Trigger Property="IsMouseOver" Value="True">
@@ -252,7 +250,7 @@
                                         </Setter>
                                         <Style.Triggers>
                                             <Trigger Property="IsFocused" Value="True">
-                                                <Setter Property="BorderBrush" Value="#667eea"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
                                                 <Setter Property="BorderThickness" Value="2"/>
                                             </Trigger>
                                             <Trigger Property="IsMouseOver" Value="True">
@@ -286,7 +284,7 @@
                                                             <TextBlock x:Name="CheckMark"
                                                                       Text="✓"
                                                                       FontSize="12"
-                                                                      Foreground="#667eea"
+                                                                      Foreground="{StaticResource PrimaryBrush}"
                                                                       HorizontalAlignment="Center"
                                                                       VerticalAlignment="Center"
                                                                       Visibility="Collapsed"/>
@@ -296,11 +294,8 @@
                                                     <ControlTemplate.Triggers>
                                                         <Trigger Property="IsChecked" Value="True">
                                                             <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
-                                                            <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#667eea"/>
-                                                            <Setter TargetName="CheckBoxBorder" Property="Background" Value="#F0F4FF"/>
-                                                        </Trigger>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#667eea"/>
+                                                            <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                                                            <Setter TargetName="CheckBoxBorder" Property="Background" Value="{StaticResource PrimaryLightBrush}"/>
                                                         </Trigger>
                                                     </ControlTemplate.Triggers>
                                                 </ControlTemplate>

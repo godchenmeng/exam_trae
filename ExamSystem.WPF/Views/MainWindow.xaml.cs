@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ExamSystem.Domain.Entities;
@@ -18,6 +19,9 @@ namespace ExamSystem.WPF.Views
         private readonly ILogger<MainWindow> _logger;
         private readonly IPermissionService _permissionService;
         private User? _currentUser;
+
+        // 公共的 CurrentUser 属性，供其他组件访问
+        public User? CurrentUser => _currentUser;
 
         // 供 XAML 绑定显示的属性（改为依赖属性，确保 UI 能实时更新）
         public static readonly DependencyProperty CurrentUsernameProperty = DependencyProperty.Register(
@@ -45,6 +49,27 @@ namespace ExamSystem.WPF.Views
             
             _logger.LogInformation("MainWindow 构造函数完成，延迟加载页面直到用户登录");
             // 不在构造函数中加载页面，等待用户登录后再加载
+        }
+
+        // 允许通过自定义标题栏拖动窗体，同时支持双击最大化/还原
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (e.ClickCount == 2)
+                {
+                    WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+                    return;
+                }
+                if (e.ButtonState == MouseButtonState.Pressed)
+                {
+                    DragMove();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "拖动窗口时发生异常");
+            }
         }
 
         private void ApplyModuleVisibility()
@@ -192,6 +217,17 @@ namespace ExamSystem.WPF.Views
                 var statisticsView = _serviceProvider.GetRequiredService<StatisticsView>();
                 StatisticsFrame.Content = statisticsView;
 
+                // 加载成绩管理（仅教师和管理员可见）
+                if (_currentUser != null && (_currentUser.Role == ExamSystem.Domain.Enums.UserRole.Teacher || _currentUser.Role == ExamSystem.Domain.Enums.UserRole.Admin))
+                {
+                    var gradeManagementView = _serviceProvider.GetRequiredService<GradeManagementView>();
+                    GradeManagementFrame.Content = gradeManagementView;
+                    // 注入 ViewModel 并设置当前用户
+                    var gradeManagementVm = _serviceProvider.GetRequiredService<GradeManagementViewModel>();
+                    gradeManagementView.DataContext = gradeManagementVm;
+                    gradeManagementVm.SetCurrentUser(_currentUser);
+                }
+
                 // 加载用户管理
                 var userManagementView = _serviceProvider.GetRequiredService<UserManagementView>();
                 UserManagementFrame.Content = userManagementView;
@@ -256,14 +292,6 @@ namespace ExamSystem.WPF.Views
                             _logger.LogWarning("QuestionBankFrame.Content不是QuestionBankView类型");
                         }
                     }
-                    else
-                    {
-                        _logger.LogWarning("QuestionBankFrame.Content为null");
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("QuestionBankFrame为null");
                 }
 
                 // 同步更新 ExamPaperViewModel 的用户信息
@@ -316,12 +344,39 @@ namespace ExamSystem.WPF.Views
                     }
                 }
 
+                // 同步更新 学生考试结果 StudentExamResultViewModel 的用户信息并刷新数据
+                _logger.LogInformation($"ExamResultFrame是否为null: {ExamResultFrame == null}");
+                if (ExamResultFrame != null)
+                {
+                    _logger.LogInformation($"ExamResultFrame.Content是否为null: {ExamResultFrame.Content == null}");
+                    if (ExamResultFrame.Content is StudentExamResultView studentExamResultView)
+                    {
+                        _logger.LogInformation("ExamResultFrame.Content是StudentExamResultView类型");
+                        if (studentExamResultView.DataContext is StudentExamResultViewModel resultVm)
+                        {
+                            _logger.LogInformation("找到StudentExamResultViewModel，正在设置用户信息并刷新数据");
+                            resultVm.SetCurrentUser(_currentUser);
+                            // 触发刷新命令以加载数据
+                            resultVm.RefreshCommand?.Execute(null);
+                            _logger.LogInformation("StudentExamResultViewModel用户信息设置完成并已请求刷新");
+                        }
+                        else
+                        {
+                            _logger.LogWarning("StudentExamResultView.DataContext不是StudentExamResultViewModel类型或为null");
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation("ExamResultFrame.Content不是StudentExamResultView类型（可能为教师/管理员视图）");
+                    }
+                }
+
                 // 可以在这里添加其他需要用户信息的ViewModel更新
                 _logger.LogInformation("所有ViewModel的用户信息已更新");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "更新ViewModel用户信息时发生错误");
+                _logger.LogError(ex, "UpdateViewModelsWithCurrentUser 时发生异常");
             }
         }
 

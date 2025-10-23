@@ -156,6 +156,23 @@ namespace ExamSystem.Services.Interfaces
     /// <param name="recordId">考试记录ID</param>
     /// <returns>考试结果详情</returns>
     Task<ExamResultDetail> GetExamResultDetailAsync(int recordId);
+
+    // 新增：教师侧功能
+    /// <summary>
+    /// 搜索考试记录，用于教师侧成绩管理列表
+    /// </summary>
+    Task<List<ExamRecord>> SearchExamRecordsAsync(string keyword, int? userId = null, int? paperId = null, DateTime? startDate = null, DateTime? endDate = null);
+
+    /// <summary>
+    /// 主观题人工评分（更新单题的得分、评语、评分标记），并在全部评分完成后更新考试状态为 Graded，重新计算总分
+    /// </summary>
+    Task<bool> GradeSubjectiveAnswerAsync(int recordId, int questionId, decimal score, string? comment, int graderId);
+
+    /// <summary>
+    /// 同步：根据 AnswerRecords 重新聚合并更新 ExamRecords（总分、主观分、状态、是否通过等）。
+    /// 用于修复历史数据未同步的问题或手动触发校准。
+    /// </summary>
+    Task<bool> SyncExamRecordFromAnswerRecordsAsync(int recordId);
 }
 
 /// <summary>

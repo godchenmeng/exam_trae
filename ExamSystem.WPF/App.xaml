@@ -22,6 +22,8 @@
             <!-- 消息中心相关转换器 -->
             <converters:BooleanToBrushConverter x:Key="BooleanToBrushConverter"/>
             <converters:ReadStatusConverter x:Key="ReadStatusConverter"/>
+            <converters:TrueFalseToChineseTextConverter x:Key="TrueFalseToChineseTextConverter" />
+            <converters:ChoiceQuestionVisibilityConverter x:Key="ChoiceQuestionVisibilityConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Data;
 using ExamSystem.Domain.Entities;
+using ExamSystem.Domain.Enums; // 新增：使用考试状态枚举
 
 namespace ExamSystem.Infrastructure.Repositories
 {
@@ -109,6 +110,7 @@ namespace ExamSystem.Infrastructure.Repositories
                               .ThenInclude(ar => ar.Question)
                               .Include(er => er.User)
                               .Include(er => er.ExamPaper)
+                              .AsNoTracking()
                               .FirstOrDefaultAsync(er => er.RecordId == recordId);
         }
 
@@ -287,6 +289,8 @@ namespace ExamSystem.Infrastructure.Repositories
         {
             var query = _dbSet.Include(er => er.User)
                              .Include(er => er.ExamPaper)
+                             .Include(er => er.AnswerRecords) // 确保加载答题记录，用于界面判断 HasUngraded
+                             .AsNoTracking()
                              .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
@@ -314,6 +318,9 @@ namespace ExamSystem.Infrastructure.Repositories
             {
                 query = query.Where(er => er.StartTime <= endDate.Value);
             }
+
+            // 调整：包含已提交（Submitted），以确保刚结束但未评分的试卷也能在成绩管理中显示
+            query = query.Where(er => er.Status == ExamStatus.Submitted || er.Status == ExamStatus.Completed || er.Status == ExamStatus.Graded);
 
             return await query.OrderByDescending(er => er.StartTime).ToListAsync();
         }

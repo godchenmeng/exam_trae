@@ -2,6 +2,11 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:converters="clr-namespace:ExamSystem.WPF.Converters">
 
+    <!-- 全局窗口图标：统一使用项目 logo -->
+    <Style TargetType="Window">
+        <Setter Property="Icon" Value="pack://application:,,,/logo.png"/>
+    </Style>
+
     <!-- 转换器资源 -->
     <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
@@ -13,10 +18,12 @@
     <converters:NotificationPriorityToTextConverter x:Key="NotificationPriorityToTextConverter"/>
     <converters:NotificationScopeToTextConverter x:Key="NotificationScopeToTextConverter"/>
 
-    <!-- 颜色定义 -->
-    <SolidColorBrush x:Key="PrimaryBrush" Color="#2196F3"/>
-    <SolidColorBrush x:Key="PrimaryLightBrush" Color="#E3F2FD"/>
-    <SolidColorBrush x:Key="AccentBrush" Color="#FF4081"/>
+    <!-- 颜色定义（主色切换为中国消防红） -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#FF3B30"/>
+    <SolidColorBrush x:Key="PrimaryLightBrush" Color="#FFE5E3"/>
+    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="#E53935"/>
+    <SolidColorBrush x:Key="PrimaryPressedBrush" Color="#B71C1C"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#FFC107"/>
     <SolidColorBrush x:Key="BackgroundBrush" Color="#F5F5F5"/>
     <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#212121"/>
@@ -25,6 +32,10 @@
     <SolidColorBrush x:Key="PrimaryTextBrush" Color="#212121"/>
     <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="#6C757D"/>
+    <!-- 语义红（危险）与交互态 -->
+    <SolidColorBrush x:Key="DangerBrush" Color="#B00020"/>
+    <SolidColorBrush x:Key="DangerHoverBrush" Color="#9A0007"/>
+    <SolidColorBrush x:Key="DangerPressedBrush" Color="#7F0000"/>
     
     <!-- 渐变背景 -->
     <LinearGradientBrush x:Key="BackgroundGradient" StartPoint="0,0" EndPoint="1,1">
@@ -54,10 +65,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#1976D2"/>
+                            <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#0D47A1"/>
+                            <Setter Property="Background" Value="{StaticResource PrimaryPressedBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -150,10 +161,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#1976D2"/>
+                            <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#0D47A1"/>
+                            <Setter Property="Background" Value="{StaticResource PrimaryPressedBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="#BDBDBD"/>
@@ -194,7 +205,7 @@
                             <Setter Property="Background" Value="{StaticResource PrimaryLightBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#BBDEFB"/>
+                            <Setter Property="Background" Value="#FFD6D3"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -239,9 +250,9 @@
     </Style>
     <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource SuccessButton}"/>
 
-    <!-- 警告按钮样式 -->
+    <!-- 警告按钮样式（统一为琥珀色） -->
     <Style x:Key="WarningButton" TargetType="Button">
-        <Setter Property="Background" Value="#F39C12"/>
+        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="16,8"/>
@@ -258,10 +269,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#E67E22"/>
+                            <Setter Property="Background" Value="#FFB300"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#D35400"/>
+                            <Setter Property="Background" Value="#FFA000"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="#BDBDBD"/>
@@ -273,9 +284,9 @@
     </Style>
     <Style x:Key="WarningButtonStyle" TargetType="Button" BasedOn="{StaticResource WarningButton}"/>
 
-    <!-- 危险按钮样式 -->
+    <!-- 危险按钮样式（使用更深红以区分主要操作） -->
     <Style x:Key="DangerButton" TargetType="Button">
-        <Setter Property="Background" Value="#E74C3C"/>
+        <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="16,8"/>
@@ -292,10 +303,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#C0392B"/>
+                            <Setter Property="Background" Value="{StaticResource DangerHoverBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#A93226"/>
+                            <Setter Property="Background" Value="{StaticResource DangerPressedBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="#BDBDBD"/>
@@ -485,10 +496,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#1976D2"/>
+                            <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#0D47A1"/>
+                            <Setter Property="Background" Value="{StaticResource PrimaryPressedBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Background" Value="#BDBDBD"/>

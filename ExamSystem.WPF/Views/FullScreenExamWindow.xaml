@@ -209,9 +209,10 @@
         </Style>
         
         <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="#007BFF"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#0056B3"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
         </Style>
         
         <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
@@ -316,7 +317,7 @@
                         <TextBlock Text="第" Style="{StaticResource HeaderTextStyle}" Foreground="#2C3E50"/>
                         <TextBlock Text="{Binding CurrentQuestionIndex}" Style="{StaticResource HeaderTextStyle}" Foreground="#2C3E50"/>
                         <TextBlock Text="题" Style="{StaticResource HeaderTextStyle}" Foreground="#2C3E50"/>
-                        <Border Background="#007BFF" CornerRadius="12" Padding="8,4" Margin="15,0,0,0">
+                        <Border Background="{StaticResource PrimaryBrush}" CornerRadius="12" Padding="8,4" Margin="15,0,0,0">
                             <TextBlock Text="{Binding CurrentQuestion.QuestionType}" 
                                        Foreground="White" FontSize="12" FontWeight="SemiBold"/>
                         </Border>
@@ -435,9 +436,9 @@
                                                         <Setter Property="BorderBrush" Value="#1E7E34"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding IsCurrent}" Value="True">
-                                                        <Setter Property="Background" Value="#007BFF"/>
+                                                        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
                                                         <Setter Property="Foreground" Value="White"/>
-                                                        <Setter Property="BorderBrush" Value="#0056B3"/>
+                                                        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>

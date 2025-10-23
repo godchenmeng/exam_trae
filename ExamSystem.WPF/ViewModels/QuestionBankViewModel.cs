@@ -21,7 +21,7 @@ namespace ExamSystem.WPF.ViewModels;
 /// <summary>
 /// 题库管理视图模型
 /// </summary>
-public class QuestionBankViewModel : BaseViewModel
+public class QuestionBankViewModel : ExamSystem.WPF.ViewModels.Base.BaseViewModel
 {
     private readonly IQuestionBankService _questionBankService;
     private readonly IQuestionService _questionService;

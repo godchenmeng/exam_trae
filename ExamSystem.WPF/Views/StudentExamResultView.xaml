@@ -23,10 +23,10 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="#2196F3"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
                     <Setter Property="Effect">
                         <Setter.Value>
-                            <DropShadowEffect Color="#2196F3" Direction="270" ShadowDepth="2" Opacity="0.2" BlurRadius="12"/>
+                            <DropShadowEffect Color="#FF3B30" Direction="270" ShadowDepth="2" Opacity="0.2" BlurRadius="12"/>
                         </Setter.Value>
                     </Setter>
                 </Trigger>
@@ -50,8 +50,8 @@
 
         <!-- 良好分数样式 -->
         <Style x:Key="GoodScoreStyle" TargetType="Border" BasedOn="{StaticResource ScoreTagStyle}">
-            <Setter Property="Background" Value="#E3F2FD"/>
-            <Setter Property="BorderBrush" Value="#2196F3"/>
+            <Setter Property="Background" Value="#C8E6C9"/>
+            <Setter Property="BorderBrush" Value="#66BB6A"/>
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
@@ -71,7 +71,7 @@
 
         <!-- 按钮样式 -->
         <Style x:Key="ActionButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="12,6"/>
@@ -87,10 +87,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1976D2"/>
+                                <Setter Property="Background" Value="{StaticResource PrimaryHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#1565C0"/>
+                                <Setter Property="Background" Value="{StaticResource PrimaryPressedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -113,62 +113,23 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- 标题 -->
-                <TextBlock Grid.Row="0" Text="考试结果" FontSize="24" FontWeight="Bold" Foreground="#333" Margin="0,0,0,20"/>
-
-                <!-- 筛选控件 -->
-                <Grid Grid.Row="1">
+                <!-- 标题 + 操作 -->
+                <Grid Grid.Row="0" Margin="0,0,0,20">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-
-                    <!-- 搜索框 -->
-                    <TextBlock Grid.Column="0" Text="搜索：" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <TextBox Grid.Column="1" x:Name="SearchTextBox" 
-                             Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
-                             Height="32" Padding="8" BorderBrush="#DDD" BorderThickness="1"/>
-
-                    <!-- 科目筛选 -->
-                    <TextBlock Grid.Column="3" Text="科目：" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <ComboBox Grid.Column="4" x:Name="SubjectComboBox"
-                              ItemsSource="{Binding Subjects}"
-                              SelectedItem="{Binding SelectedSubject}"
-                              Height="32" Padding="8">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-
-                    <!-- 时间范围筛选 -->
-                    <TextBlock Grid.Column="6" Text="时间：" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <ComboBox Grid.Column="7" x:Name="TimeRangeComboBox"
-                              ItemsSource="{Binding TimeRanges}"
-                              SelectedItem="{Binding SelectedTimeRange}"
-                              Height="32" Padding="8">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-
-                    <!-- 刷新按钮 -->
-                    <Button Grid.Column="9" Content="刷新" 
-                            Command="{Binding RefreshCommand}"
-                            Style="{StaticResource ActionButtonStyle}"
-                            Height="32" Width="80"/>
+                    <TextBlock Text="考试结果" FontSize="24" FontWeight="Bold" Foreground="#333" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="刷新" Command="{Binding RefreshCommand}"
+                                Style="{StaticResource ActionButtonStyle}" Height="32" Width="80"
+                                IsEnabled="{Binding IsLoading, Converter={StaticResource BooleanToFalseConverter}}"/>
+                        <StackPanel Orientation="Horizontal" Margin="12,0,0,0"
+                                    Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <ProgressBar IsIndeterminate="True" Width="120" Height="4" VerticalAlignment="Center"/>
+                            <TextBlock Text="正在刷新..." FontSize="12" Foreground="#666" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Border>
@@ -215,8 +176,8 @@
                                         <TextBlock Text="{Binding ExamTitle}" FontSize="16" FontWeight="Bold" Foreground="#333" Margin="0,0,0,8"/>
                                         
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                            <TextBlock Text="科目：" FontSize="12" Foreground="#666" Margin="0,0,4,0"/>
-                                            <TextBlock Text="{Binding Subject}" FontSize="12" Foreground="#333"/>
+                                            <TextBlock Text="试卷名称：" FontSize="12" Foreground="#666" Margin="0,0,4,0"/>
+                                            <TextBlock Text="{Binding ExamTitle}" FontSize="12" Foreground="#333"/>
                                             <TextBlock Text="  |  " FontSize="12" Foreground="#CCC" Margin="8,0"/>
                                             <TextBlock Text="考试时间：" FontSize="12" Foreground="#666" Margin="0,0,4,0"/>
                                             <TextBlock Text="{Binding ExamDate, StringFormat=yyyy-MM-dd HH:mm}" FontSize="12" Foreground="#333"/>
@@ -240,48 +201,36 @@
                                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,0">
                                         <Border x:Name="ScoreBorder" Style="{StaticResource GoodScoreStyle}">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Score}" FontSize="18" FontWeight="Bold" Foreground="#333"/>
-                                                <TextBlock Text="/" FontSize="14" Foreground="#666" Margin="2,0"/>
-                                                <TextBlock Text="{Binding TotalScore}" FontSize="14" Foreground="#666"/>
+                                                <TextBlock FontSize="18" FontWeight="Bold" Foreground="#333">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="{}{0:F1} / {1:F1} 分">
+                                                            <Binding Path="Score"/>
+                                                            <Binding Path="TotalScore"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
                                             </StackPanel>
                                         </Border>
-                                        <TextBlock Text="{Binding ScorePercentage, StringFormat={}{0:F1}%}" 
-                                                   FontSize="12" Foreground="#666" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                        <!-- 移除百分比显示，仅展示总分 -->
                                     </StackPanel>
 
-                                    <!-- 操作按钮 -->
-                                    <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
-                                        <Button Content="查看详情" 
-                                                Command="{Binding DataContext.ViewDetailCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                Style="{StaticResource ActionButtonStyle}"
-                                                Margin="0,0,0,8"/>
-                                        
-                                        <Button Content="错题分析" 
-                                                Command="{Binding DataContext.ViewWrongAnswersCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                Style="{StaticResource ActionButtonStyle}"
-                                                Background="#FF9800"
-                                                Visibility="{Binding HasWrongAnswers, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                    </StackPanel>
+                                    <!-- 操作按钮（根据需求移除查看详情与错题分析按钮） -->
                                 </Grid>
-
-                                <!-- 数据触发器设置分数样式 -->
-                                <Border.Triggers>
-                                    <DataTrigger Binding="{Binding ScoreLevel}" Value="Excellent">
-                                        <Setter TargetName="ScoreBorder" Property="Style" Value="{StaticResource ExcellentScoreStyle}"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ScoreLevel}" Value="Good">
-                                        <Setter TargetName="ScoreBorder" Property="Style" Value="{StaticResource GoodScoreStyle}"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ScoreLevel}" Value="Pass">
-                                        <Setter TargetName="ScoreBorder" Property="Style" Value="{StaticResource PassScoreStyle}"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ScoreLevel}" Value="Fail">
-                                        <Setter TargetName="ScoreBorder" Property="Style" Value="{StaticResource FailScoreStyle}"/>
-                                    </DataTrigger>
-                                </Border.Triggers>
                             </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding ScoreLevel}" Value="Excellent">
+                                    <Setter TargetName="ScoreBorder" Property="Style" Value="{StaticResource ExcellentScoreStyle}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ScoreLevel}" Value="Good">
+                                    <Setter TargetName="ScoreBorder" Property="Style" Value="{StaticResource GoodScoreStyle}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ScoreLevel}" Value="Pass">
+                                    <Setter TargetName="ScoreBorder" Property="Style" Value="{StaticResource PassScoreStyle}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ScoreLevel}" Value="Fail">
+                                    <Setter TargetName="ScoreBorder" Property="Style" Value="{StaticResource FailScoreStyle}"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

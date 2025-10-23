@@ -20,17 +20,20 @@ namespace ExamSystem.WPF.ViewModels
     public class StudentExamResultViewModel : INotifyPropertyChanged
     {
         private readonly IExamService _examService;
+        private readonly IAuthService _authService;
         private readonly ILogger<StudentExamResultViewModel> _logger;
         
         private bool _isLoading;
         private string _searchKeyword = string.Empty;
         private string _selectedSubject = "全部";
         private string _selectedTimeRange = "全部";
+        private User? _currentUser;
 
         public StudentExamResultViewModel()
         {
             // 从依赖注入容器获取服务
             _examService = ((App)Application.Current).GetServices().GetRequiredService<IExamService>();
+            _authService = ((App)Application.Current).GetServices().GetRequiredService<IAuthService>();
             _logger = ((App)Application.Current).GetServices().GetRequiredService<ILogger<StudentExamResultViewModel>>();
 
             // 初始化集合
@@ -38,11 +41,23 @@ namespace ExamSystem.WPF.ViewModels
             Subjects = new ObservableCollection<string> { "全部", "数学", "语文", "英语", "物理", "化学", "生物", "历史", "地理", "政治", "计算机" };
             TimeRanges = new ObservableCollection<string> { "全部", "最近一周", "最近一月", "最近三月", "最近半年", "最近一年" };
 
+            // 获取当前用户
+            _currentUser = _authService.GetCurrentUser();
+
             // 初始化命令
             InitializeCommands();
 
             // 加载数据
             _ = LoadExamResultsAsync();
+        }
+
+        /// <summary>
+        /// 设置当前用户上下文
+        /// </summary>
+        public void SetCurrentUser(User user)
+        {
+            _currentUser = user;
+            _logger.LogInformation("StudentExamResultViewModel 已接收当前用户: {Username} (ID={UserId})", _currentUser.Username, _currentUser.UserId);
         }
 
         #region 属性
@@ -199,11 +214,34 @@ namespace ExamSystem.WPF.ViewModels
             {
                 IsLoading = true;
                 
-                // 获取所有考试结果数据（实际应用中应该从服务获取）
-                var allResults = await GetAllExamResultsAsync();
+                if (_currentUser == null)
+                {
+                    _logger.LogWarning("当前用户为空，无法应用筛选条件");
+                    ExamResults.Clear();
+                    return;
+                }
                 
-                // 应用筛选条件
-                var filteredResults = allResults.AsEnumerable();
+                // 从服务获取筛选后的考试结果数据
+                var examResults = await _examService.GetStudentExamResultsAsync(
+                    _currentUser.UserId, 
+                    SearchKeyword, 
+                    SelectedSubject == "全部" ? null : SelectedSubject, 
+                    SelectedTimeRange == "全部" ? null : SelectedTimeRange);
+                
+                // 转换为 ViewModel 并应用额外的前端筛选
+                var filteredResults = examResults.Select(result => new StudentExamResultItemViewModel
+                {
+                    Id = result.RecordId,
+                    ExamTitle = result.ExamTitle,
+                    Subject = result.Subject,
+                    ExamDate = result.ExamDate,
+                    Duration = result.Duration,
+                    Score = result.Score,
+                    TotalScore = result.TotalScore,
+                    QuestionCount = result.QuestionCount,
+                    Status = result.Status,
+                    HasWrongAnswers = result.HasWrongAnswers
+                }).AsEnumerable();
 
                 // 按关键词筛选
                 if (!string.IsNullOrWhiteSpace(SearchKeyword))
@@ -250,132 +288,41 @@ namespace ExamSystem.WPF.ViewModels
         }
 
         /// <summary>
-        /// 获取所有考试结果（模拟数据，实际应该从服务获取）
+        /// 获取所有考试结果（从服务获取真实数据）
         /// </summary>
         private async Task<StudentExamResultItemViewModel[]> GetAllExamResultsAsync()
         {
-            await Task.Delay(100);
-            
-            return new[]
+            if (_currentUser == null)
             {
-                new StudentExamResultItemViewModel
+                _logger.LogWarning("当前用户为空，无法获取考试结果");
+                return Array.Empty<StudentExamResultItemViewModel>();
+            }
+
+            try
+            {
+                // 从服务获取学生考试结果
+                var examResults = await _examService.GetStudentExamResultsAsync(_currentUser.UserId);
+                
+                // 转换为 ViewModel
+                return examResults.Select(result => new StudentExamResultItemViewModel
                 {
-                    Id = 1,
-                    ExamTitle = "高等数学期中考试",
-                    Subject = "数学",
-                    ExamDate = DateTime.Now.AddDays(-7),
-                    Duration = "1小时30分钟",
-                    Score = 85,
-                    TotalScore = 100,
-                    QuestionCount = 20,
-                    Status = "已完成",
-                    HasWrongAnswers = true
-                },
-                new StudentExamResultItemViewModel
-                {
-                    Id = 2,
-                    ExamTitle = "大学英语四级模拟考试",
-                    Subject = "英语",
-                    ExamDate = DateTime.Now.AddDays(-14),
-                    Duration = "2小时15分钟",
-                    Score = 92,
-                    TotalScore = 100,
-                    QuestionCount = 50,
-                    Status = "已完成",
-                    HasWrongAnswers = true
-                },
-                new StudentExamResultItemViewModel
-                {
-                    Id = 3,
-                    ExamTitle = "计算机基础知识测试",
-                    Subject = "计算机",
-                    ExamDate = DateTime.Now.AddDays(-21),
-                    Duration = "1小时",
-                    Score = 78,
-                    TotalScore = 100,
-                    QuestionCount = 30,
-                    Status = "已完成",
-                    HasWrongAnswers = true
-                },
-                new StudentExamResultItemViewModel
-                {
-                    Id = 4,
-                    ExamTitle = "物理力学综合测试",
-                    Subject = "物理",
-                    ExamDate = DateTime.Now.AddDays(-35),
-                    Duration = "1小时45分钟",
-                    Score = 96,
-                    TotalScore = 100,
-                    QuestionCount = 25,
-                    Status = "已完成",
-                    HasWrongAnswers = false
-                },
-                new StudentExamResultItemViewModel
-                {
-                    Id = 5,
-                    ExamTitle = "化学有机化合物测试",
-                    Subject = "化学",
-                    ExamDate = DateTime.Now.AddDays(-42),
-                    Duration = "1小时20分钟",
-                    Score = 68,
-                    TotalScore = 100,
-                    QuestionCount = 35,
-                    Status = "已完成",
-                    HasWrongAnswers = true
-                },
-                new StudentExamResultItemViewModel
-                {
-                    Id = 6,
-                    ExamTitle = "生物细胞结构测试",
-                    Subject = "生物",
-                    ExamDate = DateTime.Now.AddDays(-60),
-                    Duration = "1小时10分钟",
-                    Score = 88,
-                    TotalScore = 100,
-                    QuestionCount = 40,
-                    Status = "已完成",
-                    HasWrongAnswers = true
-                },
-                new StudentExamResultItemViewModel
-                {
-                    Id = 7,
-                    ExamTitle = "历史近代史综合测试",
-                    Subject = "历史",
-                    ExamDate = DateTime.Now.AddDays(-90),
-                    Duration = "2小时",
-                    Score = 75,
-                    TotalScore = 100,
-                    QuestionCount = 45,
-                    Status = "已完成",
-                    HasWrongAnswers = true
-                },
-                new StudentExamResultItemViewModel
-                {
-                    Id = 8,
-                    ExamTitle = "地理气候变化测试",
-                    Subject = "地理",
-                    ExamDate = DateTime.Now.AddDays(-120),
-                    Duration = "1小时30分钟",
-                    Score = 82,
-                    TotalScore = 100,
-                    QuestionCount = 35,
-                    Status = "已完成",
-                    HasWrongAnswers = true
-                },
-                new StudentExamResultItemViewModel
-                {
-                    Id = 9,
-                    ExamTitle = "政治马克思主义基本原理",
-                    Subject = "政治",
-                    ExamDate = DateTime.Now.AddDays(-200),
-                    Duration = "1小时45分钟",
-                    Score = 91,
-                    TotalScore = 100,
-                    QuestionCount = 30,
-                    Status = "已完成",
-                    HasWrongAnswers = false
-                }
-            };
+                    Id = result.RecordId,
+                    ExamTitle = result.ExamTitle,
+                    Subject = result.Subject,
+                    ExamDate = result.ExamDate,
+                    Duration = result.Duration,
+                    Score = result.Score,
+                    TotalScore = result.TotalScore,
+                    QuestionCount = result.QuestionCount,
+                    Status = result.Status,
+                    HasWrongAnswers = result.HasWrongAnswers
+                }).ToArray();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "获取考试结果失败，用户ID: {UserId}", _currentUser.UserId);
+                throw;
+            }
         }
 
         /// <summary>

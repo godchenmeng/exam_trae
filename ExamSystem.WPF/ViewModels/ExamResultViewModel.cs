@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using ExamSystem.WPF.Commands;
@@ -247,15 +248,38 @@ namespace ExamSystem.WPF.ViewModels
 
         private Brush GetStatusColor(ExamStatus status)
         {
+            // 优先使用全局资源中的主题色，以确保代码层与XAML主题一致
+            SolidColorBrush Primary() => TryGetBrushResource("PrimaryBrush") ?? new SolidColorBrush(Color.FromRgb(255, 59, 48));
+            SolidColorBrush Success() => new SolidColorBrush(Color.FromRgb(39, 174, 96));   // #27AE60
+            SolidColorBrush Warning() => new SolidColorBrush(Color.FromRgb(255, 152, 0));   // #FF9800
+            SolidColorBrush Danger() => new SolidColorBrush(Color.FromRgb(231, 76, 60));    // #E74C3C
+            SolidColorBrush Neutral() => new SolidColorBrush(Color.FromRgb(149, 165, 166)); // #95A5A6
+            SolidColorBrush Default() => new SolidColorBrush(Color.FromRgb(127, 140, 141)); // #7F8C8D
+
             return status switch
             {
-                ExamStatus.NotStarted => new SolidColorBrush(Color.FromRgb(149, 165, 166)), // #95A5A6
-                ExamStatus.InProgress => new SolidColorBrush(Color.FromRgb(52, 152, 219)),  // #3498DB
-                ExamStatus.Completed => new SolidColorBrush(Color.FromRgb(39, 174, 96)),   // #27AE60
-                ExamStatus.Timeout => new SolidColorBrush(Color.FromRgb(231, 76, 60)),     // #E74C3C
-                ExamStatus.Submitted => new SolidColorBrush(Color.FromRgb(39, 174, 96)),   // #27AE60
-                _ => new SolidColorBrush(Color.FromRgb(127, 140, 141))                     // #7F8C8D
+                ExamStatus.NotStarted => Neutral(),
+                ExamStatus.InProgress => Primary(),
+                ExamStatus.Completed => Success(),
+                ExamStatus.Timeout => Danger(),
+                ExamStatus.Submitted => Success(),
+                _ => Default()
             };
+        }
+
+        private static SolidColorBrush? TryGetBrushResource(string key)
+        {
+            try
+            {
+                if (Application.Current?.Resources.Contains(key) == true)
+                {
+                    var brush = Application.Current.Resources[key] as SolidColorBrush;
+                    if (brush != null)
+                        return brush;
+                }
+            }
+            catch { }
+            return null;
         }
 
         private string FormatTimeSpan(TimeSpan timeSpan)
