@@ -103,6 +103,8 @@ namespace ExamSystem.WPF
                     services.AddScoped<IExcelImportService, ExcelImportService>();
                     services.AddScoped<IExcelExportService, ExcelExportService>();
                     services.AddScoped<ExamSystem.WPF.Services.IStatisticsService, ExamSystem.WPF.Services.StatisticsService>();
+                    // 新增：仪表板服务
+                    services.AddScoped<IDashboardService, DashboardService>();
 
                     // ViewModels
                     services.AddTransient<DashboardViewModel>();
@@ -134,7 +136,12 @@ namespace ExamSystem.WPF
                     
                     // 添加DatabaseSeeder
                     services.AddTransient<DatabaseSeeder>();
-                    services.AddTransient<DashboardView>();
+                    // 使用Provider为DashboardView注入ViewModel
+                    services.AddTransient<DashboardView>(provider =>
+                    {
+                        var vm = provider.GetRequiredService<DashboardViewModel>();
+                        return new DashboardView(vm);
+                    });
                     services.AddTransient<ExamView>();
                     services.AddTransient<ExamPaperView>(provider =>
                     {

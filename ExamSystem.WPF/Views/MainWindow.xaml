@@ -255,7 +255,7 @@
                           DockPanel.Dock="Left" 
                           VerticalAlignment="Center"
                           Foreground="{StaticResource PrimaryBrush}"/>
-                <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='当前时间: {0:yyyy-MM-dd HH:mm:ss}'}" 
+                <TextBlock Text="{Binding ElementName=RootWindow, Path=CurrentTime, StringFormat='当前时间: {0:yyyy-MM-dd HH:mm:ss}'}" 
                           DockPanel.Dock="Right" 
                           HorizontalAlignment="Right" 
                           VerticalAlignment="Center"

@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:converters="clr-namespace:ExamSystem.WPF.Converters">
+                    xmlns:converters="clr-namespace:ExamSystem.WPF.Converters"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- 全局窗口图标：统一使用项目 logo -->
     <Style TargetType="Window">
@@ -36,6 +37,57 @@
     <SolidColorBrush x:Key="DangerBrush" Color="#B00020"/>
     <SolidColorBrush x:Key="DangerHoverBrush" Color="#9A0007"/>
     <SolidColorBrush x:Key="DangerPressedBrush" Color="#7F0000"/>
+
+    <!-- 新增：无障碍与配色扩展 -->
+    <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextOnAccentBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="MutedBackgroundBrush" Color="#FAFAFA"/>
+
+    <!-- 设计令牌：间距（Spacing）与圆角（CornerRadius） -->
+    <Thickness x:Key="SpacingXS">4</Thickness>
+    <Thickness x:Key="SpacingS">8</Thickness>
+    <Thickness x:Key="SpacingM">12</Thickness>
+    <Thickness x:Key="SpacingL">16</Thickness>
+    <Thickness x:Key="SpacingXL">24</Thickness>
+    <CornerRadius x:Key="RadiusS">6</CornerRadius>
+    <CornerRadius x:Key="RadiusM">8</CornerRadius>
+    <CornerRadius x:Key="RadiusL">12</CornerRadius>
+
+    <!-- 设计令牌：字号与行高（可用于统一文本风格） -->
+    <sys:Double x:Key="FontSizeTitle">24</sys:Double>
+    <sys:Double x:Key="FontSizeSubtitle">18</sys:Double>
+    <sys:Double x:Key="FontSizeBody">14</sys:Double>
+    <sys:Double x:Key="FontSizeCaption">12</sys:Double>
+
+    <!-- KPI 卡片样式：统一卡片与数值展示风格 -->
+    <Style x:Key="KpiCard" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusM}"/>
+        <Setter Property="Padding" Value="16"/>
+        <Setter Property="Margin" Value="5"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="#000000"
+                                  Opacity="0.1"
+                                  ShadowDepth="2"
+                                  BlurRadius="8"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="KpiTitleText" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="LineHeight" Value="20"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+    </Style>
+    <Style x:Key="KpiValueText" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="Margin" Value="0,4,0,0"/>
+    </Style>
     
     <!-- 渐变背景 -->
     <LinearGradientBrush x:Key="BackgroundGradient" StartPoint="0,0" EndPoint="1,1">
@@ -387,6 +439,31 @@
         <Setter Property="CanUserAddRows" Value="False"/>
         <Setter Property="CanUserDeleteRows" Value="False"/>
         <Setter Property="IsReadOnly" Value="True"/>
+    </Style>
+
+    <!-- 列表样式 -->
+    <Style x:Key="ModernListView" TargetType="ListView">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="AlternationCount" Value="2"/>
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Padding" Value="8"/>
+                    <Style.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter Property="Background" Value="#FAFAFA"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{StaticResource PrimaryLightBrush}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- 标题样式 -->

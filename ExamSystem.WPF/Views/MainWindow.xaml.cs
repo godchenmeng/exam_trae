@@ -7,6 +7,7 @@ using ExamSystem.Domain.Entities;
 using ExamSystem.WPF.ViewModels;
 using ExamSystem.Services.Interfaces;
 using ExamSystem.Services.Models;
+using System.Windows.Threading;
 
 namespace ExamSystem.WPF.Views
 {
@@ -19,6 +20,7 @@ namespace ExamSystem.WPF.Views
         private readonly ILogger<MainWindow> _logger;
         private readonly IPermissionService _permissionService;
         private User? _currentUser;
+        private readonly DispatcherTimer _clockTimer;
 
         // 公共的 CurrentUser 属性，供其他组件访问
         public User? CurrentUser => _currentUser;
@@ -39,6 +41,13 @@ namespace ExamSystem.WPF.Views
             get => (DateTime?)GetValue(PreviousLoginAtProperty);
             set => SetValue(PreviousLoginAtProperty, value);
         }
+        public static readonly DependencyProperty CurrentTimeProperty = DependencyProperty.Register(
+            nameof(CurrentTime), typeof(DateTime), typeof(MainWindow), new PropertyMetadata(DateTime.Now));
+        public DateTime CurrentTime
+        {
+            get => (DateTime)GetValue(CurrentTimeProperty);
+            set => SetValue(CurrentTimeProperty, value);
+        }
 
         public MainWindow(IServiceProvider serviceProvider, ILogger<MainWindow> logger, IPermissionService permissionService)
         {
@@ -49,6 +58,9 @@ namespace ExamSystem.WPF.Views
             
             _logger.LogInformation("MainWindow 构造函数完成，延迟加载页面直到用户登录");
             // 不在构造函数中加载页面，等待用户登录后再加载
+            _clockTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _clockTimer.Tick += (s, e) => CurrentTime = DateTime.Now;
+            _clockTimer.Start();
         }
 
         // 允许通过自定义标题栏拖动窗体，同时支持双击最大化/还原
@@ -144,6 +156,13 @@ namespace ExamSystem.WPF.Views
                 // 加载仪表板
                 var dashboardView = _serviceProvider.GetRequiredService<DashboardView>();
                 DashboardFrame.Content = dashboardView;
+                // 立即为DashboardView设置用户信息并加载数据
+                if (_currentUser != null && dashboardView.DataContext is DashboardViewModel dashboardVm)
+                {
+                    _logger.LogInformation("在LoadPages中为DashboardViewModel设置用户信息并加载数据");
+                    dashboardVm.SetCurrentUser(_currentUser);
+                    dashboardVm.LoadDataCommand?.Execute(null);
+                }
 
                 // 加载各个页面
                 var questionBankView = _serviceProvider.GetRequiredService<QuestionBankView>();
@@ -253,7 +272,29 @@ namespace ExamSystem.WPF.Views
             {
                 _logger.LogInformation($"=== UpdateViewModelsWithCurrentUser ===");
                 _logger.LogInformation($"当前用户: {_currentUser.Username} ({_currentUser.Role})");
-                
+
+                // 同步更新 DashboardViewModel 的用户信息并刷新数据
+                _logger.LogInformation($"DashboardFrame是否为null: {DashboardFrame == null}");
+                if (DashboardFrame != null)
+                {
+                    _logger.LogInformation($"DashboardFrame.Content是否为null: {DashboardFrame.Content == null}");
+                    if (DashboardFrame.Content is DashboardView dashboardView)
+                    {
+                        _logger.LogInformation("DashboardFrame.Content是DashboardView类型");
+                        if (dashboardView.DataContext is DashboardViewModel dashboardVm)
+                        {
+                            _logger.LogInformation("找到DashboardViewModel，正在设置用户信息并刷新数据");
+                            dashboardVm.SetCurrentUser(_currentUser);
+                            dashboardVm.LoadDataCommand?.Execute(null);
+                            _logger.LogInformation("DashboardViewModel用户信息设置完成并已请求刷新");
+                        }
+                        else
+                        {
+                            _logger.LogWarning("DashboardView.DataContext不是DashboardViewModel类型或为null");
+                        }
+                    }
+                }
+
                 // 详细调试QuestionBankFrame的内容
                 _logger.LogInformation($"QuestionBankFrame是否为null: {QuestionBankFrame == null}");
                 if (QuestionBankFrame != null)

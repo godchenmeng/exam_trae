@@ -3,274 +3,318 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:ExamSystem.WPF.ViewModels"
+             xmlns:local="clr-namespace:ExamSystem.WPF.Views"
+             xmlns:viewModels="clr-namespace:ExamSystem.WPF.ViewModels"
+             xmlns:domain="clr-namespace:ExamSystem.Domain.Enums;assembly=ExamSystem.Domain"
+             xmlns:lvc="http://livecharts.com"
+             xmlns:lvcwpf="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="800">
-
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <Grid Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <!-- 欢迎信息 -->
-            <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="8" Padding="20" Margin="0,0,0,20">
-                <StackPanel>
-                    <TextBlock Text="欢迎使用在线考试系统" 
-                               FontSize="24" 
-                               FontWeight="Bold" 
-                               Foreground="White" 
-                               Margin="0,0,0,5"/>
-                    <TextBlock x:Name="WelcomeMessageTextBlock" 
-                               Text="管理员，您好！" 
-                               FontSize="14" 
-                               Foreground="White" 
-                               Opacity="0.9"/>
+             d:DesignWidth="1000" d:DesignHeight="700"
+             Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <DataTemplate x:Key="ActivityItemTemplate" DataType="{x:Type viewModels:RecentActivityModel}">
+            <Border Padding="10" Margin="0,5" Background="#F9FAFB" CornerRadius="6">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Icon}" FontSize="16" Margin="0,0,10,0"/>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding Description}" Foreground="#6B7280"/>
+                        <TextBlock Text="{Binding Time}" Foreground="#9CA3AF" FontSize="12"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
+        </DataTemplate>
 
-            <!-- 统计卡片 -->
-            <Grid Grid.Row="1" Margin="0,0,0,20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+        <!-- 角色模块可见性样式 -->
+        <Style x:Key="RolePanelStyle" TargetType="FrameworkElement">
+            <Setter Property="Visibility" Value="Collapsed"/>
+        </Style>
+    </UserControl.Resources>
 
-                <!-- 题库数量 -->
-                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,10,0">
-                    <StackPanel>
-                        <TextBlock Text="📚" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                        <TextBlock x:Name="QuestionBankCountTextBlock" 
-                                   Text="0" 
-                                   FontSize="28" 
-                                   FontWeight="Bold" 
-                                   Foreground="{StaticResource PrimaryBrush}" 
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="题库数量" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource TextSecondaryBrush}" 
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <Grid Background="{StaticResource SurfaceBrush}" Margin="{StaticResource SpacingXL}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                <!-- 题目数量 -->
-                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="5,0">
-                    <StackPanel>
-                        <TextBlock Text="📝" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                        <TextBlock x:Name="QuestionCountTextBlock" 
-                                   Text="0" 
-                                   FontSize="28" 
-                                   FontWeight="Bold" 
-                                   Foreground="{StaticResource AccentBrush}" 
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="题目数量" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource TextSecondaryBrush}" 
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
+        <!-- 欢迎信息 -->
+        <TextBlock Grid.Row="0" Text="{Binding WelcomeMessage}" Style="{StaticResource TitleText}"/>
 
-                <!-- 试卷数量 -->
-                <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="5,0">
-                    <StackPanel>
-                        <TextBlock Text="📄" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                        <TextBlock x:Name="ExamPaperCountTextBlock" 
-                                   Text="0" 
-                                   FontSize="28" 
-                                   FontWeight="Bold" 
-                                   Foreground="#52C41A" 
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="试卷数量" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource TextSecondaryBrush}" 
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
-
-                <!-- 考试记录 -->
-                <Border Grid.Column="3" Style="{StaticResource CardStyle}" Margin="10,0,0,0">
-                    <StackPanel>
-                        <TextBlock Text="👥" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                        <TextBlock x:Name="ExamRecordCountTextBlock" 
-                                   Text="0" 
-                                   FontSize="28" 
-                                   FontWeight="Bold" 
-                                   Foreground="#FAAD14" 
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="考试记录" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource TextSecondaryBrush}" 
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-
-            <!-- 快速操作 -->
-            <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+        <!-- KPI 卡片：按角色显示 -->
+        <!-- 教师 KPI -->
+        <UniformGrid x:Name="TeacherKpiGrid" Grid.Row="1" Columns="4" Margin="0,10,0,10">
+            <UniformGrid.Style>
+                <Style TargetType="UniformGrid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentRole}" Value="{x:Static domain:UserRole.Teacher}">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </UniformGrid.Style>
+            <Border Style="{StaticResource KpiCard}">
                 <StackPanel>
-                    <TextBlock Text="快速操作" 
-                               FontSize="16" 
-                               FontWeight="Bold" 
-                               Foreground="{StaticResource TextPrimaryBrush}" 
-                               Margin="0,0,0,15"/>
-                    
-                    <UniformGrid Columns="4" Rows="2">
-                        <!-- 创建题库 -->
-                        <Button x:Name="CreateQuestionBankButton" 
-                                Style="{StaticResource PrimaryButton}" 
-                                Margin="5" 
-                                Height="60"
-                                Click="CreateQuestionBankButton_Click">
-                            <StackPanel>
-                                <TextBlock Text="📚" FontSize="20" Margin="0,0,0,5"/>
-                                <TextBlock Text="创建题库" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- 添加题目 -->
-                        <Button x:Name="AddQuestionButton" 
-                                Style="{StaticResource PrimaryButton}" 
-                                Margin="5" 
-                                Height="60"
-                                Click="AddQuestionButton_Click">
-                            <StackPanel>
-                                <TextBlock Text="➕" FontSize="20" Margin="0,0,0,5"/>
-                                <TextBlock Text="添加题目" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- 创建试卷 -->
-                        <Button x:Name="CreateExamPaperButton" 
-                                Style="{StaticResource PrimaryButton}" 
-                                Margin="5" 
-                                Height="60"
-                                Click="CreateExamPaperButton_Click">
-                            <StackPanel>
-                                <TextBlock Text="📄" FontSize="20" Margin="0,0,0,5"/>
-                                <TextBlock Text="创建试卷" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- 查看统计 -->
-                        <Button x:Name="ViewStatisticsButton" 
-                                Style="{StaticResource PrimaryButton}" 
-                                Margin="5" 
-                                Height="60"
-                                Click="ViewStatisticsButton_Click">
-                            <StackPanel>
-                                <TextBlock Text="📊" FontSize="20" Margin="0,0,0,5"/>
-                                <TextBlock Text="查看统计" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- 用户管理 -->
-                        <Button x:Name="UserManagementButton" 
-                                Style="{StaticResource SecondaryButton}" 
-                                Margin="5" 
-                                Height="60"
-                                Click="UserManagementButton_Click">
-                            <StackPanel>
-                                <TextBlock Text="👤" FontSize="20" Margin="0,0,0,5"/>
-                                <TextBlock Text="用户管理" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- 系统设置 -->
-                        <Button x:Name="SystemSettingsButton" 
-                                Style="{StaticResource SecondaryButton}" 
-                                Margin="5" 
-                                Height="60"
-                                Click="SystemSettingsButton_Click">
-                            <StackPanel>
-                                <TextBlock Text="⚙️" FontSize="20" Margin="0,0,0,5"/>
-                                <TextBlock Text="系统设置" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- 数据备份 -->
-                        <Button x:Name="DataBackupButton" 
-                                Style="{StaticResource SecondaryButton}" 
-                                Margin="5" 
-                                Height="60"
-                                Click="DataBackupButton_Click">
-                            <StackPanel>
-                                <TextBlock Text="💾" FontSize="20" Margin="0,0,0,5"/>
-                                <TextBlock Text="数据备份" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- 帮助文档 -->
-                        <Button x:Name="HelpDocumentButton" 
-                                Style="{StaticResource SecondaryButton}" 
-                                Margin="5" 
-                                Height="60"
-                                Click="HelpDocumentButton_Click">
-                            <StackPanel>
-                                <TextBlock Text="❓" FontSize="20" Margin="0,0,0,5"/>
-                                <TextBlock Text="帮助文档" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-                    </UniformGrid>
+                    <TextBlock Text="我的题库" Style="{StaticResource KpiTitleText}"/>
+                    <TextBlock Text="{Binding MyQuestionBankCount}" Style="{StaticResource KpiValueText}"/>
                 </StackPanel>
             </Border>
-
-            <!-- 最近活动 -->
-            <Border Grid.Row="3" Style="{StaticResource CardStyle}">
+            <Border Style="{StaticResource KpiCard}">
                 <StackPanel>
-                    <TextBlock Text="最近活动" 
-                               FontSize="16" 
-                               FontWeight="Bold" 
-                               Foreground="{StaticResource TextPrimaryBrush}" 
-                               Margin="0,0,0,15"/>
-                    
-                    <ListView x:Name="RecentActivitiesListView" 
-                              BorderThickness="0" 
-                              Background="Transparent"
-                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="{StaticResource BorderBrush}" 
-                                        BorderThickness="0,0,0,1" 
-                                        Padding="0,10">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        
-                                        <TextBlock Grid.Column="0" 
-                                                   Text="{Binding Icon}" 
-                                                   FontSize="16" 
-                                                   Margin="0,0,10,0" 
-                                                   VerticalAlignment="Center"/>
-                                        
-                                        <StackPanel Grid.Column="1">
-                                            <TextBlock Text="{Binding Title}" 
-                                                       FontSize="14" 
-                                                       Foreground="{StaticResource TextPrimaryBrush}"/>
-                                            <TextBlock Text="{Binding Description}" 
-                                                       FontSize="12" 
-                                                       Foreground="{StaticResource TextSecondaryBrush}"/>
-                                        </StackPanel>
-                                        
-                                        <TextBlock Grid.Column="2" 
-                                                   Text="{Binding Time}" 
-                                                   FontSize="12" 
-                                                   Foreground="{StaticResource TextSecondaryBrush}" 
-                                                   VerticalAlignment="Center"/>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                    <TextBlock Text="我的题目" Style="{StaticResource KpiTitleText}"/>
+                    <TextBlock Text="{Binding MyQuestionCount}" Style="{StaticResource KpiValueText}"/>
                 </StackPanel>
             </Border>
+            <Border Style="{StaticResource KpiCard}">
+                <StackPanel>
+                    <TextBlock Text="我的试卷（发布中）" Style="{StaticResource KpiTitleText}"/>
+                    <TextBlock Text="{Binding MyExamPaperCount}" Style="{StaticResource KpiValueText}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource KpiCard}">
+                <StackPanel>
+                    <TextBlock Text="我的平均分/通过率" Style="{StaticResource KpiTitleText}"/>
+                    <TextBlock Text="{Binding MyAverageScore, StringFormat=平均分：{0:F1}}" Style="{StaticResource KpiValueText}"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- 学生 KPI -->
+        <UniformGrid x:Name="StudentKpiGrid" Grid.Row="1" Columns="4" Margin="0,10,0,10">
+            <UniformGrid.Style>
+                <Style TargetType="UniformGrid">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentRole}" Value="{x:Static domain:UserRole.Student}">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </UniformGrid.Style>
+            <Border Style="{StaticResource KpiCard}">
+                <StackPanel>
+                    <TextBlock Text="可参加考试数" Style="{StaticResource KpiTitleText}"/>
+                    <TextBlock Text="{Binding AvailableExamCount}" Style="{StaticResource KpiValueText}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource KpiCard}">
+                <StackPanel>
+                    <TextBlock Text="已完成考试数" Style="{StaticResource KpiTitleText}"/>
+                    <TextBlock Text="{Binding CompletedExamCount}" Style="{StaticResource KpiValueText}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource KpiCard}">
+                <StackPanel>
+                    <TextBlock Text="我的平均分（30天）" Style="{StaticResource KpiTitleText}"/>
+                    <TextBlock Text="{Binding AverageScore, StringFormat={}{0:F1}}" Style="{StaticResource KpiValueText}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource KpiCard}">
+                <StackPanel>
+                    <TextBlock Text="我的通过率（30天）" Style="{StaticResource KpiTitleText}"/>
+                    <TextBlock Text="{Binding PassRate, StringFormat={}{0:P0}}" Style="{StaticResource KpiValueText}"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- 快速操作：按角色显示 -->
+        <!-- 教师操作区 -->
+        <StackPanel x:Name="TeacherActions" Grid.Row="2">
+            <StackPanel.Style>
+                <Style TargetType="StackPanel" BasedOn="{StaticResource Toolbar}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentRole}" Value="{x:Static domain:UserRole.Teacher}">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <Button Style="{StaticResource ActionButtonStyle}" Content="新建题库" Click="CreateQuestionBankButton_Click"/>
+            <Button Style="{StaticResource ActionButtonStyle}" Content="添加题目" Click="AddQuestionButton_Click"/>
+            <Button Style="{StaticResource ActionButtonStyle}" Content="创建试卷" Click="CreateExamPaperButton_Click"/>
+            <Button Style="{StaticResource ActionButtonStyle}" Content="查看统计" Click="ViewStatisticsButton_Click"/>
+        </StackPanel>
+
+        <!-- 学生操作区 -->
+        <StackPanel x:Name="StudentActions" Grid.Row="2">
+            <StackPanel.Style>
+                <Style TargetType="StackPanel" BasedOn="{StaticResource Toolbar}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentRole}" Value="{x:Static domain:UserRole.Student}">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <Button Style="{StaticResource ActionButtonStyle}" Content="查看统计" Click="ViewStatisticsButton_Click"/>
+            <Button Style="{StaticResource ActionButtonStyle}" Content="帮助文档" Click="HelpDocumentButton_Click"/>
+        </StackPanel>
+
+        <!-- 角色专属模块 -->
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,10,0,10">
+            <StackPanel>
+                <!-- 管理员模块移除（按原型清除与教师/学生不相关内容） -->
+                <StackPanel x:Name="AdminPanel">
+                     <StackPanel.Style>
+                         <Style TargetType="StackPanel" BasedOn="{StaticResource RolePanelStyle}">
+                             <Style.Triggers>
+                                 <DataTrigger Binding="{Binding CurrentRole}" Value="{x:Static domain:UserRole.Admin}">
+                                     <Setter Property="Visibility" Value="Visible"/>
+                                 </DataTrigger>
+                             </Style.Triggers>
+                         </Style>
+                     </StackPanel.Style>
+                     <TextBlock Text="管理员概览" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/>
+                     <UniformGrid Columns="4" Rows="2" Margin="0,5,0,10">
+                         <StackPanel>
+                             <TextBlock Text="系统用户"/>
+                             <TextBlock Text="{Binding TotalUsers}" FontSize="20" FontWeight="Bold"/>
+                         </StackPanel>
+                         <StackPanel>
+                             <TextBlock Text="活跃用户"/>
+                             <TextBlock Text="{Binding ActiveUsers}" FontSize="20" FontWeight="Bold"/>
+                         </StackPanel>
+                         <StackPanel>
+                             <TextBlock Text="锁定用户"/>
+                             <TextBlock Text="{Binding LockedUsers}" FontSize="20" FontWeight="Bold"/>
+                         </StackPanel>
+                         <StackPanel>
+                             <TextBlock Text="管理员数"/>
+                             <TextBlock Text="{Binding AdminCount}" FontSize="20" FontWeight="Bold"/>
+                         </StackPanel>
+                         <StackPanel>
+                             <TextBlock Text="教师数"/>
+                             <TextBlock Text="{Binding TeacherCount}" FontSize="20" FontWeight="Bold"/>
+                         </StackPanel>
+                         <StackPanel>
+                             <TextBlock Text="学生数"/>
+                             <TextBlock Text="{Binding StudentCount}" FontSize="20" FontWeight="Bold"/>
+                         </StackPanel>
+                         <StackPanel>
+                             <TextBlock Text="已发布试卷"/>
+                             <TextBlock Text="{Binding PublishedPaperCount}" FontSize="20" FontWeight="Bold"/>
+                         </StackPanel>
+                         <StackPanel>
+                             <TextBlock Text="未发布试卷"/>
+                             <TextBlock Text="{Binding UnpublishedPaperCount}" FontSize="20" FontWeight="Bold"/>
+                         </StackPanel>
+                     </UniformGrid>
+                     <!-- 管理员趋势区图表（近7天） -->
+                     <TextBlock Text="趋势区（近7天）" FontWeight="Bold" FontSize="16" Margin="0,10,0,8"/>
+                      <Border x:Name="AdminTrendChartHost" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Height="220"/>
+                 </StackPanel>
+
+                 <!-- 教师模块：试卷排行榜 + 表现图表 + 待批阅队列 -->
+                 <StackPanel x:Name="TeacherPanel">
+                     <StackPanel.Style>
+                         <Style TargetType="StackPanel" BasedOn="{StaticResource RolePanelStyle}">
+                             <Style.Triggers>
+                                 <DataTrigger Binding="{Binding CurrentRole}" Value="{x:Static domain:UserRole.Teacher}">
+                                     <Setter Property="Visibility" Value="Visible"/>
+                                 </DataTrigger>
+                             </Style.Triggers>
+                         </Style>
+                     </StackPanel.Style>
+                     <TextBlock Text="我的试卷排行榜" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/>
+                     <ListView ItemsSource="{Binding TeacherTopPapers}" Height="180" Style="{StaticResource ModernListView}">
+                         <ListView.View>
+                             <GridView AllowsColumnReorder="False">
+                                 <GridViewColumn Header="试卷" DisplayMemberBinding="{Binding PaperName}" Width="220"/>
+                                 <GridViewColumn Header="平均分" DisplayMemberBinding="{Binding AverageScore}" Width="100"/>
+                                 <GridViewColumn Header="通过率" DisplayMemberBinding="{Binding PassRate}" Width="100"/>
+                             </GridView>
+                         </ListView.View>
+                     </ListView>
+                     <!-- 教师试卷表现图表（平均分） -->
+                     <TextBlock Text="试卷表现图表（平均分）" FontWeight="Bold" FontSize="16" Margin="0,10,0,8"/>
+                      <Border x:Name="TeacherPerformanceChartHost" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Height="220"/>
+
+                     <!-- 待批阅队列（占位） -->
+                     <TextBlock Text="待批阅队列" FontWeight="Bold" FontSize="16" Margin="0,10,0,8"/>
+                     <Grid>
+                         <Grid.RowDefinitions>
+                             <RowDefinition Height="Auto"/>
+                             <RowDefinition Height="*"/>
+                         </Grid.RowDefinitions>
+                         <ListView Grid.Row="1" ItemsSource="{Binding TeacherPendingGradings}" Height="180" Style="{StaticResource ModernListView}">
+                             <ListView.View>
+                                 <GridView AllowsColumnReorder="False">
+                                     <GridViewColumn Header="试卷" DisplayMemberBinding="{Binding PaperName}" Width="220"/>
+                                     <GridViewColumn Header="未评分数" DisplayMemberBinding="{Binding PendingCount}" Width="120"/>
+                                     <GridViewColumn Header="最迟提交时间" DisplayMemberBinding="{Binding DueDate}" Width="160"/>
+                                 </GridView>
+                             </ListView.View>
+                         </ListView>
+                         <TextBlock Grid.Row="0" Text="当前暂无待批阅记录" Foreground="#6B7280">
+                             <TextBlock.Style>
+                                 <Style TargetType="TextBlock">
+                                     <Setter Property="Visibility" Value="Collapsed"/>
+                                     <Style.Triggers>
+                                         <DataTrigger Binding="{Binding ElementName=TeacherPanel, Path=DataContext.TeacherPendingGradings.Count}" Value="0">
+                                             <Setter Property="Visibility" Value="Visible"/>
+                                         </DataTrigger>
+                                     </Style.Triggers>
+                                 </Style>
+                             </TextBlock.Style>
+                         </TextBlock>
+                     </Grid>
+                 </StackPanel>
+
+                 <!-- 学生模块：待参加与近期成绩（保持） -->
+                 <StackPanel x:Name="StudentPanel">
+                     <StackPanel.Style>
+                         <Style TargetType="StackPanel" BasedOn="{StaticResource RolePanelStyle}">
+                             <Style.Triggers>
+                                 <DataTrigger Binding="{Binding CurrentRole}" Value="{x:Static domain:UserRole.Student}">
+                                     <Setter Property="Visibility" Value="Visible"/>
+                                 </DataTrigger>
+                             </Style.Triggers>
+                         </Style>
+                     </StackPanel.Style>
+                     <TextBlock Text="待参加考试" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/>
+                     <ItemsControl ItemsSource="{Binding StudentUpcomingExams}">
+                         <ItemsControl.ItemTemplate>
+                             <DataTemplate>
+                                 <Border Padding="10" Margin="0,5" Background="{StaticResource MutedBackgroundBrush}" CornerRadius="6">
+                                     <StackPanel Orientation="Horizontal">
+                                         <TextBlock Text="📝" FontSize="16" Margin="0,0,10,0"/>
+                                         <StackPanel>
+                                             <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                                             <TextBlock Text="{Binding StartTime, StringFormat=开始时间：{0:yyyy-MM-dd HH:mm}}" Foreground="#6B7280"/>
+                                         </StackPanel>
+                                     </StackPanel>
+                                 </Border>
+                             </DataTemplate>
+                         </ItemsControl.ItemTemplate>
+                     </ItemsControl>
+
+                     <TextBlock Text="近期考试成绩" FontWeight="Bold" FontSize="16" Margin="10,10,0,8"/>
+                     <ListView ItemsSource="{Binding StudentRecentResults}" Height="180" Style="{StaticResource ModernListView}">
+                         <ListView.View>
+                             <GridView AllowsColumnReorder="False">
+                                 <GridViewColumn Header="试卷" DisplayMemberBinding="{Binding PaperName}" Width="220"/>
+                                 <GridViewColumn Header="得分" DisplayMemberBinding="{Binding Score}" Width="100"/>
+                                 <GridViewColumn Header="通过" DisplayMemberBinding="{Binding IsPassed}" Width="80"/>
+                                 <GridViewColumn Header="考试时间" DisplayMemberBinding="{Binding ExamTime}" Width="160"/>
+                             </GridView>
+                         </ListView.View>
+                     </ListView>
+                 </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="4" Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <TextBlock Text="最近活动" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/>
+                <ListView ItemsSource="{Binding RecentActivities}" ItemTemplate="{StaticResource ActivityItemTemplate}"/>
+            </StackPanel>
+        </Border>
         </Grid>
-    </ScrollViewer>
-</UserControl>
+     </ScrollViewer>
+ </UserControl>
