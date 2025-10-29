@@ -85,5 +85,20 @@ public class AnswerRecord
     /// 评分者
     /// </summary>
     public virtual User? Grader { get; set; }
+
+    /// <summary>
+    /// 学生作答时长（秒）
+    /// </summary>
+    public int DrawDurationSeconds { get; set; } = 0;
+
+    /// <summary>
+    /// 客户端信息（JSON）：设备、版本、分辨率等
+    /// </summary>
+    public string? ClientInfoJson { get; set; }
+
+    /// <summary>
+    /// 人工评分量表明细（JSON）：Rubric各项得分
+    /// </summary>
+    public string? RubricScoresJson { get; set; }
     }
 }

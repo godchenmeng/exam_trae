@@ -14,7 +14,7 @@ namespace ExamSystem.WPF.ViewModels
     /// <summary>
     /// 学生端消息中心 ViewModel
     /// </summary>
-    public class MessageCenterViewModel : ExamSystem.WPF.ViewModels.Base.BaseViewModel
+    public class MessageCenterViewModel : BaseViewModel
     {
         private readonly INotificationService _notificationService;
 

@@ -154,7 +154,7 @@
                                             <TextBlock Text="{Binding OrderIndex}" Style="{StaticResource QuestionTextStyle}"/>
                                             <TextBlock Text="题" Style="{StaticResource QuestionTextStyle}"/>
                                             <TextBlock Text="（" Style="{StaticResource QuestionTextStyle}" Margin="8,0,0,0"/>
-                                            <TextBlock Text="{Binding Question.Type, Converter={StaticResource QuestionTypeConverter}}" 
+                                            <TextBlock Text="{Binding Question.QuestionType, Converter={StaticResource QuestionTypeConverter}}" 
                                                        Style="{StaticResource QuestionTextStyle}"/>
                                             <TextBlock Text="）" Style="{StaticResource QuestionTextStyle}"/>
                                         </StackPanel>
@@ -179,16 +179,16 @@
                                         <ItemsControl.Style>
                                             <Style TargetType="ItemsControl">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Question.Type}" Value="{x:Static enums:QuestionType.SingleChoice}">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Question.Type}" Value="{x:Static enums:QuestionType.MultipleChoice}">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Question.Type}" Value="{x:Static enums:QuestionType.TrueFalse}">
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Question.Type}" Value="{x:Static enums:QuestionType.Essay}">
+                                                    <DataTrigger Binding="{Binding Question.QuestionType}" Value="{x:Static enums:QuestionType.SingleChoice}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Question.QuestionType}" Value="{x:Static enums:QuestionType.MultipleChoice}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Question.QuestionType}" Value="{x:Static enums:QuestionType.TrueFalse}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Question.QuestionType}" Value="{x:Static enums:QuestionType.Essay}">
                                                         <Setter Property="Visibility" Value="Collapsed"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>

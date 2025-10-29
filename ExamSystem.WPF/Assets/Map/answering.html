@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地图绘制题 - 学生作答</title>
+    
+    <!-- 百度地图 API -->
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=您的密钥"></script>
+    
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="styles/answering.css">
+</head>
+<body>
+    <div id="map-container">
+        <!-- 地图容器 -->
+        <div id="map"></div>
+        
+        <!-- 绘图工具栏 -->
+        <div id="drawing-toolbar">
+            <div class="toolbar-group">
+                <button id="tool-point" class="tool-btn active" data-tool="point" title="绘制点">
+                    <span class="tool-icon">📍</span>
+                </button>
+                <button id="tool-line" class="tool-btn" data-tool="line" title="绘制线">
+                    <span class="tool-icon">📏</span>
+                </button>
+                <button id="tool-polygon" class="tool-btn" data-tool="polygon" title="绘制多边形">
+                    <span class="tool-icon">⬟</span>
+                </button>
+                <button id="tool-circle" class="tool-btn" data-tool="circle" title="绘制圆形">
+                    <span class="tool-icon">⭕</span>
+                </button>
+            </div>
+            
+            <div class="toolbar-group">
+                <button id="tool-edit" class="tool-btn" data-tool="edit" title="编辑">
+                    <span class="tool-icon">✏️</span>
+                </button>
+                <button id="tool-delete" class="tool-btn" data-tool="delete" title="删除">
+                    <span class="tool-icon">🗑️</span>
+                </button>
+                <button id="tool-clear" class="tool-btn danger" title="清空所有">
+                    <span class="tool-icon">🧹</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 图层信息面板 -->
+        <div id="layer-info">
+            <div class="info-header">
+                <h4>绘制信息</h4>
+            </div>
+            <div class="info-content">
+                <div class="info-item">
+                    <span class="info-label">已绘制：</span>
+                    <span id="overlay-count">0</span> 个对象
+                </div>
+                <div class="info-item">
+                    <span class="info-label">当前工具：</span>
+                    <span id="current-tool">点</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 状态栏 -->
+        <div id="status-bar">
+            <div class="status-left">
+                <span id="status-text">准备就绪</span>
+            </div>
+            <div class="status-right">
+                <span id="coordinates">坐标: --</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 核心脚本 -->
+    <script src="scripts/answering-core.js"></script>
+</body>
+</html>

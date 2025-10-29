@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net8.0\CheckDbColumns.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net8.0\CheckDbColumns.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net8.0\CheckDbColumns.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\CheckDbColumns.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net8.0\CheckDbColumns.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\CheckDbColumns.sourcelink.json

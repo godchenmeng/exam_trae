@@ -1,0 +1,5 @@
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingSimple.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingSimple.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingSimple.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingSimple.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingSimple.sourcelink.json

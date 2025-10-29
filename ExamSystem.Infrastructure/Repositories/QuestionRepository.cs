@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using ExamSystem.Data;
 using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
+using ExamSystem.Domain.Models;
 
 namespace ExamSystem.Infrastructure.Repositories
 {
@@ -251,5 +253,139 @@ namespace ExamSystem.Infrastructure.Repositories
             await RemoveAsync(question);
             return true;
         }
+
+        #region 地图绘制题扩展方法
+
+        /// <summary>
+        /// 获取地图绘制题配置
+        /// </summary>
+        public MapDrawingConfig? GetMapDrawingConfig(Question question)
+        {
+            if (string.IsNullOrEmpty(question.MapDrawingConfigJson))
+                return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<MapDrawingConfig>(question.MapDrawingConfigJson);
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 设置地图绘制题配置
+        /// </summary>
+        public void SetMapDrawingConfig(Question question, MapDrawingConfig config)
+        {
+            question.MapDrawingConfigJson = JsonSerializer.Serialize(config);
+        }
+
+        /// <summary>
+        /// 获取指引图层
+        /// </summary>
+        public List<OverlayDTO>? GetGuidanceOverlays(Question question)
+        {
+            if (string.IsNullOrEmpty(question.GuidanceOverlaysJson))
+                return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<List<OverlayDTO>>(question.GuidanceOverlaysJson);
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 设置指引图层
+        /// </summary>
+        public void SetGuidanceOverlays(Question question, List<OverlayDTO> overlays)
+        {
+            question.GuidanceOverlaysJson = JsonSerializer.Serialize(overlays);
+        }
+
+        /// <summary>
+        /// 获取参考答案图层
+        /// </summary>
+        public List<OverlayDTO>? GetReferenceOverlays(Question question)
+        {
+            if (string.IsNullOrEmpty(question.ReferenceOverlaysJson))
+                return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<List<OverlayDTO>>(question.ReferenceOverlaysJson);
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 设置参考答案图层
+        /// </summary>
+        public void SetReferenceOverlays(Question question, List<OverlayDTO> overlays)
+        {
+            question.ReferenceOverlaysJson = JsonSerializer.Serialize(overlays);
+        }
+
+        /// <summary>
+        /// 获取评分量表
+        /// </summary>
+        public ReviewRubric? GetReviewRubric(Question question)
+        {
+            if (string.IsNullOrEmpty(question.ReviewRubricJson))
+                return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<ReviewRubric>(question.ReviewRubricJson);
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 设置评分量表
+        /// </summary>
+        public void SetReviewRubric(Question question, ReviewRubric rubric)
+        {
+            question.ReviewRubricJson = JsonSerializer.Serialize(rubric);
+        }
+
+        /// <summary>
+        /// 获取建筑图层配置
+        /// </summary>
+        public BuildingLayersConfig? GetBuildingLayersConfig(Question question)
+        {
+            if (string.IsNullOrEmpty(question.ShowBuildingLayersJson))
+                return null;
+
+            try
+            {
+                return JsonSerializer.Deserialize<BuildingLayersConfig>(question.ShowBuildingLayersJson);
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 设置建筑图层配置
+        /// </summary>
+        public void SetBuildingLayersConfig(Question question, BuildingLayersConfig config)
+        {
+            question.ShowBuildingLayersJson = JsonSerializer.Serialize(config);
+        }
+
+        #endregion
     }
 }

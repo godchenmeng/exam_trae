@@ -247,7 +247,9 @@ namespace ExamSystem.WPF.ViewModels
                 QuestionType.MultipleChoice,
                 QuestionType.TrueFalse,
                 QuestionType.FillInBlank,
-                QuestionType.Essay
+                QuestionType.ShortAnswer,
+                QuestionType.Essay,
+                QuestionType.MapDrawing
             };
         }
         

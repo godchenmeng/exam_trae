@@ -251,6 +251,7 @@ namespace ExamSystem.WPF.Dialogs
                 QuestionType.FillInBlank => "填空题",
                 QuestionType.ShortAnswer => "简答题",
                 QuestionType.Essay => "问答题",
+                QuestionType.MapDrawing => "地图绘制题",
                 _ => "未知"
             };
         }

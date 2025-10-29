@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DbPatcher")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+49dd5a8a81d1ffafa147485a4673797f4063ed29")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+de336eba6dfd3b3471074b0f3cbb67a91927ad30")]
 [assembly: System.Reflection.AssemblyProductAttribute("DbPatcher")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DbPatcher")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

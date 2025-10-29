@@ -17,7 +17,7 @@ namespace ExamSystem.WPF.ViewModels
     /// <summary>
     /// 教师/管理员端通知发送 ViewModel
     /// </summary>
-    public class NotificationSendViewModel : ExamSystem.WPF.ViewModels.Base.BaseViewModel
+    public class NotificationSendViewModel : BaseViewModel
     {
         private readonly INotificationService _notificationService;
         private readonly IUserService _userService;
@@ -192,7 +192,7 @@ namespace ExamSystem.WPF.ViewModels
     /// <summary>
     /// 供界面绑定选择的用户项
     /// </summary>
-    public class SelectableUser : ExamSystem.WPF.ViewModels.Base.BaseViewModel
+    public class SelectableUser : BaseViewModel
     {
         private readonly User _user;
         public SelectableUser(User user)

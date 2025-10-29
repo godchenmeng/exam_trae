@@ -221,6 +221,7 @@ namespace ExamSystem.Services.Services
                 QuestionType.TrueFalse => "判断题",
                 QuestionType.FillInBlank => "填空题",
                 QuestionType.Essay => "问答题",
+                QuestionType.MapDrawing => "地图绘制题",
                 _ => "未知"
             };
         }

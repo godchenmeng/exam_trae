@@ -22,6 +22,7 @@ namespace ExamSystem.WPF.Converters
                     QuestionType.FillInBlank => "填空题",
                     QuestionType.ShortAnswer => "简答题",
                     QuestionType.Essay => "论述题",
+                    QuestionType.MapDrawing => "地图绘制题",
                     _ => "未知"
                 };
             }
@@ -40,6 +41,7 @@ namespace ExamSystem.WPF.Converters
                     "填空题" => QuestionType.FillInBlank,
                     "简答题" => QuestionType.ShortAnswer,
                     "论述题" => QuestionType.Essay,
+                    "地图绘制题" => QuestionType.MapDrawing,
                     _ => QuestionType.SingleChoice
                 };
             }

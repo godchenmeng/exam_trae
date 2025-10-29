@@ -10,7 +10,9 @@ using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
 using ExamSystem.WPF.Commands;
+using ExamSystem.WPF.Views;
 using Microsoft.Extensions.Logging;
+using Microsoft.Web.WebView2.Wpf;
 
 namespace ExamSystem.WPF.ViewModels
 {
@@ -20,6 +22,7 @@ namespace ExamSystem.WPF.ViewModels
     public class ExamViewModel : INotifyPropertyChanged, IDisposable
     {
         private readonly IExamService _examService;
+        private readonly IMapDrawingService _mapDrawingService;
         private readonly ILogger<ExamViewModel> _logger;
         private readonly DispatcherTimer _timer;
         
@@ -30,9 +33,10 @@ namespace ExamSystem.WPF.ViewModels
         private bool _isExamInProgress = true;
         private int _remainingSeconds = 0;
 
-        public ExamViewModel(IExamService examService, ILogger<ExamViewModel> logger)
+        public ExamViewModel(IExamService examService, IMapDrawingService mapDrawingService, ILogger<ExamViewModel> logger)
         {
             _examService = examService;
+            _mapDrawingService = mapDrawingService;
             _logger = logger;
             
             // 初始化命令
@@ -44,6 +48,11 @@ namespace ExamSystem.WPF.ViewModels
             SelectTrueFalseCommand = new RelayCommand<bool?>(SelectTrueFalse);
             SaveAnswerCommand = new RelayCommand(async () => await SaveCurrentAnswerAsync());
             SubmitExamCommand = new RelayCommand(async () => await SubmitExamAsync());
+            
+            // 地图绘制题命令初始化
+            SelectDrawingToolCommand = new RelayCommand<string>(SelectDrawingTool);
+            ClearMapDrawingCommand = new RelayCommand(ClearMapDrawing);
+            SaveMapDrawingCommand = new RelayCommand(async () => await SaveMapDrawingAsync());
             SaveCurrentAnswerCommand = new RelayCommand(async () => await SaveCurrentAnswerAsync());
             
             // 初始化集合
@@ -105,11 +114,86 @@ namespace ExamSystem.WPF.ViewModels
         public bool IsTrueFalse => CurrentQuestion?.QuestionType == QuestionType.TrueFalse;
         public bool IsFillInBlank => CurrentQuestion?.QuestionType == QuestionType.FillInBlank;
         public bool IsEssay => CurrentQuestion?.QuestionType == QuestionType.Essay;
+        public bool IsMapDrawing => CurrentQuestion?.QuestionType == QuestionType.MapDrawing;
 
         // 答案属性
         public bool? TrueFalseAnswer { get; set; }
         public string FillInBlankAnswer { get; set; } = "";
         public string EssayAnswer { get; set; } = "";
+        
+        // 地图绘制题相关属性
+        private bool _isMapLoading = false;
+        public bool IsMapLoading
+        {
+            get => _isMapLoading;
+            set
+            {
+                _isMapLoading = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private string _currentDrawingTool = "point";
+        public string CurrentDrawingTool
+        {
+            get => _currentDrawingTool;
+            set
+            {
+                _currentDrawingTool = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private int _mapDrawingOverlayCount = 0;
+        public int MapDrawingOverlayCount
+        {
+            get => _mapDrawingOverlayCount;
+            set
+            {
+                _mapDrawingOverlayCount = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private int _mapDrawingTimeRemaining = 0;
+        public string MapDrawingTimeRemaining
+        {
+            get
+            {
+                var timeSpan = TimeSpan.FromSeconds(_mapDrawingTimeRemaining);
+                return $"{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+            }
+        }
+        
+        public string MapAnsweringUrl => "file:///" + System.IO.Path.Combine(
+            System.AppDomain.CurrentDomain.BaseDirectory, 
+            "Assets", "Map", "answering.html").Replace("\\", "/");
+
+        // 地图绘制服务属性
+        public IMapDrawingService MapDrawingService => _mapDrawingService;
+        
+        // 自动保存相关属性
+        private DateTime _lastSaveTime = DateTime.Now;
+        public DateTime LastSaveTime
+        {
+            get => _lastSaveTime;
+            set
+            {
+                _lastSaveTime = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private bool _isAutoSaveEnabled = false;
+        public bool IsAutoSaveEnabled
+        {
+            get => _isAutoSaveEnabled;
+            set
+            {
+                _isAutoSaveEnabled = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool CanGoPrevious => _currentQuestionIndex > 0;
         public bool CanGoNext => _currentQuestionIndex < TotalQuestions - 1;
@@ -126,6 +210,11 @@ namespace ExamSystem.WPF.ViewModels
         public ICommand SelectTrueFalseCommand { get; }
         public ICommand SaveAnswerCommand { get; }
         public ICommand SubmitExamCommand { get; }
+        
+        // 地图绘制题相关命令
+        public ICommand SelectDrawingToolCommand { get; }
+        public ICommand ClearMapDrawingCommand { get; }
+        public ICommand SaveMapDrawingCommand { get; }
         public ICommand SaveCurrentAnswerCommand { get; }
 
         #endregion
@@ -266,6 +355,21 @@ namespace ExamSystem.WPF.ViewModels
             // 加载已保存的答案
             LoadSavedAnswer(answerRecord);
 
+            // 地图绘制题特殊处理
+            if (question.QuestionType == QuestionType.MapDrawing)
+            {
+                // 初始化地图绘制题相关属性
+                IsMapLoading = true;
+                MapDrawingOverlayCount = 0;
+                CurrentDrawingTool = "point";
+                _mapDrawingTimeRemaining = question.TimeLimitSeconds > 0 ? 
+                    question.TimeLimitSeconds : 0;
+                OnPropertyChanged(nameof(MapDrawingTimeRemaining));
+                
+                // 触发地图WebView初始化
+                // _ = InitializeMapWebViewAsync();
+            }
+
             // 更新导航状态
             UpdateQuestionNavigations();
 
@@ -277,6 +381,7 @@ namespace ExamSystem.WPF.ViewModels
             OnPropertyChanged(nameof(IsTrueFalse));
             OnPropertyChanged(nameof(IsFillInBlank));
             OnPropertyChanged(nameof(IsEssay));
+            OnPropertyChanged(nameof(IsMapDrawing));
             OnPropertyChanged(nameof(CanGoPrevious));
             OnPropertyChanged(nameof(CanGoNext));
         }
@@ -337,6 +442,9 @@ namespace ExamSystem.WPF.ViewModels
                 case QuestionType.Essay:
                     EssayAnswer = userAnswer;
                     break;
+                case QuestionType.MapDrawing:
+                    // 地图绘制题答案通过WebView2处理，这里不需要特殊处理
+                    break;
             }
 
             OnPropertyChanged(nameof(TrueFalseAnswer));
@@ -380,7 +488,7 @@ namespace ExamSystem.WPF.ViewModels
             OnPropertyChanged(nameof(UnansweredCount));
         }
 
-        private async Task SaveCurrentAnswerAsync()
+        public async Task SaveCurrentAnswerAsync()
         {
             try
             {
@@ -427,6 +535,11 @@ namespace ExamSystem.WPF.ViewModels
 
                 case QuestionType.Essay:
                     return EssayAnswer ?? "";
+
+                case QuestionType.MapDrawing:
+                    // 地图绘制题答案从WebView2获取，通过SaveMapDrawingAsync方法保存
+                    // 这里返回当前答案记录中的答案，如果没有则返回空字符串
+                    return _answerRecords[_currentQuestionIndex].UserAnswer ?? "";
 
                 default:
                     return "";
@@ -543,6 +656,199 @@ namespace ExamSystem.WPF.ViewModels
             OnPropertyChanged(nameof(TrueFalseAnswer));
         }
 
+        /// <summary>
+        /// 获取当前答题记录
+        /// </summary>
+        public AnswerRecord? GetCurrentAnswerRecord()
+        {
+            if (_currentQuestionIndex >= 0 && _currentQuestionIndex < _answerRecords.Count)
+            {
+                return _answerRecords[_currentQuestionIndex];
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 向WebView2发送消息
+        /// </summary>
+        public Task SendMessageToWebViewAsync(WebView2 webView, string action, object data)
+        {
+            try
+            {
+                if (webView?.CoreWebView2 != null)
+                {
+                    var message = new
+                    {
+                        action = action,
+                        data = data
+                    };
+                    
+                    var json = System.Text.Json.JsonSerializer.Serialize(message);
+                    webView.CoreWebView2.PostWebMessageAsString(json);
+                    
+                    System.Diagnostics.Debug.WriteLine($"发送消息到WebView2: {action}");
+                }
+                return Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"发送消息到WebView2失败: {action}");
+                return Task.CompletedTask;
+            }
+        }
+
+        private ExamView? _examView;
+
+        /// <summary>
+        /// 设置关联的ExamView实例
+        /// </summary>
+        public void SetExamView(ExamView examView)
+        {
+            _examView = examView;
+        }
+
+        private async void SelectDrawingTool(string? tool)
+        {
+            if (!string.IsNullOrEmpty(tool))
+            {
+                CurrentDrawingTool = tool;
+                // 发送工具切换消息到WebView2
+                if (_examView?.MapWebViewControl != null)
+                {
+                    await SendMessageToWebViewAsync(_examView.MapWebViewControl, "selectTool", new { tool = tool });
+                }
+            }
+        }
+
+        private async void ClearMapDrawing()
+        {
+            // 发送清空地图消息到WebView2
+            if (_examView?.MapWebViewControl != null)
+            {
+                await SendMessageToWebViewAsync(_examView.MapWebViewControl, "clearDrawing", new { });
+                MapDrawingOverlayCount = 0;
+            }
+        }
+
+        private async Task SaveMapDrawingAsync()
+        {
+            try
+            {
+                if (CurrentQuestion?.QuestionType != QuestionType.MapDrawing)
+                    return;
+
+                // 通过WebView2获取当前绘制的数据
+                if (_examView?.MapWebViewControl?.CoreWebView2 != null)
+                {
+                    // 发送获取绘制数据的消息
+                    await SendMessageToWebViewAsync(_examView.MapWebViewControl, "getDrawingData", new { });
+                    
+                    // 注意：实际的数据保存会在WebView2消息回调中处理
+                    _logger.LogInformation($"请求获取地图绘制数据，题目ID: {CurrentQuestion.QuestionId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "保存地图绘制题答案时发生错误");
+            }
+        }
+
+        /// <summary>
+        /// 初始化地图绘制题WebView2
+        /// </summary>
+        public Task InitializeMapWebViewAsync(Microsoft.Web.WebView2.Wpf.WebView2 webView)
+        {
+            try
+            {
+                // 设置WebView2源
+                var htmlPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "Map", "answering.html");
+                if (System.IO.File.Exists(htmlPath))
+                {
+                    var mapAnsweringUrl = new System.Uri(htmlPath).ToString();
+                    webView.Source = new System.Uri(mapAnsweringUrl);
+                }
+                else
+                {
+                    _logger.LogWarning("地图绘制题HTML文件不存在: {HtmlPath}", htmlPath);
+                }
+                return Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "初始化地图WebView失败");
+                return Task.CompletedTask;
+            }
+        }
+
+        /// <summary>
+        /// 处理来自WebView2的消息
+        /// </summary>
+        public void HandleWebViewMessage(string message)
+        {
+            try
+            {
+                var messageObj = System.Text.Json.JsonSerializer.Deserialize<WebViewMessage>(message);
+                
+                switch (messageObj?.Type)
+                {
+                    case "mapReady":
+                        IsMapLoading = false;
+                        OnPropertyChanged(nameof(IsMapLoading));
+                        break;
+                        
+                    case "toolChanged":
+                        if (messageObj.Data?.ContainsKey("toolName") == true)
+                        {
+                            CurrentDrawingTool = messageObj.Data["toolName"].ToString() ?? "point";
+                            OnPropertyChanged(nameof(CurrentDrawingTool));
+                        }
+                        break;
+                        
+                    case "overlayCountChanged":
+                        if (messageObj.Data?.ContainsKey("count") == true && 
+                            int.TryParse(messageObj.Data["count"].ToString(), out int count))
+                        {
+                            MapDrawingOverlayCount = count;
+                            OnPropertyChanged(nameof(MapDrawingOverlayCount));
+                        }
+                        break;
+                        
+                    case "drawingDataChanged":
+                        // 处理绘制数据变更
+                        if (messageObj.Data?.ContainsKey("data") == true)
+                        {
+                            var drawingData = messageObj.Data["data"].ToString();
+                            // 这里可以实时保存绘制数据
+                            _ = Task.Run(async () => await SaveDrawingDataAsync(drawingData ?? ""));
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "处理WebView消息失败: {Message}", message);
+            }
+        }
+
+        /// <summary>
+        /// 保存绘制数据
+        /// </summary>
+        private async Task SaveDrawingDataAsync(string drawingData)
+        {
+            try
+            {
+                // 实现保存绘制数据的逻辑
+                // await _examService.SaveAnswerAsync(ExamRecord.Id, CurrentQuestion.QuestionId, drawingData);
+                await Task.Delay(100); // 模拟保存过程
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "保存绘制数据失败");
+            }
+        }
+
+        #endregion
+
         private async void OnTimerTick(object? sender, EventArgs e)
         {
             _remainingSeconds--;
@@ -570,8 +876,6 @@ namespace ExamSystem.WPF.ViewModels
                 ExamTimeout?.Invoke(this, EventArgs.Empty);
             }
         }
-
-        #endregion
 
         #region INotifyPropertyChanged
 
@@ -672,5 +976,15 @@ namespace ExamSystem.WPF.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+    }
+
+    /// <summary>
+    /// WebView消息模型
+    /// </summary>
+    public class WebViewMessage
+    {
+        public string Type { get; set; } = "";
+        public Dictionary<string, object>? Data { get; set; }
+        public string? Timestamp { get; set; }
     }
 }

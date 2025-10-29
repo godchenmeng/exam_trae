@@ -73,6 +73,7 @@ public class QuestionBankStatistics
     public int TrueFalseCount { get; set; }
     public int FillInBlankCount { get; set; }
     public int EssayCount { get; set; }
+    public int MapDrawingCount { get; set; }
     public int EasyCount { get; set; }
     public int MediumCount { get; set; }
     public int HardCount { get; set; }

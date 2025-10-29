@@ -214,6 +214,7 @@ public class QuestionBankService : IQuestionBankService
                 TrueFalseCount = questions.Count(q => q.QuestionType == QuestionType.TrueFalse),
                 FillInBlankCount = questions.Count(q => q.QuestionType == QuestionType.FillInBlank),
                 EssayCount = questions.Count(q => q.QuestionType == QuestionType.Essay),
+                MapDrawingCount = questions.Count(q => q.QuestionType == QuestionType.MapDrawing),
                 EasyCount = questions.Count(q => q.Difficulty == Difficulty.Easy),
                 MediumCount = questions.Count(q => q.Difficulty == Difficulty.Medium),
                 HardCount = questions.Count(q => q.Difficulty == Difficulty.Hard)

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>地图绘制题（本地）</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #app { display: flex; height: 100%; }
+    #map { flex: 1; background: #f5f5f5; }
+    #sidebar { width: 300px; border-left: 1px solid #ddd; padding: 8px; font-family: Consolas, monospace; font-size: 12px; overflow: auto; }
+    .log { white-space: pre-wrap; }
+    .btn { display: inline-block; margin: 4px 0; padding: 6px 10px; background: #1976d2; color: #fff; border-radius: 3px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="map">地图容器（初始不加载真实地图，用于桥接调试）</div>
+    <div id="sidebar">
+      <div>
+        <div class="btn" id="btnSubmit">提交答案（模拟）</div>
+        <div class="btn" id="btnClear">清空作答</div>
+      </div>
+      <h4>消息日志</h4>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <script src="scripts/core.js"></script>
+</body>
+</html>

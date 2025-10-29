@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>百度地图编辑器（纯HTML版）</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- BMapGL DrawingManager CSS -->
+  <link rel="stylesheet" href="css/DrawingManager.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<!-- 顶部标题栏已移除 -->
+
+    <div id="edit-baidu-map" class="container-fluid">
+        <!-- 地图容器 -->
+        <div id="map">
+
+        </div>
+        <div id="mapHint" class="map-hint"><strong>操作说明：</strong>圆和矩形通过拖拽绘制；标记、线、多边形通过点击逐点绘制。</div>
+        <!-- 顶部控制条：移除矢量/路网按钮，保持简洁 -->
+        <!-- 绘图工具栏（置于定位与筛选与操作面板之上） -->
+        <div class="bottom-toolbar">
+            <div class="btn-grid" aria-label="绘图工具">
+                <button id="toolMarker" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iconModal">画标记</button>
+                <button id="toolPolyline" class="btn btn-primary">画水带</button>
+                <button id="toolPolygon" class="btn btn-primary">画多边形</button>
+                <button id="toolRectangle" class="btn btn-primary">画矩形</button>
+                <button id="toolCircle" class="btn btn-primary">画圆</button>
+            </div>
+        </div>
+
+        <!-- 信息与输入区（封装为分组卡片） -->
+        <div class="control-panels">
+            <div class="input-card card shadow-sm">
+                <div class="card-header">定位与筛选</div>
+                <div class="card-body">
+                    <form id="infoForm" class="row g-3 align-items-center needs-validation" novalidate>
+                        <!-- 城市选择和筛选选项在同一行 -->
+                        <div class="col-12">
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <div class="d-flex align-items-center">
+                                    <label for="selectCity" class="col-form-label me-2">城市：</label>
+                                    <select id="selectCity" class="form-select" required>
+                                        <option value="guiyang" selected>贵阳市</option>
+                                        <option value="zunyi">遵义市</option>
+                                        <option value="liupanshui">六盘水市</option>
+                                        <option value="anshun">安顺市</option>
+                                        <option value="bijie">毕节市</option>
+                                        <option value="tongren">铜仁市</option>
+                                        <option value="qiandongnan">黔东南苗族侗族自治州</option>
+                                        <option value="qiannan">黔南布依族苗族自治州</option>
+                                        <option value="qianxinan">黔西南布依族苗族自治州</option>
+                                    </select>
+                                    <div class="invalid-feedback">请选择城市</div>
+                                </div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="chkDz" value="dz" />
+                                        <label class="form-check-label" for="chkDz">消防队站(<span id="dzCount">0</span>)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="chkZz" value="zz" />
+                                        <label class="form-check-label" for="chkZz">专职队(<span id="zzCount">0</span>)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="chkZd" value="zd" />
+                                        <label class="form-check-label" for="chkZd">重点建筑(<span id="zdCount">0</span>)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <label for="tipInput" class="col-form-label">中心定位：</label>
+                        </div>
+                        <div class="col-auto">
+                            <input id="tipInput" type="text" class="form-control" placeholder="输入地名" pattern="^\s*([-\d\.]+)\s*,\s*([-\d\.]+)\s*$" required />
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- 覆盖物列表与操作 -->
+            <div class="input-card card shadow-sm">
+                <div class="card-header">操作面板</div>
+                <div class="card-body tools-two-col">
+                    <div class="overlay-list">
+                        <h5>已绘制图形：</h5>
+                        <div id="overlayList"></div>
+                    </div>
+                    <!-- 颜色选择（可选，默认隐藏） -->
+                    <div class="input-item" style="display:none;">
+                        <label>边框色：</label>
+                        <input type="color" id="strokeColor" />
+                        <label style="margin-left:1rem;">填充色：</label>
+                        <input type="color" id="fillColor" />
+                    </div>
+                    <div class="input-item mt-2 side-tools d-grid gap-2">
+                        <button id="btnClear" class="btn btn-sm btn-outline-danger">全部删除</button>
+                        <button id="btnCloseDraw" class="btn btn-sm btn-outline-secondary">停止绘图</button>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.control-panels -->
+        <!-- 图标选择模态框（Bootstrap） -->
+        <div class="modal fade" id="iconModal" tabindex="-1" aria-labelledby="iconModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="iconModalLabel">选择图标</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-2">
+                            <div class="col-12 col-md-4">
+                                <select id="selectIconCategory" class="form-select">
+                                    <option value="all" selected>全部分类</option>
+                                    <option value="building">建筑</option>
+                                    <option value="fire">消防</option>
+                                    <option value="poi">兴趣点</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="iconList" class="d-flex flex-wrap"></div>
+                        <div class="d-flex justify-content-end align-items-center mt-3">
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0" id="iconPagination"></ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <!-- 依赖脚本：Bootstrap、BMapGL + DrawingManager -->
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=E4805d16520de693a3fe707cdc962045"></script>
+  <script src="js/DrawingManager.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

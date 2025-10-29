@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace ExamSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(ExamDbContext))]
@@ -13,8 +15,7 @@ namespace ExamSystem.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.17");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
             modelBuilder.Entity("ExamSystem.Domain.Entities.AnswerRecord", b =>
                 {
@@ -25,8 +26,14 @@ namespace ExamSystem.Infrastructure.Migrations
                     b.Property<DateTime?>("AnswerTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ClientInfoJson")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Comment")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("DrawDurationSeconds")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("GradeTime")
                         .HasColumnType("TEXT");
@@ -45,6 +52,9 @@ namespace ExamSystem.Infrastructure.Migrations
 
                     b.Property<int>("RecordId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("RubricScoresJson")
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Score")
                         .HasColumnType("decimal(5,2)");
@@ -315,18 +325,36 @@ namespace ExamSystem.Infrastructure.Migrations
                     b.Property<int>("Difficulty")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("GuidanceOverlaysJson")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("MapDrawingConfigJson")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("QuestionType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ReferenceOverlaysJson")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReviewRubricJson")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("Score")
                         .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("ShowBuildingLayersJson")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Tags")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("TimeLimitSeconds")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -380,12 +408,12 @@ namespace ExamSystem.Infrastructure.Migrations
                         new
                         {
                             BankId = 1,
-                            CreatedAt = new DateTime(2025, 10, 21, 10, 58, 29, 885, DateTimeKind.Local).AddTicks(3725),
+                            CreatedAt = new DateTime(2025, 10, 27, 1, 34, 3, 353, DateTimeKind.Local).AddTicks(311),
                             CreatorId = 1,
                             Description = "系统默认题库",
                             IsActive = true,
                             Name = "默认题库",
-                            UpdatedAt = new DateTime(2025, 10, 21, 10, 58, 29, 885, DateTimeKind.Local).AddTicks(3797)
+                            UpdatedAt = new DateTime(2025, 10, 27, 1, 34, 3, 353, DateTimeKind.Local).AddTicks(312)
                         });
                 });
 
@@ -480,7 +508,7 @@ namespace ExamSystem.Infrastructure.Migrations
                         new
                         {
                             UserId = 1,
-                            CreatedAt = new DateTime(2025, 10, 21, 10, 58, 29, 884, DateTimeKind.Local).AddTicks(7690),
+                            CreatedAt = new DateTime(2025, 10, 27, 1, 34, 3, 353, DateTimeKind.Local).AddTicks(227),
                             Email = "admin@exam.com",
                             IsActive = true,
                             LoginFailCount = 0,

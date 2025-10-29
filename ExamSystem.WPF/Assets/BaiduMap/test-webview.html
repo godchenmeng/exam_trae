@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebView2 百度地图测试</title>
+  <style>
+    body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+    #map { width: 100%; height: 500px; border: 1px solid #ddd; }
+    .info { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 4px; }
+    .status { color: green; font-weight: bold; }
+    .error { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>WebView2 百度地图测试页面</h2>
+  <div class="info">
+    <div>状态: <span id="status">初始化中...</span></div>
+    <div>错误: <span id="error">无</span></div>
+  </div>
+  
+  <div id="map"></div>
+  
+  <div class="info">
+    <button onclick="testMap()">测试地图功能</button>
+    <button onclick="sendMessageToWPF()">发送消息到WPF</button>
+  </div>
+
+  <script src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=E4805d16520de693a3fe707cdc962045"></script>
+  <script>
+    let map = null;
+    let statusEl = document.getElementById('status');
+    let errorEl = document.getElementById('error');
+    
+    function updateStatus(msg) {
+      statusEl.textContent = msg;
+      statusEl.className = 'status';
+      console.log('Status:', msg);
+    }
+    
+    function updateError(msg) {
+      errorEl.textContent = msg;
+      errorEl.className = 'error';
+      console.error('Error:', msg);
+    }
+    
+    function initMap() {
+      try {
+        updateStatus('正在初始化地图...');
+        
+        if (typeof BMapGL === 'undefined') {
+          updateError('BMapGL未加载');
+          return;
+        }
+        
+        map = new BMapGL.Map('map');
+        const point = new BMapGL.Point(106.63, 26.65); // 贵阳
+        map.centerAndZoom(point, 12);
+        map.enableScrollWheelZoom(true);
+        
+        updateStatus('地图初始化成功');
+        
+        // 添加一个测试标记
+        const marker = new BMapGL.Marker(point);
+        map.addOverlay(marker);
+        
+        updateStatus('地图加载完成，功能正常');
+        
+      } catch (error) {
+        updateError('地图初始化失败: ' + error.message);
+      }
+    }
+    
+    function testMap() {
+      if (map) {
+        try {
+          const center = map.getCenter();
+          updateStatus(`地图中心: ${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`);
+        } catch (error) {
+          updateError('地图测试失败: ' + error.message);
+        }
+      } else {
+        updateError('地图未初始化');
+      }
+    }
+    
+    function sendMessageToWPF() {
+      try {
+        if (window.chrome && window.chrome.webview) {
+          window.chrome.webview.postMessage({
+            type: 'test',
+            message: '来自WebView2的测试消息',
+            timestamp: new Date().toISOString()
+          });
+          updateStatus('消息已发送到WPF');
+        } else {
+          updateError('WebView2消息接口不可用');
+        }
+      } catch (error) {
+        updateError('发送消息失败: ' + error.message);
+      }
+    }
+    
+    // 页面加载完成后初始化地图
+    document.addEventListener('DOMContentLoaded', function() {
+      updateStatus('页面加载完成，等待地图API...');
+      
+      // 等待百度地图API加载完成
+      if (typeof BMapGL !== 'undefined') {
+        initMap();
+      } else {
+        // 轮询检查API是否加载完成
+        let checkCount = 0;
+        const checkInterval = setInterval(() => {
+          checkCount++;
+          if (typeof BMapGL !== 'undefined') {
+            clearInterval(checkInterval);
+            initMap();
+          } else if (checkCount > 50) { // 10秒超时
+            clearInterval(checkInterval);
+            updateError('百度地图API加载超时');
+          }
+        }, 200);
+      }
+    });
+    
+    // 监听来自WPF的消息
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.addEventListener('message', function(event) {
+        console.log('收到WPF消息:', event.data);
+        updateStatus('收到WPF消息: ' + JSON.stringify(event.data));
+      });
+    }
+  </script>
+</body>
+</html>

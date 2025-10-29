@@ -86,6 +86,8 @@ namespace ExamSystem.WPF
                     services.AddScoped<IQuestionBankRepository, QuestionBankRepository>();
                     services.AddScoped<IExamPaperRepository, ExamPaperRepository>();
                     services.AddScoped<IExamRecordRepository, ExamRecordRepository>();
+                    // 新增：注册通用仓储（用于IRepository<T>）
+                    services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
                     // 新增通知模块 Repository
                     services.AddScoped<INotificationRepository, NotificationRepository>();
                     services.AddScoped<INotificationRecipientRepository, NotificationRecipientRepository>();
@@ -105,6 +107,8 @@ namespace ExamSystem.WPF
                     services.AddScoped<ExamSystem.WPF.Services.IStatisticsService, ExamSystem.WPF.Services.StatisticsService>();
                     // 新增：仪表板服务
                     services.AddScoped<IDashboardService, DashboardService>();
+                    // 新增：地图绘制服务
+                    services.AddScoped<IMapDrawingService, MapDrawingService>();
 
                     // ViewModels
                     services.AddTransient<DashboardViewModel>();
@@ -119,6 +123,7 @@ namespace ExamSystem.WPF
                     services.AddTransient<QuestionBankViewModel>();
                     services.AddTransient<StatisticsViewModel>();
                     services.AddTransient<UserManagementViewModel>();
+
                     // 新增通知相关 ViewModel
                     services.AddTransient<MessageCenterViewModel>();
                     services.AddTransient<NotificationSendViewModel>();
@@ -129,6 +134,8 @@ namespace ExamSystem.WPF
                     services.AddTransient<ExamResultDetailViewModel>();
                     // 新增成绩管理 ViewModel
                     services.AddTransient<GradeManagementViewModel>();
+                    // 新增：地图绘制题 ViewModel
+                    services.AddTransient<MapDrawingAuthoringViewModel>();
 
                     // Views
                     services.AddTransient<LoginWindow>();
@@ -184,6 +191,12 @@ namespace ExamSystem.WPF
                     {
                         var vm = provider.GetRequiredService<NotificationSendViewModel>();
                         return new NotificationSendView(vm);
+                    });
+                    // 新增：地图绘制题编辑窗口（注入对应 ViewModel）
+                    services.AddTransient<MapDrawingAuthoring>(provider =>
+                    {
+                        var vm = provider.GetRequiredService<MapDrawingAuthoringViewModel>();
+                        return new MapDrawingAuthoring(vm);
                     });
                     
                     // Dialogs

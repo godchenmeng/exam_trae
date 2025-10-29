@@ -23,6 +23,7 @@ namespace ExamSystem.WPF.ViewModels
     {
         private readonly IExamService _examService;
         private readonly IAuthService _authService;
+        private readonly IMapDrawingService _mapDrawingService;
         private readonly DispatcherTimer _timer;
         private readonly int _paperId;
         private readonly string _paperTitle;
@@ -47,6 +48,7 @@ namespace ExamSystem.WPF.ViewModels
             // 从依赖注入容器获取服务
             _examService = ((App)Application.Current).GetServices().GetRequiredService<IExamService>();
             _authService = ((App)Application.Current).GetServices().GetRequiredService<IAuthService>();
+            _mapDrawingService = ((App)Application.Current).GetServices().GetRequiredService<IMapDrawingService>();
             
             // 初始化集合
             QuestionNavigations = new ObservableCollection<FullScreenQuestionNavigationViewModel>();
@@ -248,6 +250,32 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
+        // 地图绘制服务属性
+        public IMapDrawingService MapDrawingService => _mapDrawingService;
+
+        // 地图绘制题相关属性
+        private bool _isMapDrawing = false;
+        public bool IsMapDrawing
+        {
+            get => _isMapDrawing;
+            set
+            {
+                _isMapDrawing = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _mapDrawingOverlayCount = 0;
+        public int MapDrawingOverlayCount
+        {
+            get => _mapDrawingOverlayCount;
+            set
+            {
+                _mapDrawingOverlayCount = value;
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region 命令
@@ -261,6 +289,10 @@ namespace ExamSystem.WPF.ViewModels
         public ICommand SaveAnswerCommand { get; private set; } = null!;
         public ICommand SubmitExamCommand { get; private set; } = null!;
         public ICommand ExitExamCommand { get; private set; } = null!;
+        
+        // 地图绘制题相关命令
+        public ICommand ClearMapDrawingCommand { get; private set; } = null!;
+        public ICommand SaveMapDrawingCommand { get; private set; } = null!;
 
         #endregion
 
@@ -286,6 +318,10 @@ namespace ExamSystem.WPF.ViewModels
             SaveAnswerCommand = new RelayCommand(SaveAnswer);
             SubmitExamCommand = new RelayCommand(SubmitExam);
             ExitExamCommand = new RelayCommand(ExitExam);
+            
+            // 地图绘制题相关命令
+            ClearMapDrawingCommand = new RelayCommand(ClearMapDrawing);
+            SaveMapDrawingCommand = new RelayCommand(SaveMapDrawing);
         }
 
         /// <summary>
@@ -415,6 +451,17 @@ namespace ExamSystem.WPF.ViewModels
                     }
                 }
 
+                // 地图绘制题特殊处理 - 在设置CurrentQuestion之前设置，确保属性变化事件能正确触发
+                if (question.QuestionType == QuestionType.MapDrawing)
+                {
+                    IsMapDrawing = true;
+                    MapDrawingOverlayCount = 0;
+                }
+                else
+                {
+                    IsMapDrawing = false;
+                }
+
                 CurrentQuestion = vm;
                 System.Diagnostics.Debug.WriteLine($"LoadQuestionAsync: 设置CurrentQuestion完成，Options.Count={CurrentQuestion.Options.Count}");
 
@@ -443,6 +490,10 @@ namespace ExamSystem.WPF.ViewModels
                         case QuestionType.ShortAnswer:
                         case QuestionType.Essay:
                             CurrentQuestion.EssayAnswer = userAnswer;
+                            break;
+                        case QuestionType.MapDrawing:
+                            // 地图绘制题答案通过WebView2处理
+                            CurrentQuestion.MapDrawingAnswer = userAnswer;
                             break;
                     }
                 }
@@ -475,13 +526,14 @@ namespace ExamSystem.WPF.ViewModels
         {
             // 添加调试输出
             System.Diagnostics.Debug.WriteLine($"UpdateQuestionTypeProperties: CurrentQuestion={CurrentQuestion?.QuestionType}");
-            System.Diagnostics.Debug.WriteLine($"IsSingleChoice={IsSingleChoice}, IsMultipleChoice={IsMultipleChoice}, IsTrueFalse={IsTrueFalse}");
+            System.Diagnostics.Debug.WriteLine($"IsSingleChoice={IsSingleChoice}, IsMultipleChoice={IsMultipleChoice}, IsTrueFalse={IsTrueFalse}, IsMapDrawing={IsMapDrawing}");
             
             OnPropertyChanged(nameof(IsSingleChoice));
             OnPropertyChanged(nameof(IsMultipleChoice));
             OnPropertyChanged(nameof(IsTrueFalse));
             OnPropertyChanged(nameof(IsFillInBlank));
             OnPropertyChanged(nameof(IsEssay));
+            OnPropertyChanged(nameof(IsMapDrawing));
         }
 
         // 当选项的IsSelected变化时刷新答题卡和缓存答案，避免事件互斥导致的状态错乱
@@ -534,6 +586,7 @@ namespace ExamSystem.WPF.ViewModels
                 QuestionType.FillInBlank => "填空题",
                 QuestionType.ShortAnswer => "简答题",
                 QuestionType.Essay => "简答题",
+                QuestionType.MapDrawing => "地图绘制题",
                 _ => "未知"
             };
         }
@@ -880,6 +933,36 @@ namespace ExamSystem.WPF.ViewModels
             IsExitConfirmed = true;
         }
 
+        /// <summary>
+        /// 获取当前答题记录
+        /// </summary>
+        public AnswerRecord? GetCurrentAnswerRecord()
+        {
+            if (CurrentQuestionIndex >= 1 && CurrentQuestionIndex <= _answerRecords.Count)
+            {
+                return _answerRecords[CurrentQuestionIndex - 1]; // 转换为0-based索引
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 清除地图绘制
+        /// </summary>
+        private void ClearMapDrawing()
+        {
+            // 这个方法将通过WebView2与前端地图编辑器通信来清除绘制内容
+            // 具体实现在FullScreenExamWindow.xaml.cs中
+        }
+
+        /// <summary>
+        /// 保存地图绘制
+        /// </summary>
+        private void SaveMapDrawing()
+        {
+            // 这个方法将通过WebView2与前端地图编辑器通信来保存绘制内容
+            // 具体实现在FullScreenExamWindow.xaml.cs中
+        }
+
         #endregion
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -931,6 +1014,30 @@ namespace ExamSystem.WPF.ViewModels
             set
             {
                 _essayAnswer = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // 地图绘制题答案
+        private string _mapDrawingAnswer = string.Empty;
+        public string MapDrawingAnswer
+        {
+            get => _mapDrawingAnswer;
+            set
+            {
+                _mapDrawingAnswer = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // 地图绘制题配置JSON
+        private string _mapDrawingConfigJson = string.Empty;
+        public string MapDrawingConfigJson
+        {
+            get => _mapDrawingConfigJson;
+            set
+            {
+                _mapDrawingConfigJson = value;
                 OnPropertyChanged();
             }
         }

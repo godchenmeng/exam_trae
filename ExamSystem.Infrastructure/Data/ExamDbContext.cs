@@ -20,6 +20,7 @@ namespace ExamSystem.Data
         public DbSet<AnswerRecord> AnswerRecords { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
         public DbSet<NotificationRecipient> NotificationRecipients { get; set; } = null!;
+        public DbSet<MapDrawingData> MapDrawingData { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -164,6 +165,26 @@ namespace ExamSystem.Data
                       .WithMany()
                       .HasForeignKey(e => e.ReceiverId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 配置地图绘制数据表
+            modelBuilder.Entity<MapDrawingData>(entity =>
+            {
+                entity.HasKey(e => e.DrawingId);
+                entity.Property(e => e.ShapeType).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.CoordinatesJson).IsRequired().HasColumnType("TEXT");
+                entity.Property(e => e.StyleJson).HasColumnType("TEXT");
+                entity.Property(e => e.Label).HasMaxLength(500);
+                entity.Property(e => e.CreatedAt).IsRequired();
+                entity.HasOne(e => e.AnswerRecord)
+                      .WithMany()
+                      .HasForeignKey(e => e.AnswerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                // 创建索引
+                entity.HasIndex(e => e.AnswerId);
+                entity.HasIndex(e => e.ShapeType);
+                entity.HasIndex(e => e.CreatedAt);
             });
 
             // 种子数据

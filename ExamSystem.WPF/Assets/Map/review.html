@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地图绘制题 - 教师阅卷</title>
+    
+    <!-- 百度地图 API -->
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=您的密钥"></script>
+    
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="styles/review.css">
+</head>
+<body>
+    <!-- 地图容器 -->
+    <div id="map" class="map-container"></div>
+    
+    <!-- 图层控制面板 -->
+    <div id="layerControl" class="layer-control-panel">
+        <div class="panel-header">
+            <h4>图层控制</h4>
+            <button id="toggleLayerControl" class="toggle-btn">−</button>
+        </div>
+        <div class="panel-content">
+            <div class="layer-group">
+                <h5>答案图层</h5>
+                <label class="layer-item">
+                    <input type="checkbox" id="referenceLayer" checked>
+                    <span class="checkmark"></span>
+                    参考答案
+                    <span class="layer-color reference-color"></span>
+                </label>
+                <label class="layer-item">
+                    <input type="checkbox" id="studentLayer" checked>
+                    <span class="checkmark"></span>
+                    学生答案
+                    <span class="layer-color student-color"></span>
+                </label>
+            </div>
+            
+            <div class="layer-group">
+                <h5>辅助图层</h5>
+                <label class="layer-item">
+                    <input type="checkbox" id="guideLayer">
+                    <span class="checkmark"></span>
+                    参考线
+                    <span class="layer-color guide-color"></span>
+                </label>
+                <label class="layer-item">
+                    <input type="checkbox" id="gridLayer">
+                    <span class="checkmark"></span>
+                    网格线
+                </label>
+            </div>
+            
+            <div class="layer-group">
+                <h5>对比工具</h5>
+                <button id="alignMaps" class="tool-btn">对齐地图</button>
+                <button id="calculateMatch" class="tool-btn">计算匹配度</button>
+                <button id="highlightDiff" class="tool-btn">高亮差异</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 统计信息面板 -->
+    <div id="statsPanel" class="stats-panel">
+        <div class="panel-header">
+            <h4>统计信息</h4>
+            <button id="toggleStatsPanel" class="toggle-btn">−</button>
+        </div>
+        <div class="panel-content">
+            <div class="stat-item">
+                <span class="stat-label">参考答案:</span>
+                <span id="referenceCount" class="stat-value">0</span>
+                <span class="stat-unit">个图形</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">学生答案:</span>
+                <span id="studentCount" class="stat-value">0</span>
+                <span class="stat-unit">个图形</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">匹配度:</span>
+                <span id="matchPercentage" class="stat-value highlight">0%</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">差异数:</span>
+                <span id="differenceCount" class="stat-value">0</span>
+                <span class="stat-unit">处</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 加载遮罩 -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在加载地图...</div>
+    </div>
+    
+    <!-- 状态栏 -->
+    <div id="statusBar" class="status-bar">
+        <div class="status-left">
+            <span id="mapStatus">地图就绪</span>
+        </div>
+        <div class="status-right">
+            <span id="coordinates">坐标: --</span>
+        </div>
+    </div>
+
+    <!-- 核心脚本 -->
+    <script src="scripts/review-core.js"></script>
+</body>
+</html>

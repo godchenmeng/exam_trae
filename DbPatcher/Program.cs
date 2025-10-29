@@ -258,6 +258,12 @@ ON NotificationRecipients (NotificationId, ReceiverId);";
                 Console.WriteLine("IsPublished 列添加完成");
             }
 
+            // 添加地图绘制题相关列到 Questions 表
+            AddMapDrawingColumns(connection);
+
+            // 添加地图绘制题相关列到 AnswerRecords 表
+            AddMapDrawingAnswerColumns(connection);
+
             // 验证表是否存在
             using (var verifyCmd = connection.CreateCommand())
             {
@@ -277,6 +283,88 @@ ON NotificationRecipients (NotificationId, ReceiverId);";
             Console.WriteLine($"[失败] 补丁执行失败: {ex.Message}");
             Console.WriteLine(ex.StackTrace);
             Environment.ExitCode = 1;
+        }
+    }
+
+    static void AddMapDrawingColumns(SqliteConnection connection)
+    {
+        Console.WriteLine("\n[地图绘制题] 检查 Questions 表的地图绘制相关列...");
+        
+        // 检查 MapDrawingConfigJson 列是否存在
+        bool mapDrawingConfigExists = false;
+        using (var checkCmd = connection.CreateCommand())
+        {
+            checkCmd.CommandText = "PRAGMA table_info(Questions)";
+            using var reader = checkCmd.ExecuteReader();
+            while (reader.Read())
+            {
+                if (reader.GetString(1) == "MapDrawingConfigJson")
+                {
+                    mapDrawingConfigExists = true;
+                    break;
+                }
+            }
+        }
+
+        if (!mapDrawingConfigExists)
+        {
+            Console.WriteLine("正在添加 MapDrawingConfigJson 列到 Questions 表...");
+            using (var addColumnCmd = connection.CreateCommand())
+            {
+                addColumnCmd.CommandText = "ALTER TABLE Questions ADD COLUMN MapDrawingConfigJson TEXT NULL";
+                addColumnCmd.ExecuteNonQuery();
+            }
+            Console.WriteLine("MapDrawingConfigJson 列添加完成");
+        }
+        else
+        {
+            Console.WriteLine("MapDrawingConfigJson 列已存在，跳过");
+        }
+    }
+
+    static void AddMapDrawingAnswerColumns(SqliteConnection connection)
+    {
+        Console.WriteLine("\n[地图绘制题] 检查 AnswerRecords 表的地图绘制相关列...");
+        
+        // 检查需要添加的列
+        var columnsToAdd = new Dictionary<string, string>
+        {
+            { "DrawDurationSeconds", "INTEGER NULL" },
+            { "ClientInfoJson", "TEXT NULL" },
+            { "RubricScoresJson", "TEXT NULL" }
+        };
+
+        foreach (var column in columnsToAdd)
+        {
+            bool columnExists = false;
+            using (var checkCmd = connection.CreateCommand())
+            {
+                checkCmd.CommandText = "PRAGMA table_info(AnswerRecords)";
+                using var reader = checkCmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader.GetString(1) == column.Key)
+                    {
+                        columnExists = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!columnExists)
+            {
+                Console.WriteLine($"正在添加 {column.Key} 列到 AnswerRecords 表...");
+                using (var addColumnCmd = connection.CreateCommand())
+                {
+                    addColumnCmd.CommandText = $"ALTER TABLE AnswerRecords ADD COLUMN {column.Key} {column.Value}";
+                    addColumnCmd.ExecuteNonQuery();
+                }
+                Console.WriteLine($"{column.Key} 列添加完成");
+            }
+            else
+            {
+                Console.WriteLine($"{column.Key} 列已存在，跳过");
+            }
         }
     }
 }

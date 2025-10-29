@@ -105,5 +105,35 @@ namespace ExamSystem.Domain.Entities
     /// 答题记录
     /// </summary>
     public virtual ICollection<AnswerRecord> AnswerRecords { get; set; } = new List<AnswerRecord>();
+
+    /// <summary>
+    /// 地图绘制题配置（JSON）：allowedTools、requiredOverlays、constraints、showBuildingLayers、timeLimitSeconds
+    /// </summary>
+    public string? MapDrawingConfigJson { get; set; }
+
+    /// <summary>
+    /// 辅助指引图层（JSON）：仅学生端可见，教师端可编辑
+    /// </summary>
+    public string? GuidanceOverlaysJson { get; set; }
+
+    /// <summary>
+    /// 参考答案图层（JSON）：仅教师端可见，用于阅卷对比
+    /// </summary>
+    public string? ReferenceOverlaysJson { get; set; }
+
+    /// <summary>
+    /// 人工评分量表（JSON）：定义评分项与权重
+    /// </summary>
+    public string? ReviewRubricJson { get; set; }
+
+    /// <summary>
+    /// 作答时限（秒），0 表示不限时
+    /// </summary>
+    public int TimeLimitSeconds { get; set; } = 0;
+
+    /// <summary>
+    /// 建筑图层显示配置（JSON）
+    /// </summary>
+    public string? ShowBuildingLayersJson { get; set; }
     }
 }

@@ -34,6 +34,11 @@ public enum QuestionType
     /// <summary>
     /// 论述题
     /// </summary>
-    Essay = 6
+    Essay = 6,
+
+    /// <summary>
+    /// 地图绘制题（新题型）
+    /// </summary>
+    MapDrawing = 7
     }
 }

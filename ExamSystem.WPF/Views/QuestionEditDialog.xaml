@@ -415,7 +415,12 @@
             <Button Content="{Binding SaveButtonText}" 
                     Command="{Binding SaveCommand}"
                     Style="{StaticResource PrimaryButtonStyle}"
-                    IsEnabled="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"/>
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
+                    Visibility="{Binding IsMapDrawing, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+            <!--<Button Content="打开地图绘制编辑器"
+                    Click="OpenMapDrawingEditorButton_Click"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Visibility="{Binding IsMapDrawing, Converter={StaticResource BooleanToVisibilityConverter}}"/>-->
             <Button Content="取消" 
                     Click="CancelButton_Click"
                     Style="{StaticResource SecondaryButtonStyle}"/>

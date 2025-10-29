@@ -10,11 +10,15 @@ namespace ExamSystem.WPF.Views
 {
     public partial class DashboardView : UserControl
     {
+        private CartesianChart _adminChart;
+        private CartesianChart _teacherChart;
+
         public DashboardView(DashboardViewModel viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;
             this.SizeChanged += DashboardView_SizeChanged;
+            this.Unloaded += DashboardView_Unloaded;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -35,12 +39,56 @@ namespace ExamSystem.WPF.Views
             InitializeCharts();
         }
 
+        private void DashboardView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // 清理图表资源
+                CleanupCharts();
+            }
+            catch (Exception ex)
+            {
+                // 记录错误但不抛出异常，避免影响应用程序关闭
+                System.Diagnostics.Debug.WriteLine($"清理图表资源时发生错误: {ex.Message}");
+            }
+        }
+
+        private void CleanupCharts()
+        {
+            try
+            {
+                // 清理管理员图表
+                if (_adminChart != null)
+                {
+                    if (AdminTrendChartHost != null)
+                    {
+                        AdminTrendChartHost.Child = null;
+                    }
+                    _adminChart = null;
+                }
+
+                // 清理教师图表
+                if (_teacherChart != null)
+                {
+                    if (TeacherPerformanceChartHost != null)
+                    {
+                        TeacherPerformanceChartHost.Child = null;
+                    }
+                    _teacherChart = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"清理图表时发生错误: {ex.Message}");
+            }
+        }
+
         private void InitializeCharts()
         {
             try
             {
                 // 管理员趋势区：近7天用户增长（示例数据）
-                var adminChart = new CartesianChart
+                _adminChart = new CartesianChart
                 {
                     Height = 220,
                     Series = new ISeries[]
@@ -58,10 +106,14 @@ namespace ExamSystem.WPF.Views
                         }
                     }
                 };
-                AdminTrendChartHost.Child = adminChart;
+                
+                if (AdminTrendChartHost != null)
+                {
+                    AdminTrendChartHost.Child = _adminChart;
+                }
 
                 // 教师试卷表现：Top5试卷平均分（示例数据）
-                var teacherChart = new CartesianChart
+                _teacherChart = new CartesianChart
                 {
                     Height = 220,
                     Series = new ISeries[]
@@ -73,11 +125,16 @@ namespace ExamSystem.WPF.Views
                         }
                     }
                 };
-                TeacherPerformanceChartHost.Child = teacherChart;
+                
+                if (TeacherPerformanceChartHost != null)
+                {
+                    TeacherPerformanceChartHost.Child = _teacherChart;
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // 非关键路径，忽略图表初始化错误
+                // 非关键路径，记录错误但不影响应用程序运行
+                System.Diagnostics.Debug.WriteLine($"图表初始化失败: {ex.Message}");
             }
         }
 

@@ -450,7 +450,7 @@ namespace ExamSystem.Services.Services
         {
             return questionType switch
             {
-                "单选" or "多选" or "判断" or "填空" or "主观" => true,
+                "单选" or "多选" or "判断" or "填空" or "主观" or "地图绘制" => true,
                 _ => false
             };
         }
@@ -614,6 +614,7 @@ namespace ExamSystem.Services.Services
                 "判断" => QuestionType.TrueFalse,
                 "填空" => QuestionType.FillInBlank,
                 "主观" => QuestionType.Essay,
+                "地图绘制" => QuestionType.MapDrawing,
                 _ => QuestionType.SingleChoice
             };
         }

@@ -1,0 +1,53 @@
+{
+  "questionId": "test-map-001",
+  "studentId": "student-001",
+  "submissionTime": "2024-01-15T14:30:00Z",
+  "drawingData": [
+    {
+      "type": "point",
+      "coordinates": [116.3966, 39.9086],
+      "properties": {
+        "name": "消防车位置",
+        "icon": "truck",
+        "color": "#e74c3c",
+        "timestamp": "2024-01-15T14:25:12Z"
+      }
+    },
+    {
+      "type": "line",
+      "coordinates": [
+        [116.3966, 39.9086],
+        [116.3971, 39.9091],
+        [116.3976, 39.9094],
+        [116.3978, 39.9096]
+      ],
+      "properties": {
+        "name": "救援路线",
+        "color": "#3498db",
+        "width": 3,
+        "style": "solid",
+        "timestamp": "2024-01-15T14:27:45Z"
+      }
+    },
+    {
+      "type": "point",
+      "coordinates": [116.3973, 39.9092],
+      "properties": {
+        "name": "集合点",
+        "icon": "meeting-point",
+        "color": "#27ae60",
+        "timestamp": "2024-01-15T14:29:30Z"
+      }
+    }
+  ],
+  "metadata": {
+    "totalDrawingTime": 1245,
+    "toolUsage": {
+      "point": 2,
+      "line": 1,
+      "polygon": 0
+    },
+    "revisions": 3,
+    "finalSubmission": true
+  }
+}

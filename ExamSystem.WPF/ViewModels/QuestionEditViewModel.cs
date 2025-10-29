@@ -54,24 +54,21 @@ namespace ExamSystem.WPF.ViewModels
             get => _question;
             set
             {
-                if (_question != value)
-                {
-                    _question = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(DialogTitle));
-                    OnPropertyChanged(nameof(SaveButtonText));
-                    OnPropertyChanged(nameof(IsChoiceQuestion));
-                    OnPropertyChanged(nameof(IsSingleChoice));
-                    OnPropertyChanged(nameof(IsMultipleChoice));
-                    OnPropertyChanged(nameof(IsTrueFalse));
-                    OnPropertyChanged(nameof(IsFillInBlank));
-                    OnPropertyChanged(nameof(ShowTraditionalAnswerInput));
-                    OnPropertyChanged(nameof(AnswerTooltip));
-                    OnPropertyChanged(nameof(SingleChoiceGroupName));
-                    OnPropertyChanged(nameof(TrueFalseAnswer));
-                    OnPropertyChanged(nameof(FillBlankContent));
-                    LoadOptions();
-                }
+                _question = value;
+                OnPropertyChanged(nameof(Question));
+                OnPropertyChanged(nameof(DialogTitle));
+                OnPropertyChanged(nameof(SaveButtonText));
+                OnPropertyChanged(nameof(IsChoiceQuestion));
+                OnPropertyChanged(nameof(IsSingleChoice));
+                OnPropertyChanged(nameof(IsMultipleChoice));
+                OnPropertyChanged(nameof(IsTrueFalse));
+                OnPropertyChanged(nameof(IsFillInBlank));
+                OnPropertyChanged(nameof(IsMapDrawing));
+                OnPropertyChanged(nameof(ShowTraditionalAnswerInput));
+                OnPropertyChanged(nameof(AnswerTooltip));
+                OnPropertyChanged(nameof(TrueFalseAnswer));
+                OnPropertyChanged(nameof(FillBlankContent));
+                OnPropertyChanged(nameof(SingleChoiceGroupName));
             }
         }
 
@@ -130,7 +127,8 @@ namespace ExamSystem.WPF.ViewModels
             { QuestionType.TrueFalse, "判断题" },
             { QuestionType.FillInBlank, "填空题" },
             { QuestionType.ShortAnswer, "简答题" },
-            { QuestionType.Essay, "论述题" }
+            { QuestionType.Essay, "论述题" },
+            { QuestionType.MapDrawing, "地图绘制题" }
         };
 
         /// <summary>
@@ -163,6 +161,7 @@ namespace ExamSystem.WPF.ViewModels
                     OnPropertyChanged(nameof(IsMultipleChoice));
                     OnPropertyChanged(nameof(IsTrueFalse));
                     OnPropertyChanged(nameof(IsFillInBlank));
+                    OnPropertyChanged(nameof(IsMapDrawing));
                     OnPropertyChanged(nameof(ShowTraditionalAnswerInput));
                     OnPropertyChanged(nameof(AnswerTooltip));
                     OnPropertyChanged(nameof(TrueFalseAnswer));
@@ -229,7 +228,9 @@ namespace ExamSystem.WPF.ViewModels
         /// <summary>
         /// 是否需要显示传统答案输入框（排除选择题、判断题）
         /// </summary>
-        public bool ShowTraditionalAnswerInput => !IsChoiceQuestion && !IsTrueFalse;
+        //public bool IsMapDrawing => Question.QuestionType == QuestionType.MapDrawing;
+        public bool IsMapDrawing = false;
+        public bool ShowTraditionalAnswerInput => !IsChoiceQuestion && !IsTrueFalse && !IsMapDrawing;
 
         /// <summary>
         /// 判断题答案选择（True/False）
@@ -314,6 +315,7 @@ namespace ExamSystem.WPF.ViewModels
             QuestionType.MultipleChoice => "多选题答案格式：A,B,C 或 1,2,3",
             QuestionType.TrueFalse => "判断题答案格式：True 或 False",
             QuestionType.FillInBlank => "填空题答案格式：答案1;答案2;答案3",
+            QuestionType.MapDrawing => "地图绘制题答案将在地图编辑器中配置",
             _ => "请输入正确答案"
         };
 
@@ -610,6 +612,8 @@ namespace ExamSystem.WPF.ViewModels
 
         private bool CanSave()
         {
+            // 地图绘制题不在本对话框直接保存
+            if (IsMapDrawing) return false;
             return !IsLoading && !string.IsNullOrWhiteSpace(Question.Content);
         }
 

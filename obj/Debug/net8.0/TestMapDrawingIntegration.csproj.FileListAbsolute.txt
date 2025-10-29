@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingIntegration.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingIntegration.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingIntegration.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingIntegration.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingIntegration.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\TestMapDrawingIntegration.sourcelink.json
