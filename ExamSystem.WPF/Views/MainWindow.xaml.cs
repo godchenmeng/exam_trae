@@ -98,6 +98,7 @@ namespace ExamSystem.WPF.Views
                 TabUserManagement.Visibility = Visibility.Collapsed;
                 TabMessageCenter.Visibility = Visibility.Collapsed;
                 TabLearningResources.Visibility = Visibility.Collapsed;
+                TabBuildingManagement.Visibility = Visibility.Collapsed;
                 // 新增：成绩管理入口
                 if (TabGradeManagement != null)
                 {
@@ -122,6 +123,7 @@ namespace ExamSystem.WPF.Views
                                         ? Visibility.Visible : Visibility.Collapsed;
             TabStatistics.Visibility = _permissionService.HasModuleAccess(role, "StatisticsReports") ? Visibility.Visible : Visibility.Collapsed;
             TabUserManagement.Visibility = _permissionService.HasModuleAccess(role, "UserManagement") ? Visibility.Visible : Visibility.Collapsed;
+            TabBuildingManagement.Visibility = _permissionService.HasModuleAccess(role, "BuildingManagement") ? Visibility.Visible : Visibility.Collapsed;
             
             // 新增模块：使用常量类
             TabMessageCenter.Visibility = _permissionService.HasModuleAccess(role, ModuleKeys.MessageCenter) ? Visibility.Visible : Visibility.Collapsed;
@@ -250,6 +252,13 @@ namespace ExamSystem.WPF.Views
                 // 加载用户管理
                 var userManagementView = _serviceProvider.GetRequiredService<UserManagementView>();
                 UserManagementFrame.Content = userManagementView;
+
+                // 加载建筑物管理
+                if (_currentUser != null && _currentUser.Role == ExamSystem.Domain.Enums.UserRole.Admin)
+                {
+                    var buildingManagementView = _serviceProvider.GetRequiredService<BuildingManagementView>();
+                    BuildingManagementFrame.Content = buildingManagementView;
+                }
 
                 _logger.LogInformation("所有页面加载完成");
             }
@@ -409,6 +418,31 @@ namespace ExamSystem.WPF.Views
                     else
                     {
                         _logger.LogInformation("ExamResultFrame.Content不是StudentExamResultView类型（可能为教师/管理员视图）");
+                    }
+                }
+
+                // 同步更新 BuildingManagementViewModel 的用户信息
+                _logger.LogInformation($"BuildingManagementFrame是否为null: {BuildingManagementFrame == null}");
+                if (BuildingManagementFrame != null)
+                {
+                    _logger.LogInformation($"BuildingManagementFrame.Content是否为null: {BuildingManagementFrame.Content == null}");
+                    if (BuildingManagementFrame.Content is BuildingManagementView buildingManagementView)
+                    {
+                        _logger.LogInformation("BuildingManagementFrame.Content是BuildingManagementView类型");
+                        if (buildingManagementView.DataContext is BuildingManagementViewModel buildingVm)
+                        {
+                            _logger.LogInformation("找到BuildingManagementViewModel，正在设置用户信息");
+                            buildingVm.SetCurrentUser(_currentUser);
+                            _logger.LogInformation("BuildingManagementViewModel用户信息设置完成");
+                        }
+                        else
+                        {
+                            _logger.LogWarning("BuildingManagementView.DataContext不是BuildingManagementViewModel类型或为null");
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation("BuildingManagementFrame.Content不是BuildingManagementView类型");
                     }
                 }
 

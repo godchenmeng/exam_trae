@@ -220,6 +220,12 @@ namespace ExamSystem.WPF.Views
             NavigateToTab("TabUserManagement");
         }
 
+        private void BuildingManagementButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 导航到建筑物管理
+            NavigateToTab("TabBuildingManagement");
+        }
+
         private void SystemSettingsButton_Click(object sender, RoutedEventArgs e)
         {
             // 暂未实现系统设置模块，先提示

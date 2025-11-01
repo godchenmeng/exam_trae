@@ -46,7 +46,17 @@ namespace ExamSystem.WPF
                 appLogger.LogInformation("SQLite 数据库路径: {DbPath}", dbPath);
 
                 // 确保数据库迁移已应用（避免缺失列导致运行时错误，如 IsPublished）
-                await context.Database.MigrateAsync();
+                try
+                {
+                    await context.Database.MigrateAsync();
+                    appLogger.LogInformation("数据库迁移应用成功");
+                }
+                catch (Exception migrationEx)
+                {
+                    appLogger.LogWarning(migrationEx, "数据库迁移过程中出现警告，尝试确保数据库连接");
+                    // 如果迁移失败，尝试确保数据库可以连接
+                    await context.Database.EnsureCreatedAsync();
+                }
 
                 var seeder = new DatabaseSeeder(context, logger);
                 await seeder.SeedAsync();
@@ -91,6 +101,8 @@ namespace ExamSystem.WPF
                     // 新增通知模块 Repository
                     services.AddScoped<INotificationRepository, NotificationRepository>();
                     services.AddScoped<INotificationRecipientRepository, NotificationRecipientRepository>();
+                    // 新增：建筑数据仓储（用于地图绘制题建筑数据加载）
+                    services.AddScoped<IBuildingRepository, BuildingRepository>();
 
                     // Service层
                     services.AddScoped<IUserService, UserService>();
@@ -109,6 +121,8 @@ namespace ExamSystem.WPF
                     services.AddScoped<IDashboardService, DashboardService>();
                     // 新增：地图绘制服务
                     services.AddScoped<IMapDrawingService, MapDrawingService>();
+                    // 新增：建筑物管理服务
+                    services.AddScoped<IBuildingService, BuildingService>();
 
                     // ViewModels
                     services.AddTransient<DashboardViewModel>();
@@ -123,6 +137,9 @@ namespace ExamSystem.WPF
                     services.AddTransient<QuestionBankViewModel>();
                     services.AddTransient<StatisticsViewModel>();
                     services.AddTransient<UserManagementViewModel>();
+                    // 新增：建筑物管理 ViewModel
+                    services.AddTransient<BuildingManagementViewModel>();
+                    services.AddTransient<BuildingEditViewModel>();
 
                     // 新增通知相关 ViewModel
                     services.AddTransient<MessageCenterViewModel>();
@@ -186,6 +203,12 @@ namespace ExamSystem.WPF
                      services.AddTransient<FullScreenExamWindow>();
                      // 新增成绩管理视图
                      services.AddTransient<GradeManagementView>();
+                    // 新增建筑物管理视图（注入 ViewModel）
+                    services.AddTransient<BuildingManagementView>(provider =>
+                    {
+                        var vm = provider.GetRequiredService<BuildingManagementViewModel>();
+                        return new BuildingManagementView(vm);
+                    });
                     // 新增通知发送视图（注入 ViewModel）
                     services.AddTransient<NotificationSendView>(provider =>
                     {

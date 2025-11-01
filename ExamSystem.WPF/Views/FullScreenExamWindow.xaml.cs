@@ -15,6 +15,8 @@ using System.Text.Json;
 using System.Collections.Generic;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Domain.DTOs;
+using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 
 namespace ExamSystem.WPF.Views
 {
@@ -563,6 +565,80 @@ namespace ExamSystem.WPF.Views
                     url = "/index.html";
                 }
 
+                // 动态图标清单 API：/api/icons
+                if (string.Equals(url, "/api/icons", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var iconsRoot = Path.Combine(assetsPath, "icon");
+                        var result = new System.Collections.Generic.List<System.Collections.Generic.Dictionary<string, object>>();
+
+                        if (Directory.Exists(iconsRoot))
+                        {
+                            foreach (var dir in Directory.GetDirectories(iconsRoot))
+                            {
+                                var categoryName = Path.GetFileName(dir);
+                                var icons = new System.Collections.Generic.List<System.Collections.Generic.Dictionary<string, string>>();
+
+                                foreach (var file in Directory.GetFiles(dir))
+                                {
+                                    var ext = Path.GetExtension(file).ToLowerInvariant();
+                                    if (ext is ".png" or ".jpg" or ".jpeg" or ".svg" or ".gif" or ".webp")
+                                    {
+                                        var fileName = Path.GetFileNameWithoutExtension(file);
+                                        var fileBaseName = Path.GetFileName(file);
+                                        var relUrl = $"/icon/{categoryName}/{fileBaseName}";
+                                        icons.Add(new System.Collections.Generic.Dictionary<string, string>
+                                        {
+                                            ["name"] = fileName,
+                                            ["url"] = relUrl
+                                        });
+                                    }
+                                }
+
+                                result.Add(new System.Collections.Generic.Dictionary<string, object>
+                                {
+                                    ["name"] = categoryName,
+                                    ["icons"] = icons
+                                });
+                            }
+                        }
+
+                        var payload = new System.Collections.Generic.Dictionary<string, object>
+                        {
+                            ["categories"] = result,
+                            ["totalCount"] = result.Sum(c =>
+                            {
+                                if (c.TryGetValue("icons", out var iconsObj) && iconsObj is System.Collections.Generic.List<System.Collections.Generic.Dictionary<string, string>> list)
+                                {
+                                    return list.Count;
+                                }
+                                return 0;
+                            })
+                        };
+
+                        var json = JsonSerializer.Serialize(payload);
+                        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+                        response.StatusCode = 200;
+                        response.ContentType = "application/json; charset=utf-8";
+                        response.ContentLength64 = bytes.Length;
+                        response.OutputStream.Write(bytes, 0, bytes.Length);
+                        response.OutputStream.Close();
+                        return;
+                    }
+                    catch (Exception apiEx)
+                    {
+                        Debug.WriteLine($"FullScreenExamWindow /api/icons 生成失败: {apiEx.Message}");
+                        var error = System.Text.Encoding.UTF8.GetBytes("{\"error\":\"failed to list icons\"}");
+                        response.StatusCode = 500;
+                        response.ContentType = "application/json; charset=utf-8";
+                        response.ContentLength64 = error.Length;
+                        response.OutputStream.Write(error, 0, error.Length);
+                        response.OutputStream.Close();
+                        return;
+                    }
+                }
+
                 var filePath = Path.Combine(assetsPath, url.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
 
                 if (File.Exists(filePath))
@@ -576,6 +652,12 @@ namespace ExamSystem.WPF.Views
                         ".js" => "application/javascript; charset=utf-8",
                         ".css" => "text/css; charset=utf-8",
                         ".json" => "application/json; charset=utf-8",
+                        ".png" => "image/png",
+                        ".jpg" => "image/jpeg",
+                        ".jpeg" => "image/jpeg",
+                        ".svg" => "image/svg+xml",
+                        ".gif" => "image/gif",
+                        ".webp" => "image/webp",
                         _ => "application/octet-stream"
                     };
 
@@ -609,10 +691,24 @@ namespace ExamSystem.WPF.Views
                 var webView = sender as WebView2;
                 if (webView?.CoreWebView2 != null && e.IsSuccess)
                 {
+                    
                     Debug.WriteLine("FullScreenExamWindow WebView2导航成功，开始处理");
                     
                     // 订阅WebView消息
                     webView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
+
+                    // 发送握手消息，通知前端WPF已准备好接收消息
+                    try
+                    {
+                        var readyMessage = new { type = "wpfReady" };
+                        var readyJson = JsonSerializer.Serialize(readyMessage);
+                        webView.CoreWebView2.PostWebMessageAsJson(readyJson);
+                        Debug.WriteLine("FullScreenExamWindow 已向WebView发送 wpfReady 握手消息");
+                    }
+                    catch (Exception sendReadyEx)
+                    {
+                        Debug.WriteLine($"FullScreenExamWindow 发送 wpfReady 握手失败: {sendReadyEx.Message}");
+                    }
 
                     // 如果当前是地图绘制题，加载题目配置
                     if (_viewModel?.CurrentQuestion?.QuestionType == "地图绘制题")
@@ -668,6 +764,7 @@ namespace ExamSystem.WPF.Views
                 }
 
                 var webView = MapWebView;
+
                 if (webView == null)
                 {
                     Debug.WriteLine("FullScreenExamWindow MapWebView为null，无法初始化");
@@ -682,6 +779,8 @@ namespace ExamSystem.WPF.Views
                     _isMapInitialized = true;
                     return;
                 }
+
+                
 
                 Debug.WriteLine("FullScreenExamWindow 开始设置WebView2环境选项...");
 
@@ -699,7 +798,7 @@ namespace ExamSystem.WPF.Views
                 if (webView.CoreWebView2 != null)
                 {
                     Debug.WriteLine("FullScreenExamWindow CoreWebView2初始化成功，开始配置设置...");
-
+                    webView.CoreWebView2.OpenDevToolsWindow();
                     // 配置WebView2设置
                     var settings = webView.CoreWebView2.Settings;
                     settings.IsScriptEnabled = true;
@@ -804,7 +903,7 @@ namespace ExamSystem.WPF.Views
 
                     if (webView.CoreWebView2 != null)
                     {
-                        webView.CoreWebView2.PostWebMessageAsString(messageJson);
+                        
                     }
                 }
             }
@@ -821,14 +920,64 @@ namespace ExamSystem.WPF.Views
         {
             try
             {
-                var messageJson = e.TryGetWebMessageAsString();
+                // 安全地获取消息字符串
+                string? messageJson = null;
+                try
+                {
+                    messageJson = e.WebMessageAsJson;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"FullScreenExamWindow 获取WebView消息字符串失败: {ex.Message}");
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(messageJson))
+                {
+                    Debug.WriteLine("FullScreenExamWindow 收到空的WebView消息");
+                    return;
+                }
+
                 Debug.WriteLine($"FullScreenExamWindow 收到WebView消息: {messageJson}");
 
-                var message = JsonSerializer.Deserialize<JsonElement>(messageJson);
-                var messageType = message.GetProperty("type").GetString();
+                // 安全地解析JSON
+                JsonElement message;
+                try
+                {
+                    message = JsonSerializer.Deserialize<JsonElement>(messageJson);
+                }
+                catch (JsonException ex)
+                {
+                    Debug.WriteLine($"FullScreenExamWindow JSON解析失败: {ex.Message}, 消息内容: {messageJson}");
+                    return;
+                }
+
+                // 安全地获取消息类型
+                string? messageType = null;
+                try
+                {
+                    if (message.TryGetProperty("type", out var typeProperty))
+                    {
+                        messageType = typeProperty.GetString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"FullScreenExamWindow 获取消息类型失败: {ex.Message}");
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(messageType))
+                {
+                    Debug.WriteLine("FullScreenExamWindow 消息类型为空或未找到");
+                    return;
+                }
 
                 switch (messageType)
                 {
+                    case "pageReady":
+                        _ = HandleBuildingDataRequest("guiyang");
+                        break;
                     case "overlayCountChanged":
                         var count = message.GetProperty("count").GetInt32();
                         if (_viewModel != null)
@@ -846,6 +995,49 @@ namespace ExamSystem.WPF.Views
                         // 处理自动保存
                         var autoSaveData = message.GetProperty("data").ToString() ?? "";
                         HandleAutoSaveMapDrawingData(autoSaveData);
+                        break;
+
+                    case "requestBuildingData":
+                        // 处理建筑数据请求
+                        Debug.WriteLine($"FullScreenExamWindow 收到requestBuildingData消息: {messageJson}");
+                        
+                        string cityName = "";
+                        try
+                        {
+                            // 尝试从data.cityName获取城市名称
+                            if (message.TryGetProperty("data", out var dataProperty) && 
+                                dataProperty.TryGetProperty("cityName", out var cityNameProperty))
+                            {
+                                cityName = cityNameProperty.GetString() ?? "";
+                                Debug.WriteLine($"FullScreenExamWindow 从data.cityName获取城市名称: {cityName}");
+                            }
+                            // 如果data.cityName不存在，尝试直接从cityName获取
+                            else if (message.TryGetProperty("cityName", out var directCityNameProperty))
+                            {
+                                cityName = directCityNameProperty.GetString() ?? "";
+                                Debug.WriteLine($"FullScreenExamWindow 从cityName获取城市名称: {cityName}");
+                            }
+                            else
+                            {
+                                Debug.WriteLine("FullScreenExamWindow 错误: 无法从消息中提取城市名称");
+                                break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"FullScreenExamWindow 提取城市名称失败: {ex.Message}");
+                            break;
+                        }
+                        
+                        if (!string.IsNullOrEmpty(cityName))
+                        {
+                            Debug.WriteLine($"FullScreenExamWindow 开始处理建筑数据请求，城市: {cityName}");
+                            _ = HandleBuildingDataRequest(cityName);
+                        }
+                        else
+                        {
+                            Debug.WriteLine("FullScreenExamWindow 错误: 城市名称为空");
+                        }
                         break;
                 }
             }
@@ -933,6 +1125,98 @@ namespace ExamSystem.WPF.Views
             {
                 var saveType = isAutoSave ? "自动保存" : "手动保存";
                 System.Diagnostics.Debug.WriteLine($"FullScreenExamWindow {saveType}地图绘制数据异常: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 处理建筑数据请求
+        /// </summary>
+        private async Task HandleBuildingDataRequest(string cityName)
+        {
+            try
+            {
+                Debug.WriteLine($"FullScreenExamWindow 收到建筑数据请求，城市键值: {cityName}");
+                
+                // 城市键值映射：前端传递的键值 -> 数据库中的城市键值
+                var cityMapping = new Dictionary<string, string>
+                {
+                    // 贵州省城市映射到测试数据城市
+                    { "guiyang", "贵阳市" },      // 贵阳 -> 北京（用于测试）
+                    { "zunyi", "遵义市" },       // 遵义 -> 上海（用于测试）
+                    { "liupanshui", "六盘水市" },   // 六盘水 -> 北京
+                    { "anshun", "安顺市" },      // 安顺 -> 上海
+                    { "bijie", "毕节市" },        // 毕节 -> 北京
+                    { "tongren", "铜仁市" },     // 铜仁 -> 上海
+                    { "qiandongnan", "黔东南苗族侗族自治州" },  // 黔东南 -> 北京
+                    { "qiannan", "黔南布依族苗族自治州" },     // 黔南 -> 上海
+                    { "qianxinan", "黔西南布依族苗族自治州" }
+                };
+
+                // 获取映射后的城市键值
+                var mappedCityName = cityMapping.ContainsKey(cityName) ? cityMapping[cityName] : cityName;
+                Debug.WriteLine($"FullScreenExamWindow 城市键值映射: {cityName} -> {mappedCityName}");
+
+                // 从依赖注入容器获取BuildingRepository
+                var serviceProvider = ((App)Application.Current).GetServices();
+                var buildingRepository = serviceProvider.GetRequiredService<ExamSystem.Infrastructure.Repositories.IBuildingRepository>();
+
+                // 获取该城市的所有建筑数据
+                var buildings = await buildingRepository.GetBuildingsByCityAsync(mappedCityName);
+                Debug.WriteLine($"FullScreenExamWindow 查询到建筑数据数量: {buildings?.Count() ?? 0}");
+
+                // 转换为前端需要的格式
+                var buildingData = buildings.Select(b => new
+                {
+                    id = b.Id,
+                    name = b.OrgName,
+                    type = b.OrgType, // 1-消防队站；2-专职队；3-重点建筑
+                    latitude = b.GetCoordinates()?[1] ?? 0, // 纬度
+                    longitude = b.GetCoordinates()?[0] ?? 0, // 经度
+                    address = b.Address ?? "",
+                    phone = "", // Building实体没有phone字段
+                    description = b.GetOrgTypeDescription()
+                }).ToList();
+
+                Debug.WriteLine($"FullScreenExamWindow 转换后的建筑数据: {System.Text.Json.JsonSerializer.Serialize(buildingData)}");
+
+                // 发送建筑数据到WebView
+                var responseMessage = new
+                {
+                    type = "buildingDataResponse",
+                    cityName = cityName, // 返回原始城市键值
+                    buildings = buildingData
+                };
+
+                var responseJson = System.Text.Json.JsonSerializer.Serialize(responseMessage);
+                Debug.WriteLine($"FullScreenExamWindow 发送建筑数据响应: {responseJson}");
+
+                if (MapWebView?.CoreWebView2 != null)
+                {
+                    MapWebView.CoreWebView2.PostWebMessageAsJson(responseJson);
+                    Debug.WriteLine("FullScreenExamWindow 建筑数据已发送到WebView");
+                }
+                else
+                {
+                    Debug.WriteLine("FullScreenExamWindow 错误: WebView未初始化");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"FullScreenExamWindow 处理建筑数据请求失败: {ex.Message}");
+                
+                // 发送错误响应
+                var errorMessage = new
+                {
+                    type = "buildingDataError",
+                    cityName = cityName,
+                    error = ex.Message
+                };
+
+                var errorJson = System.Text.Json.JsonSerializer.Serialize(errorMessage);
+                if (MapWebView?.CoreWebView2 != null)
+                {
+                    MapWebView.CoreWebView2.PostWebMessageAsJson(errorJson);
+                }
             }
         }
 

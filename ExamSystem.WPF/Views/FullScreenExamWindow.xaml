@@ -435,21 +435,6 @@
                                     </Grid>
                                 </Border>
                                 
-                                <!-- 地图状态栏 -->
-                                <Border Grid.Row="2" Background="#F8F9FA" BorderBrush="#DEE2E6" 
-                                        BorderThickness="1" CornerRadius="0,0,6,6" Padding="15,8">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="绘制图形数量：" VerticalAlignment="Center" FontSize="12"/>
-                                        <TextBlock Text="{Binding MapDrawingOverlayCount}" VerticalAlignment="Center"
-                                                   FontSize="12" FontWeight="Bold" Foreground="#007BFF"/>
-                                        
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="20,0,0,0">
-                                            <Button Content="保存当前绘制" Padding="6,2" FontSize="11"
-                                                    Background="#17A2B8" Foreground="White" BorderBrush="#138496"
-                                                    Command="{Binding SaveMapDrawingCommand}"/>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Border>
                             </Grid>
                         </StackPanel>
                     </Border>

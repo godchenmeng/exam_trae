@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net8.0\TestBuildingData.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net8.0\TestBuildingData.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net8.0\TestBuildingData.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\TestBuildingData.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net8.0\TestBuildingData.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\TestBuildingData.sourcelink.json

@@ -125,7 +125,7 @@ public class QuestionSearchCriteria
 /// </summary>
 public class ValidationResult
 {
-    public bool IsValid { get; set; }
+    public bool IsValid { get; set; } = true;
     public List<string> Errors { get; set; } = new();
     
     public void AddError(string error)
@@ -133,5 +133,5 @@ public class ValidationResult
         IsValid = false;
         Errors.Add(error);
     }
-    }
+}
 }

@@ -1,0 +1,212 @@
+<Window x:Class="ExamSystem.WPF.Views.BuildingEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ExamSystem.WPF.Views"
+        mc:Ignorable="d"
+        Title="{Binding IsEditMode, Converter={StaticResource BooleanToStringConverter}, ConverterParameter='编辑建筑|添加建筑'}"
+        Height="600" Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/CommonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- 布尔值到字符串转换器 -->
+            <local:BooleanToStringConverter x:Key="BooleanToStringConverter"/>
+            
+            <!-- 验证错误样式 -->
+            <Style x:Key="ValidationTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource ModernTextBoxStyle}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding HasValidationErrors}" Value="True">
+                        <Setter Property="BorderBrush" Value="#E74C3C"/>
+                        <Setter Property="BorderThickness" Value="2"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="20,15">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding IsEditMode, Converter={StaticResource BooleanToStringConverter}, ConverterParameter='✏️|➕'}" 
+                           FontSize="20" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="{Binding IsEditMode, Converter={StaticResource BooleanToStringConverter}, ConverterParameter='编辑建筑信息|添加新建筑'}" 
+                           Style="{StaticResource TitleTextStyle}" 
+                           Foreground="White"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 表单内容 -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="30,20">
+            <StackPanel>
+                <!-- 基本信息 -->
+                <GroupBox Header="基本信息" Style="{StaticResource ModernGroupBoxStyle}" Margin="0,0,0,20">
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 建筑名称 -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="建筑名称*" Style="{StaticResource LabelTextStyle}"/>
+                        <StackPanel Grid.Row="0" Grid.Column="1">
+                            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ValidationTextBoxStyle}"
+                                     MaxLength="100"/>
+                            <TextBlock Text="{Binding ValidationErrors[Name]}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding ValidationErrors[Name], Converter={StaticResource StringToVisibilityConverter}}"/>
+                        </StackPanel>
+
+                        <!-- 地址 -->
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="地址*" Style="{StaticResource LabelTextStyle}" Margin="0,15,0,0"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,15,0,0">
+                            <TextBox Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ValidationTextBoxStyle}"
+                                     MaxLength="200"/>
+                            <TextBlock Text="{Binding ValidationErrors[Address]}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding ValidationErrors[Address], Converter={StaticResource StringToVisibilityConverter}}"/>
+                        </StackPanel>
+
+                        <!-- 城市 -->
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="城市*" Style="{StaticResource LabelTextStyle}" Margin="0,15,0,0"/>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,15,0,0">
+                            <TextBox Text="{Binding City, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ValidationTextBoxStyle}"
+                                     MaxLength="50"/>
+                            <TextBlock Text="{Binding ValidationErrors[City]}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding ValidationErrors[City], Converter={StaticResource StringToVisibilityConverter}}"/>
+                        </StackPanel>
+
+                        <!-- 建筑类型 -->
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="建筑类型*" Style="{StaticResource LabelTextStyle}" Margin="0,15,0,0"/>
+                        <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,15,0,0">
+                            <ComboBox ItemsSource="{Binding BuildingTypeOptions}" 
+                                      SelectedValue="{Binding BuildingType}"
+                                      SelectedValuePath="Value"
+                                      DisplayMemberPath="DisplayName"
+                                      Style="{StaticResource ModernComboBoxStyle}"/>
+                            <TextBlock Text="{Binding ValidationErrors[BuildingType]}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding ValidationErrors[BuildingType], Converter={StaticResource StringToVisibilityConverter}}"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <!-- 位置信息 -->
+                <GroupBox Header="位置信息" Style="{StaticResource ModernGroupBoxStyle}" Margin="0,0,0,20">
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 经度 -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="经度*" Style="{StaticResource LabelTextStyle}"/>
+                        <StackPanel Grid.Row="0" Grid.Column="1">
+                            <TextBox Text="{Binding Longitude, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ValidationTextBoxStyle}"/>
+                            <TextBlock Text="{Binding ValidationErrors[Longitude]}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding ValidationErrors[Longitude], Converter={StaticResource StringToVisibilityConverter}}"/>
+                        </StackPanel>
+
+                        <!-- 纬度 -->
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="纬度*" Style="{StaticResource LabelTextStyle}" Margin="15,0,0,0"/>
+                        <StackPanel Grid.Row="0" Grid.Column="3" Margin="15,0,0,0">
+                            <TextBox Text="{Binding Latitude, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ValidationTextBoxStyle}"/>
+                            <TextBlock Text="{Binding ValidationErrors[Latitude]}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding ValidationErrors[Latitude], Converter={StaticResource StringToVisibilityConverter}}"/>
+                        </StackPanel>
+
+                        <!-- 地图选择按钮 -->
+                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" 
+                                Command="{Binding SelectLocationCommand}"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Content="📍 在地图上选择位置" 
+                                Margin="0,15,0,0"
+                                HorizontalAlignment="Left"/>
+                    </Grid>
+                </GroupBox>
+
+                <!-- 描述信息 -->
+                <GroupBox Header="描述信息" Style="{StaticResource ModernGroupBoxStyle}">
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="描述" Style="{StaticResource LabelTextStyle}"/>
+                        <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                            <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ValidationTextBoxStyle}"
+                                     MaxLength="500"
+                                     Height="80"
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"
+                                     VerticalScrollBarVisibility="Auto"/>
+                            <TextBlock Text="{Binding ValidationErrors[Description]}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding ValidationErrors[Description], Converter={StaticResource StringToVisibilityConverter}}"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- 状态栏 -->
+        <Border Grid.Row="2" Background="#F8F9FA" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="20,10">
+            <TextBlock Text="{Binding StatusMessage}" 
+                       Style="{StaticResource BodyTextStyle}" 
+                       Foreground="{StaticResource SecondaryTextBrush}"/>
+        </Border>
+
+        <!-- 按钮栏 -->
+        <Border Grid.Row="3" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="20,15">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Command="{Binding CancelCommand}" 
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Content="取消" 
+                        Width="80" 
+                        Margin="0,0,10,0"/>
+                <Button Command="{Binding SaveCommand}" 
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Content="{Binding IsEditMode, Converter={StaticResource BooleanToStringConverter}, ConverterParameter='更新|保存'}" 
+                        Width="80"
+                        IsEnabled="{Binding IsSaving, Converter={StaticResource InverseBooleanConverter}}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

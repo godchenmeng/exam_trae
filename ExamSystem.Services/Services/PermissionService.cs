@@ -82,6 +82,14 @@ public class PermissionService : IPermissionService
             "SystemSettings" => userRole == UserRole.Admin,
             "ViewLogs" => userRole == UserRole.Admin,
 
+            // 建筑物管理权限
+            "building:view" => userRole == UserRole.Admin,
+            "building:add" => userRole == UserRole.Admin,
+            "building:edit" => userRole == UserRole.Admin,
+            "building:delete" => userRole == UserRole.Admin,
+            "building:import" => userRole == UserRole.Admin,
+            "building:export" => userRole == UserRole.Admin,
+
             // 消息通知与学习资源（新增权限点）
             PermissionKeys.SendNotification => userRole == UserRole.Admin || userRole == UserRole.Teacher,
             PermissionKeys.ViewNotification => true, // 所有角色可查看通知
@@ -112,6 +120,7 @@ public class PermissionService : IPermissionService
         return module switch
         {
             "UserManagement" => userRole == UserRole.Admin,
+            "BuildingManagement" => userRole == UserRole.Admin,
             "QuestionBankManagement" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
             "ExamPaperManagement" => userRole == UserRole.Admin || userRole == UserRole.Teacher,
             ModuleKeys.ExamManagement => true, // 所有用户都可以访问考试模块
@@ -185,6 +194,7 @@ public class PermissionService : IPermissionService
                 "GradeExam", "ViewAllGrades",
                 "ViewStatistics", "ExportStatistics",
                 "SystemSettings", "ViewLogs",
+                "building:view", "building:add", "building:edit", "building:delete", "building:import", "building:export",
                 PermissionKeys.SendNotification,
                 PermissionKeys.ViewNotification,
                 PermissionKeys.ReceiveNotification,

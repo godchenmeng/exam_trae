@@ -28,6 +28,11 @@ namespace ExamSystem.Services.Models
         public int FailureCount { get; set; }
 
         /// <summary>
+        /// 失败数量（别名）
+        /// </summary>
+        public int FailedCount => FailureCount;
+
+        /// <summary>
         /// 错误信息列表
         /// </summary>
         public List<string> ErrorMessages { get; set; } = new List<string>();
@@ -53,9 +58,14 @@ namespace ExamSystem.Services.Models
         public List<ImportFailureInfo> FailedQuestions { get; set; } = new List<ImportFailureInfo>();
 
         /// <summary>
+        /// 导入失败的项目信息（通用）
+        /// </summary>
+        public List<ImportFailedItem> FailedItems { get; set; } = new List<ImportFailedItem>();
+
+        /// <summary>
         /// 导入摘要信息
         /// </summary>
-        public string Summary => $"总计 {TotalCount} 条记录，成功 {SuccessCount} 条，失败 {FailureCount} 条";
+        public string Summary => $"总计 {TotalCount} 条记录，成功 {SuccessCount} 条，失败 {FailedCount} 条";
     }
 
     /// <summary>
@@ -80,5 +90,14 @@ namespace ExamSystem.Services.Models
         public string Title { get; set; } = string.Empty;
         public string ErrorMessage { get; set; } = string.Empty;
         public string RawData { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// 导入失败的项目信息（通用）
+    /// </summary>
+    public class ImportFailedItem
+    {
+        public string Data { get; set; } = string.Empty;
+        public List<string> Errors { get; set; } = new List<string>();
     }
 }

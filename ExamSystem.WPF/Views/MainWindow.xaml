@@ -244,6 +244,22 @@
                 </TabItem.HeaderTemplate>
                 <Frame Name="UserManagementFrame" NavigationUIVisibility="Hidden"/>
             </TabItem>
+
+            <!-- 建筑物管理 -->
+            <TabItem x:Name="TabBuildingManagement" Header="建筑物管理" Style="{StaticResource ModernTabItem}">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🏢" 
+                                      FontSize="16" 
+                                      VerticalAlignment="Center" 
+                                      Margin="0,0,4,0"/>
+                            <TextBlock Text="建筑物管理" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <Frame Name="BuildingManagementFrame" NavigationUIVisibility="Hidden"/>
+            </TabItem>
         </TabControl>
 
         <!-- 状态栏 -->

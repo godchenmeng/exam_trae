@@ -1,25 +1,4 @@
-// 简化的图标数据（示例）
-const IconStore = (() => {
-  function svgData(color) {
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><circle cx='24' cy='24' r='20' fill='${color}'/></svg>`;
-    return 'data:image/svg+xml;base64,' + btoa(svg);
-  }
-  const allIcons = Array.from({length: 60}).map((_, i) => ({
-    id: i+1,
-    name: '图标 ' + (i+1),
-    data: svgData(['#007bff','#28a745','#ffc107','#dc3545','#6f42c1'][i%5]),
-    category: ['building','fire','poi'][i%3]
-  }));
-  return {
-    query: function(category, page, pageSize) {
-      const list = category && category!=='all' ? allIcons.filter(x=>x.category===category) : allIcons;
-      const total = list.length;
-      const start = (page-1)*pageSize;
-      const pageList = list.slice(start, start+pageSize);
-      return { total, list: pageList };
-    }
-  };
-})();
+// 动态图标数据：从 /api/icons 加载
 
 // 页面主逻辑（基于 BMapGL WebGL）
 const App = {
@@ -27,14 +6,22 @@ const App = {
   drawingManager: null,
   currentTool: null,
   overlays: [], // { id, overlay, type, name }
+  customOverlays: {}, // 存储自定义覆盖物（纹理覆盖物和水带头标记）
   selectedMarkerIcon: null,
+  selectedMarkerIconName: null,
   iconCategory: 'all',
   iconPage: 1,
   iconPageSize: 42,
   iconTotal: 0,
   iconModal: null,
+  // 图标数据
+  iconsLoaded: false,
+  iconCategories: [], // [{ name, icons: [{name, url}] }]
+  allIconsFlat: [],
   buildingMarkers: { dz: [], zz: [], zd: [] },
-  // 确认定位按钮的目标缩放级别（数值越大越“放大”）。如需改为更远视野，可将其改小。
+  // 存储建筑数据，按类型分类
+  buildingData: { dz: [], zz: [], zd: [] },
+  // 确认定位按钮的目标缩放级别（数值越大越"放大"）。如需改为更远视野，可将其改小。
   confirmCenterZoom: 18,
 
   cityCenters: {
@@ -67,13 +54,65 @@ const App = {
 
     // 图标模态框
     this.iconModal = new bootstrap.Modal(document.getElementById('iconModal'));
-    this.renderIconPage();
+    // 加载图标数据后渲染
+    this.loadIcons().then(() => {
+      this.populateIconCategories();
+      this.renderIconPage();
+    }).catch(err => {
+      console.error('加载图标失败:', err);
+      // 仍然初始化空内容以避免界面报错
+      this.renderIconPage();
+    });
 
     // 绑定事件
     this.bindEvents();
 
+    // 初始化WebView2消息监听
+    this.initWebViewMessageListener();
+
     // 初始渲染覆盖物列表
     this.renderOverlayList();
+  },
+
+  // 从内置HTTP服务器加载图标清单
+  async loadIcons() {
+    try {
+      const resp = await fetch('/api/icons', { cache: 'no-store' });
+      if (!resp.ok) throw new Error('图标接口返回错误: ' + resp.status);
+      const data = await resp.json();
+      const categories = Array.isArray(data.categories) ? data.categories : [];
+      // 规范化结构
+      this.iconCategories = categories.map(c => ({
+        name: c.name,
+        icons: Array.isArray(c.icons) ? c.icons.map(i => ({ name: i.name, url: i.url })) : []
+      }));
+      // 汇总全部图标
+      this.allIconsFlat = this.iconCategories.flatMap(c => c.icons);
+      this.iconsLoaded = true;
+      console.log('[IconLoader] 已加载图标分类:', this.iconCategories.map(c => ({ name: c.name, count: c.icons.length })));
+    } catch (e) {
+      this.iconsLoaded = false;
+      console.error('[IconLoader] 加载失败:', e);
+      throw e;
+    }
+  },
+
+  // 填充分类下拉框
+  populateIconCategories() {
+    try {
+      const sel = document.getElementById('selectIconCategory');
+      if (!sel) return;
+      // 保留第一个“全部分类”选项，清空后续
+      sel.querySelectorAll('option:not([value="all"])').forEach(opt => opt.remove());
+      this.iconCategories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat.name;
+        opt.textContent = cat.name;
+        sel.appendChild(opt);
+      });
+    } catch (e) {
+      console.warn('填充分类失败:', e);
+    }
   },
 
   
@@ -105,6 +144,15 @@ const App = {
           const icon = new BMapGL.Icon(this.selectedMarkerIcon, new BMapGL.Size(36,36), { anchor: new BMapGL.Size(18,36) });
           overlay.setIcon(icon);
         } catch(err){}
+      }
+
+      // 为水带（polyline）添加特殊样式
+      if (type === 'polyline') {
+        try {
+          this.setupWaterHoseStyle(overlay);
+        } catch(err) {
+          console.error('设置水带样式失败:', err);
+        }
       }
 
       const id = 'ov-' + (this.overlays.length + 1);
@@ -157,9 +205,10 @@ const App = {
                 tipInput.classList.remove('is-invalid');
               } else {
                 tipInput.classList.add('is-invalid');
-                alert('未能找到该地名，请使用 "lat,lng" 格式或更换关键词');
+                alert('未能找到该地名，请更换关键词');
               }
             }, cityName);
+            this.notifyWPF('requestBuildingData', { cityName: cityName });
           } catch (err) {
             tipInput.classList.add('is-invalid');
             alert('请输入格式为 "lat,lng" 的坐标，例如：26.65,106.63');
@@ -294,6 +343,9 @@ const App = {
         document.getElementById('zzCount').textContent = 0;
         document.getElementById('zdCount').textContent = 0;
         ['chkDz','chkZz','chkZd'].forEach(id => { const el = document.getElementById(id); if (el) el.checked = false; });
+            
+        // 请求该城市的建筑数据
+        this.requestBuildingData(cityKey);
       }
     });
 
@@ -302,7 +354,22 @@ const App = {
     document.getElementById('chkZd').addEventListener('change', (ev) => this.toggleBuilding('zd', ev.target.checked));
 
     document.getElementById('btnClear').addEventListener('click', () => {
-      this.overlays.forEach(ov => { try { this.map.removeOverlay(ov.overlay); } catch(e){} });
+      this.overlays.forEach(ov => { 
+        try { this.map.removeOverlay(ov.overlay); } catch(e){}
+        try { if (ov.nameLabel) this.map.removeOverlay(ov.nameLabel); } catch(e){}
+        
+        // 如果是水带，清理相关覆盖物
+        if (ov.type === 'polyline') {
+          // 清理旧的纹理覆盖物（向后兼容）
+          if (ov.overlay._waterHoseOverlay) {
+            this.clearCustomOverlays(ov.overlay._waterHoseOverlay.id);
+          }
+          // 清理新的LineLayer水带
+          if (ov.overlay._waterHoseLineLayer) {
+            this.clearHoseLineLayer(ov.overlay._waterHoseLineLayer.id);
+          }
+        }
+      });
       this.overlays = [];
       this.renderOverlayList();
     });
@@ -361,25 +428,87 @@ const App = {
   },
 
   toggleBuilding(type, checked) {
+    console.log(`toggleBuilding 调用 - 类型:${type}, 选中:${checked}`);
+    console.log(`当前 buildingData[${type}]:`, this.buildingData[type]);
+    
     if (checked) {
-      const cityKey = document.getElementById('selectCity').value;
-      const c = this.cityCenters[cityKey];
-      if (!c) return;
-      const base = [c.lat, c.lng];
-      const offsets = [[0.01,0.01],[0.015,-0.008],[-0.012,0.014],[-0.02,-0.006]];
-      const markers = offsets.map((off,i) => {
-        const pt = new BMapGL.Point(base[1]+off[1], base[0]+off[0]);
-        const m = new BMapGL.Marker(pt);
-        m.setTitle(`${type.toUpperCase()} 标记 ${i+1}`);
-        this.map.addOverlay(m);
-        return m;
-      });
-      this.buildingMarkers[type] = markers;
-      document.getElementById(type+'Count').textContent = markers.length;
+      this.showBuildingsByType(type);
     } else {
       this.clearBuildingMarkers(type);
-      document.getElementById(type+'Count').textContent = 0;
+      document.getElementById(type+'Count').textContent = this.buildingData[type] ? this.buildingData[type].length : 0;
     }
+  },
+
+  // 显示指定类型的建筑标记
+  showBuildingsByType(type) {
+    console.log(`showBuildingsByType 调用 - 类型:${type}`);
+    
+    // 清除现有标记
+    this.clearBuildingMarkers(type);
+    console.log(`已清除 ${type} 类型的现有标记`);
+    
+    // 检查是否有该类型的建筑数据
+    if (!this.buildingData[type] || this.buildingData[type].length === 0) {
+      console.log(`没有${type}类型的建筑数据`);
+      return;
+    }
+
+    console.log(`开始显示 ${type} 类型的 ${this.buildingData[type].length} 个建筑`);
+
+    // 为每个建筑创建标记
+    this.buildingData[type].forEach((building, index) => {
+      console.log(`创建第${index + 1}个${type}类型建筑标记:`, building);
+      
+      const point = new BMapGL.Point(building.lng, building.lat);
+      
+      // 创建标记
+      const marker = new BMapGL.Marker(point);
+      
+      // 设置自定义图标（如果图标文件存在）
+      try {
+        const icon = new BMapGL.Icon(building.iconUrl, new BMapGL.Size(32, 32), {
+          anchor: new BMapGL.Size(16, 32)
+        });
+        marker.setIcon(icon);
+      } catch (e) {
+        // 如果图标加载失败，使用默认标记
+        console.warn('图标加载失败，使用默认标记:', building.iconUrl);
+      }
+
+      // 添加信息窗口
+      const infoWindow = new BMapGL.InfoWindow(`
+        <div style="padding: 10px; min-width: 200px;">
+          <h6 style="margin: 0 0 8px 0; color: #333;">${building.orgName || '未知机构'}</h6>
+          <p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">
+            <strong>类型:</strong> ${building.typeText}
+          </p>
+          <p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">
+            <strong>地址:</strong> ${building.address}
+          </p>
+          <p style="margin: 0; font-size: 12px; color: #666;">
+            <strong>坐标:</strong> ${building.lng.toFixed(6)}, ${building.lat.toFixed(6)}
+          </p>
+        </div>
+      `, {
+        width: 250,
+        height: 120
+      });
+
+      // 点击标记显示信息窗口
+      marker.addEventListener('click', () => {
+        this.map.openInfoWindow(infoWindow, point);
+      });
+
+      // 添加到地图和存储数组
+      this.map.addOverlay(marker);
+      
+      if (!this.buildingMarkers[type]) {
+        this.buildingMarkers[type] = [];
+      }
+      this.buildingMarkers[type].push(marker);
+    });
+
+    console.log(`显示${type}类型建筑标记: ${this.buildingMarkers[type].length}个`);
   },
 
   clearBuildingMarkers(type) {
@@ -390,11 +519,15 @@ const App = {
 
   defaultOverlayName(type, idx) {
     switch(type) {
-      case 'marker': return `标记 ${idx}`;
-      case 'polyline': return `线 ${idx}`;
+      case 'marker': 
+        if (this.selectedMarkerIconName) {
+          return `${this.selectedMarkerIconName} ${idx}`;
+        }
+        return `标记 ${idx}`;
+      case 'polyline': return `水带 ${idx}`;
       case 'polygon': return `多边形 ${idx}`;
       case 'rectangle': return `矩形 ${idx}`;
-      case 'circle': return `圆 ${idx}`;
+      case 'circle': return `圆形 ${idx}`;
       default: return `图形 ${idx}`;
     }
   },
@@ -426,6 +559,12 @@ const App = {
       btnDel.addEventListener('click', () => {
         try { this.map.removeOverlay(ov.overlay); } catch(e){}
         try { if (ov.nameLabel) this.map.removeOverlay(ov.nameLabel); } catch(e){}
+        
+        // 如果是水带，清理相关纹理覆盖物和水带头
+        if (ov.type === 'polyline' && ov.overlay._waterHoseOverlay) {
+          this.clearCustomOverlays(ov.overlay._waterHoseOverlay.id);
+        }
+        
         this.overlays = this.overlays.filter(x => x.id !== ov.id);
         this.renderOverlayList();
       });
@@ -494,18 +633,456 @@ const App = {
       }
     } catch(err){}
   },
+  
+
+  // 设置水带样式
+  setupWaterHoseStyle(polyline) {
+    try {
+      const path = polyline.getPath();
+      if (!path || path.length < 2) return;
+
+      // 使用LineLayer替代纹理覆盖物
+      this.addHoseLineLayer(polyline);
+    } catch(err) {
+      console.error('设置水带样式失败:', err);
+    }
+  },
+
+  // 使用LineLayer创建水带显示
+  addHoseLineLayer(polyline) {
+    try {
+      const path = polyline.getPath();
+      const id = 'hose-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      
+      // 隐藏原始polyline
+      polyline.setStrokeOpacity(0);
+      
+      // 准备LineLayer数据
+      const lineData = {
+        type: 'FeatureCollection',
+        features: [{
+          type: 'Feature',
+          properties: {
+            name: id,
+            type: 'hose'
+          },
+          geometry: {
+            type: 'LineString',
+            coordinates: path.map(point => [point.lng, point.lat])
+          }
+        }]
+      };
+
+      // 创建LineLayer
+      if (!this.hoseLineLayer) {
+        this.hoseLineLayer = new BMapGL.LineLayer({
+          enablePicked: true,
+          autoSelect: true,
+          pickWidth: 30,
+          pickHeight: 30,
+          opacity: 1,
+          style: {
+            sequence: false,
+            marginLength: 16,
+            borderColor: '#999',
+            borderMask: true,
+            borderWeight: 0,
+            strokeWeight: 8,
+            strokeLineJoin: 'round',
+            strokeLineCap: 'square',
+            strokeColor: '#ff6600',
+            // 使用水带纹理图片
+            strokeTextureUrl: 'assets/icons/line.png',
+            strokeTextureWidth: 16,
+            strokeTextureHeight: 64,
+          }
+        });
+
+        // 添加点击事件
+        this.hoseLineLayer.addEventListener('click', (e) => {
+          if (e.value.dataIndex !== -1 && e.value.dataItem) {
+            console.log('点击了水带:', e.value.dataItem.properties.name);
+          }
+        });
+
+        // 将LineLayer添加到地图
+        this.map.addNormalLayer(this.hoseLineLayer);
+      }
+
+      // 获取现有数据并添加新的水带线
+      const existingData = this.hoseLineLayer.getData() || { type: 'FeatureCollection', features: [] };
+      existingData.features.push(lineData.features[0]);
+      
+      // 更新LineLayer数据
+      this.hoseLineLayer.setData(existingData);
+
+      // 添加水带头标记
+      const hoseHeadMarker = this.addHoseHeadMarker(polyline, null, id);
+
+      // 存储LineLayer相关信息
+      if (!this.hoseLineLayerData) {
+        this.hoseLineLayerData = {};
+      }
+      this.hoseLineLayerData[id] = {
+        polyline: polyline,
+        hoseHeadMarker: hoseHeadMarker,
+        featureIndex: existingData.features.length - 1
+      };
+
+      // 将LineLayer信息关联到polyline对象
+      polyline._waterHoseLineLayer = { id: id };
+
+      console.log('LineLayer水带创建成功:', id);
+    } catch(err) {
+      console.error('创建LineLayer水带失败:', err);
+    }
+  },
+
+  // 清理LineLayer水带
+  clearHoseLineLayer(id) {
+    try {
+      if (!this.hoseLineLayerData || !this.hoseLineLayerData[id]) return;
+
+      const hoseData = this.hoseLineLayerData[id];
+      
+      // 移除水带头标记
+      if (hoseData.hoseHeadMarker) {
+        this.map.removeOverlay(hoseData.hoseHeadMarker);
+      }
+
+      // 从LineLayer数据中移除对应的feature
+      if (this.hoseLineLayer) {
+        const existingData = this.hoseLineLayer.getData();
+        if (existingData && existingData.features) {
+          existingData.features = existingData.features.filter(feature => 
+            feature.properties.name !== id
+          );
+          this.hoseLineLayer.setData(existingData);
+        }
+      }
+
+      // 清理数据记录
+      delete this.hoseLineLayerData[id];
+      
+      console.log('LineLayer水带清理成功:', id);
+    } catch(err) {
+      console.error('清理LineLayer水带失败:', err);
+    }
+  },
+
+  // 添加水带纹理
+  addHoseTexture(polyline) {
+    try {
+      const path = polyline.getPath();
+      const id = 'hose-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      
+      // 确保纹理图片只加载一次
+      if (!this.textureImg) {
+        this.textureImg = new Image();
+        this.textureImg.crossOrigin = 'anonymous';
+        this.textureImg.src = 'assets/icons/line.png';
+        
+        this.textureImg.onload = () => {
+          console.log('水带纹理图片加载成功');
+          // 触发重绘所有水带纹理
+          if (this.customOverlays) {
+            Object.values(this.customOverlays).forEach(overlay => {
+              if (overlay.textureOverlay && overlay.textureOverlay.draw) {
+                overlay.textureOverlay.draw();
+              }
+            });
+          }
+        };
+        
+        this.textureImg.onerror = () => {
+          console.error('水带纹理图片加载失败');
+        };
+      }
+
+      // 创建纹理覆盖物
+      const textureOverlay = this.createTextureOverlay(path, this.textureImg, id);
+      this.map.addOverlay(textureOverlay);
+
+      // 添加水带头标记
+      const hoseHeadMarker = this.addHoseHeadMarker(polyline, textureOverlay, id);
+
+      // 存储自定义覆盖物
+      const overlayId = 'hose_' + Date.now();
+      this.customOverlays[overlayId] = { textureOverlay, hoseHeadMarker };
+
+      // 将覆盖物关联到polyline对象
+      polyline._waterHoseOverlay = { id: overlayId };
+    } catch(err) {
+      console.error('添加水带纹理失败:', err);
+    }
+  },
+
+  // 创建百度地图水带纹理覆盖物类
+  createTextureOverlay(points, textureImg, id) {
+    const _this = this;
+    
+    function TextureOverlay(points, texture, id) {
+      this._points = points;
+      this._texture = texture;
+      this._id = id;
+    }
+
+    TextureOverlay.prototype = new BMapGL.Overlay();
+    
+    TextureOverlay.prototype.initialize = function(map) {
+      this._map = map;
+      const canvas = document.createElement('canvas');
+      canvas.style.position = 'absolute';
+      canvas.style.zIndex = '10';
+      canvas.width = map.getContainer().clientWidth;
+      canvas.height = map.getContainer().clientHeight;
+      
+      map.getPanes().labelPane.appendChild(canvas);
+      this._canvas = canvas;
+      return canvas;
+    };
+
+    TextureOverlay.prototype.draw = function() {
+      const map = this._map;
+      const canvas = this._canvas;
+      const ctx = canvas.getContext('2d');
+      
+      // 清除画布
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      if (!this._texture || !this._texture.complete) {
+        _this.drawTemporaryHose(ctx, this._points, map);
+      } else {
+        _this.drawHoseTexture(ctx, this._points, this._texture, map);
+      }
+    };
+
+    return new TextureOverlay(points, textureImg, id);
+  },
+
+  // 绘制水带纹理
+  drawHoseTexture(ctx, points, textureImg, map) {
+    if (!points || points.length < 2) return;
+
+    ctx.save();
+
+    for (let i = 0; i < points.length - 1; i++) {
+      const p1 = map.pointToPixel(points[i]);
+      const p2 = map.pointToPixel(points[i + 1]);
+
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const length = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx);
+
+      ctx.save();
+      ctx.translate(p1.x, p1.y);
+      ctx.rotate(angle);
+
+      // 创建纹理图案
+      const pattern = ctx.createPattern(textureImg, 'repeat');
+      ctx.fillStyle = pattern;
+      ctx.fillRect(0, 0, length, 15);
+
+      ctx.restore();
+    }
+
+    ctx.restore();
+  },
+
+  // 绘制临时水带（图片加载前）
+  drawTemporaryHose(ctx, points, map) {
+    if (!points || points.length < 2) return;
+
+    ctx.beginPath();
+    const firstPixel = map.pointToPixel(points[0]);
+    ctx.moveTo(firstPixel.x, firstPixel.y);
+
+    for (let i = 1; i < points.length; i++) {
+      const pixel = map.pointToPixel(points[i]);
+      ctx.lineTo(pixel.x, pixel.y);
+    }
+
+    ctx.lineWidth = 15;
+    ctx.strokeStyle = '#000';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  },
+
+  // 添加水带头标记
+  addHoseHeadMarker(polyline, textureOverlay, id) {
+    try {
+      const points = polyline.getPath();
+      if (!points || points.length < 2) return;
+
+      const headImgSrc = 'assets/icons/line_top.png';
+      
+      // 计算水带头方向角度
+      let rotation = 0;
+      const startPoint = points[0];
+      const nextPoint = points[1];
+      const dx = nextPoint.lng - startPoint.lng;
+      const dy = nextPoint.lat - startPoint.lat;
+      
+      // 使用与Vue相同的角度计算方式
+      rotation = Math.atan2(-dy, dx) * 180 / Math.PI + 90;
+
+      const icon = new BMapGL.Icon(headImgSrc, new BMapGL.Size(20, 20), {
+        anchor: new BMapGL.Size(10, 10)
+      });
+      const headMarker = new BMapGL.Marker(points[0], { icon: icon  });
+      
+      // 旋转水带头图标
+      this.rotateIcon(headMarker, rotation);
+      
+      this.map.addOverlay(headMarker);
+
+      // 返回水带头标记，由调用方管理
+      return headMarker;
+    } catch(err) {
+      console.error('添加水带头标记失败:', err);
+    }
+  },
+
+  // 计算路径总距离
+  calculatePathDistance(path) {
+    let totalDistance = 0;
+    for (let i = 1; i < path.length; i++) {
+      const distance = this.map.getDistance(path[i-1], path[i]);
+      totalDistance += distance;
+    }
+    return totalDistance;
+  },
+
+  // 获取路径上指定比例位置的坐标
+  getPositionAlongPath(path, ratio) {
+    if (ratio <= 0) return path[0];
+    if (ratio >= 1) return path[path.length - 1];
+
+    const totalDistance = this.calculatePathDistance(path);
+    const targetDistance = totalDistance * ratio;
+    
+    let currentDistance = 0;
+    for (let i = 1; i < path.length; i++) {
+      const segmentDistance = this.map.getDistance(path[i-1], path[i]);
+      if (currentDistance + segmentDistance >= targetDistance) {
+        const segmentRatio = (targetDistance - currentDistance) / segmentDistance;
+        const lng = path[i-1].lng + (path[i].lng - path[i-1].lng) * segmentRatio;
+        const lat = path[i-1].lat + (path[i].lat - path[i-1].lat) * segmentRatio;
+        return new BMapGL.Point(lng, lat);
+      }
+      currentDistance += segmentDistance;
+    }
+    return path[path.length - 1];
+  },
+
+  // 获取路径上指定位置的角度
+  getAngleAtPosition(path, ratio) {
+    try {
+      let segmentIndex = 0;
+      if (ratio >= 1) {
+        segmentIndex = path.length - 2;
+      } else {
+        const totalDistance = this.calculatePathDistance(path);
+        const targetDistance = totalDistance * ratio;
+        let currentDistance = 0;
+        
+        for (let i = 1; i < path.length; i++) {
+          const segmentDistance = this.map.getDistance(path[i-1], path[i]);
+          if (currentDistance + segmentDistance >= targetDistance) {
+            segmentIndex = i - 1;
+            break;
+          }
+          currentDistance += segmentDistance;
+        }
+      }
+
+      if (segmentIndex >= 0 && segmentIndex < path.length - 1) {
+        const p1 = path[segmentIndex];
+        const p2 = path[segmentIndex + 1];
+        
+        // 计算角度（弧度转角度）
+        // 地图坐标系：经度(lng)是X轴，纬度(lat)是Y轴
+        const deltaX = p2.lng - p1.lng;
+        const deltaY = p2.lat - p1.lat;
+        
+        // 计算从p1指向p2的角度（以东方向为0度，逆时针为正）
+        let angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+        
+        // 水带头部图标原始朝向是向右（东方向）
+        // 需要将数学角度系统转换为地图角度系统（正上方为0度，顺时针为正）
+        // 数学系统：东=0°，北=90°，西=180°，南=270°
+        // 地图系统：北=0°，东=90°，南=180°，西=270°
+        // 转换公式：地图角度 = 90° - 数学角度
+        angle = 270 - angle;
+        
+        // 确保角度在0-360度范围内
+        while (angle < 0) angle += 360;
+        while (angle >= 360) angle -= 360;
+        
+        return angle;
+      }
+      return null;
+    } catch(err) {
+      return null;
+    }
+  },
+
+  // 旋转图标
+  rotateIcon(marker, angle) {
+    try {
+      // 百度地图的图标旋转需要通过CSS transform实现
+      const icon = marker.getIcon();
+      if (icon && icon.imageUrl) {
+        // 创建带旋转的图标
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = function() {
+          const size = 24;
+          canvas.width = size;
+          canvas.height = size;
+          
+          ctx.translate(size/2, size/2);
+          ctx.rotate(angle * Math.PI / 180);
+          ctx.drawImage(img, -size/2, -size/2, size, size);
+          
+          const rotatedIcon = new BMapGL.Icon(canvas.toDataURL(), new BMapGL.Size(size, size), {
+            anchor: new BMapGL.Size(size/2, size/2)
+          });
+          marker.setIcon(rotatedIcon);
+        };
+        
+        img.src = icon.imageUrl;
+      }
+    } catch(err) {
+      console.error('旋转图标失败:', err);
+    }
+  },
 
   renderIconPage() {
-    const res = IconStore.query(this.iconCategory, this.iconPage, this.iconPageSize);
-    this.iconTotal = res.total;
     const iconListEl = document.getElementById('iconList');
+    const pagEl = document.getElementById('iconPagination');
     iconListEl.innerHTML = '';
-    res.list.forEach(icon => {
+    pagEl.innerHTML = '';
+
+    const list = (this.iconCategory && this.iconCategory !== 'all')
+      ? (this.iconCategories.find(c => c.name === this.iconCategory)?.icons || [])
+      : this.allIconsFlat;
+    const total = list.length;
+    this.iconTotal = total;
+
+    const start = (this.iconPage - 1) * this.iconPageSize;
+    const pageItems = list.slice(start, start + this.iconPageSize);
+
+    pageItems.forEach(icon => {
       const item = document.createElement('div');
       item.className = 'icon-item';
       const img = document.createElement('img');
       img.className = 'icon-img';
-      img.src = icon.data;
+      img.src = icon.url;
       img.title = icon.name;
       const span = document.createElement('span');
       span.className = 'icon-name';
@@ -513,7 +1090,8 @@ const App = {
       item.appendChild(img);
       item.appendChild(span);
       item.addEventListener('click', () => {
-        this.selectedMarkerIcon = icon.data;
+        this.selectedMarkerIcon = icon.url;
+        this.selectedMarkerIconName = icon.name;
         this.iconModal.hide();
         this.currentTool = 'marker';
         this.drawingManager.setDrawingMode('marker');
@@ -523,8 +1101,6 @@ const App = {
       iconListEl.appendChild(item);
     });
 
-    const pagEl = document.getElementById('iconPagination');
-    pagEl.innerHTML = '';
     const pages = Math.ceil(this.iconTotal / this.iconPageSize) || 1;
     const addPageItem = (page, text, active=false) => {
       const li = document.createElement('li');
@@ -625,6 +1201,278 @@ const App = {
       this.renderOverlayList();
     } catch(err) {
       alert('导入失败：' + err.message);
+    }
+  },
+
+  // 加载建筑数据并按类型分类存储
+  loadBuildingData(buildingData) {
+    try {
+      console.log('开始加载建筑数据:', buildingData);
+      console.log('建筑数据类型:', typeof buildingData, '是否为数组:', Array.isArray(buildingData));
+      
+      if (!Array.isArray(buildingData)) {
+        console.error('建筑数据格式错误，应为数组');
+        return;
+      }
+
+      // 清除现有建筑标记和数据
+      this.clearBuildingMarkers('dz');
+      this.clearBuildingMarkers('zz');
+      this.clearBuildingMarkers('zd');
+      
+      // 重置建筑数据存储
+      this.buildingData = { dz: [], zz: [], zd: [] };
+      console.log('已重置建筑数据存储');
+
+      let dzCount = 0, zzCount = 0, zdCount = 0;
+
+      buildingData.forEach((building, index) => {
+        console.log(`处理第${index + 1}个建筑:`, building);
+        
+        // 兼容两种数据格式：WPF传递的格式和原有格式
+        let lng, lat, orgType, orgName;
+        
+        if (building.longitude !== undefined && building.latitude !== undefined) {
+          // WPF传递的格式
+          lng = parseFloat(building.longitude);
+          lat = parseFloat(building.latitude);
+          orgType = building.type; // 1-消防队站；2-专职队；3-重点建筑
+          orgName = building.name;
+          console.log(`WPF格式 - 经度:${lng}, 纬度:${lat}, 类型:${orgType}, 名称:${orgName}`);
+        } else if (building.gps && building.orgType) {
+          // 原有格式
+          const gpsArray = building.gps.split(',');
+          if (gpsArray.length !== 2) {
+            console.warn(`建筑${index + 1} GPS格式错误:`, building.gps);
+            return;
+          }
+          lng = parseFloat(gpsArray[0]);
+          lat = parseFloat(gpsArray[1]);
+          orgType = building.orgType;
+          orgName = building.orgName;
+          console.log(`原有格式 - 经度:${lng}, 纬度:${lat}, 类型:${orgType}, 名称:${orgName}`);
+        } else {
+          console.warn(`建筑${index + 1} 数据格式不正确，跳过:`, building);
+          return; // 数据格式不正确，跳过
+        }
+
+        if (isNaN(lng) || isNaN(lat)) {
+          console.warn(`建筑${index + 1} 坐标无效，跳过 - 经度:${lng}, 纬度:${lat}`);
+          return;
+        }
+
+        // 根据机构类型确定标记类型和图标
+        let markerType = '';
+        let iconUrl = '';
+        let typeText = '';
+        
+        if (typeof orgType === 'number') {
+          // WPF传递的数字类型
+          switch (orgType) {
+            case 1:
+              markerType = 'dz';
+              iconUrl = 'assets/icons/fire-station.png';
+              typeText = '消防队站';
+              dzCount++;
+              break;
+            case 2:
+              markerType = 'zz';
+              iconUrl = 'assets/icons/professional-team.png';
+              typeText = '专职队';
+              zzCount++;
+              break;
+            case 3:
+              markerType = 'zd';
+              iconUrl = 'assets/icons/key-building.png';
+              typeText = '重点建筑';
+              zdCount++;
+              break;
+            default:
+              return; // 未知类型，跳过
+          }
+        } else {
+          // 原有的字符串类型
+          switch (orgType) {
+            case '消防队站':
+              markerType = 'dz';
+              iconUrl = 'assets/icons/fire-station.svg';
+              typeText = '消防队站';
+              dzCount++;
+              break;
+            case '专职队':
+              markerType = 'zz';
+              iconUrl = 'assets/icons/professional-team.svg';
+              typeText = '专职队';
+              zzCount++;
+              break;
+            case '重点建筑':
+              markerType = 'zd';
+              iconUrl = 'assets/icons/key-building.svg';
+              typeText = '重点建筑';
+              zdCount++;
+              break;
+            default:
+              return; // 未知类型，跳过
+          }
+        }
+
+        // 将建筑数据存储到对应类型的数组中
+        const buildingInfo = {
+          lng: lng,
+          lat: lat,
+          orgName: orgName,
+          orgType: orgType,
+          typeText: typeText,
+          iconUrl: iconUrl,
+          address: building.address || '未知',
+          originalData: building
+        };
+        
+        this.buildingData[markerType].push(buildingInfo);
+        console.log(`建筑${index + 1} 已存储到 ${markerType} 类型:`, buildingInfo);
+      });
+
+      console.log('建筑数据处理完成，最终存储结果:');
+      console.log('消防队站(dz):', this.buildingData.dz.length, this.buildingData.dz);
+      console.log('专职队(zz):', this.buildingData.zz.length, this.buildingData.zz);
+      console.log('重点建筑(zd):', this.buildingData.zd.length, this.buildingData.zd);
+
+      // 更新计数显示
+      document.getElementById('dzCount').textContent = dzCount;
+      document.getElementById('zzCount').textContent = zzCount;
+      document.getElementById('zdCount').textContent = zdCount;
+      
+      console.log(`计数更新 - 消防队站:${dzCount}, 专职队:${zzCount}, 重点建筑:${zdCount}`);
+
+      console.log(`建筑数据加载完成: 消防队站${dzCount}个, 专职队${zzCount}个, 重点建筑${zdCount}个`);
+      
+      // 检查当前复选框状态，显示已勾选的建筑类型
+      ['dz', 'zz', 'zd'].forEach(type => {
+        const checkbox = document.getElementById('chk' + type.charAt(0).toUpperCase() + type.slice(1));
+        if (checkbox && checkbox.checked) {
+          this.showBuildingsByType(type);
+        }
+      });
+      
+      // 通知WPF数据加载完成
+      this.notifyWPF('buildingDataLoaded', {
+        total: buildingData.length,
+        dzCount,
+        zzCount,
+        zdCount
+      });
+
+    } catch (error) {
+      console.error('加载建筑数据失败:', error);
+      this.notifyWPF('buildingDataError', { error: error.message });
+    }
+  },
+
+  // 请求建筑数据
+  requestBuildingData(cityName) {
+    console.log('请求建筑数据:', cityName);
+    this.notifyWPF('requestBuildingData', { cityName: cityName });
+  },
+
+  // 向WPF发送消息
+  notifyWPF(type, data) {
+    console.log(`[notifyWPF] 准备发送消息到WPF:`, { type, data });
+    
+    if (window.chrome && window.chrome.webview) {
+      try {
+        const message = {
+          type: type,
+          data: data,
+          timestamp: new Date().toISOString()
+        };
+        console.log(`[notifyWPF] 发送消息结构:`, message);
+        
+        window.chrome.webview.postMessage(message);
+        console.log(`[notifyWPF] 消息发送成功`);
+      } catch (error) {
+        console.error('[notifyWPF] 发送消息到WPF失败:', error);
+      }
+    } else {
+      console.warn('[notifyWPF] WebView2环境不可用，无法发送消息到WPF');
+    }
+  },
+
+  // 初始化WebView2消息监听
+  initWebViewMessageListener() {
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.addEventListener('message', (event) => {
+        try {
+          const message = event.data;
+          console.log('收到WPF消息:', message);
+
+          switch (message.type) {
+            case 'wpfReady':
+              // WPF已准备好接收消息，再次发送页面就绪，避免首次消息丢失
+              console.log('[WebView2] 收到 wpfReady 握手，回发 pageReady');
+              this.notifyWPF('pageReady', { status: 'ready' });
+              break;
+            case 'loadBuildingData':
+              this.loadBuildingData(message.data);
+              break;
+            case 'buildingDataResponse':
+              // 处理从WPF返回的建筑数据
+              console.log('收到建筑数据响应:', message);
+              console.log('建筑数据数量:', message.buildings ? message.buildings.length : 0);
+              this.loadBuildingData(message.buildings);
+              break;
+            case 'buildingDataError':
+              console.error('建筑数据加载失败:', message.error);
+              break;
+            case 'centerMap':
+              if (message.data.lng && message.data.lat) {
+                const point = new BMapGL.Point(message.data.lng, message.data.lat);
+                this.map.centerAndZoom(point, message.data.zoom || 15);
+              }
+              break;
+            case 'clearBuildings':
+              this.clearBuildingMarkers('dz');
+              this.clearBuildingMarkers('zz');
+              this.clearBuildingMarkers('zd');
+              document.getElementById('dzCount').textContent = 0;
+              document.getElementById('zzCount').textContent = 0;
+              document.getElementById('zdCount').textContent = 0;
+              break;
+            case 'getMapData':
+              // 返回当前地图数据
+              const mapData = this.serializeOverlays();
+              this.notifyWPF('mapDataResponse', mapData);
+              break;
+            default:
+              console.warn('未知消息类型:', message.type);
+          }
+        } catch (error) {
+          console.error('处理WPF消息失败:', error);
+          this.notifyWPF('messageError', { error: error.message });
+        }
+      });
+
+      // 通知WPF页面已准备就绪
+      this.notifyWPF('pageReady', { status: 'ready' });
+    }
+  },
+
+  // 清理自定义覆盖物（纹理覆盖物和水带头标记）
+  clearCustomOverlays(overlayId) {
+    if (this.customOverlays && this.customOverlays[overlayId]) {
+      const customOverlay = this.customOverlays[overlayId];
+      
+      // 清理纹理覆盖物
+      if (customOverlay.textureOverlay) {
+        try { this.map.removeOverlay(customOverlay.textureOverlay); } catch(e){}
+      }
+      
+      // 清理水带头标记
+      if (customOverlay.hoseHeadMarker) {
+        try { this.map.removeOverlay(customOverlay.hoseHeadMarker); } catch(e){}
+      }
+      
+      // 从记录中删除
+      delete this.customOverlays[overlayId];
     }
   }
 };

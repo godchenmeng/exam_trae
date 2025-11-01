@@ -21,6 +21,7 @@ namespace ExamSystem.Data
         public DbSet<Notification> Notifications { get; set; } = null!;
         public DbSet<NotificationRecipient> NotificationRecipients { get; set; } = null!;
         public DbSet<MapDrawingData> MapDrawingData { get; set; } = null!;
+        public DbSet<Building> Buildings { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -185,6 +186,31 @@ namespace ExamSystem.Data
                 entity.HasIndex(e => e.AnswerId);
                 entity.HasIndex(e => e.ShapeType);
                 entity.HasIndex(e => e.CreatedAt);
+            });
+
+            // 配置建筑表
+            modelBuilder.Entity<Building>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.City).HasMaxLength(50);
+                entity.Property(e => e.CityCn).HasMaxLength(255);
+                entity.Property(e => e.OrgCity).HasMaxLength(255);
+                entity.Property(e => e.OrgArea).HasMaxLength(255);
+                entity.Property(e => e.OrgName).HasMaxLength(255);
+                entity.Property(e => e.OrgType).IsRequired();
+                entity.Property(e => e.Address).HasColumnType("TEXT");
+                entity.Property(e => e.Gps).HasMaxLength(255);
+                entity.Property(e => e.CreateDate).IsRequired();
+                entity.Property(e => e.UpdateDate).IsRequired();
+                entity.Property(e => e.Deleted).IsRequired();
+                entity.Property(e => e.Amap).HasMaxLength(255);
+                entity.Property(e => e.Location).HasMaxLength(255);
+
+                // 创建索引
+                entity.HasIndex(e => e.CityCn);
+                entity.HasIndex(e => e.OrgType);
+                entity.HasIndex(e => e.Deleted);
+                entity.HasIndex(e => new { e.CityCn, e.OrgType, e.Deleted });
             });
 
             // 种子数据

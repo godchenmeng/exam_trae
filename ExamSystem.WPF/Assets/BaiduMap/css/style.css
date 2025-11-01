@@ -26,9 +26,118 @@ body { background: #f7f7f7; }
 .bottom-toolbar .btn-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; }
 .bottom-toolbar .btn-grid .btn { flex: 1 1 0; }
 .operation-instructions { color: #666; }
-.icon-img { width: 36px; height: 36px; object-fit: contain; }
-.icon-item { display: inline-flex; flex-direction: column; align-items: center; margin: 6px; cursor: pointer; }
-.icon-item:hover { opacity: 0.85; }
+/* 图标列表样式优化 */
+.icon-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 80px;
+  height: 100px;
+  margin: 8px;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.icon-item:hover {
+  border-color: var(--brand-primary);
+  background: #f8f9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 82, 204, 0.15);
+}
+
+.icon-item:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 82, 204, 0.2);
+}
+
+.icon-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  object-position: center;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+
+.icon-name {
+  font-size: 10px;
+  color: #666;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  font-weight: 500;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* 图标列表容器优化 */
+#iconList {
+  gap: 4px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+/* 响应式设计 */
+ @media (max-width: 768px) {
+   .icon-item {
+     width: 70px;
+     height: 90px;
+     margin: 6px;
+     padding: 6px;
+   }
+   
+   .icon-img {
+     width: 40px;
+     height: 40px;
+   }
+   
+   .icon-name {
+     font-size: 9px;
+   }
+   
+   #iconList {
+     padding: 8px;
+     max-height: 300px;
+   }
+ }
+ 
+ @media (max-width: 480px) {
+   .icon-item {
+     width: 60px;
+     height: 80px;
+     margin: 4px;
+     padding: 4px;
+   }
+   
+   .icon-img {
+     width: 32px;
+     height: 32px;
+   }
+   
+   .icon-name {
+     font-size: 8px;
+   }
+   
+   #iconList {
+     gap: 2px;
+     padding: 6px;
+   }
+ }
 .navbar-brand { font-weight: 600; }
 .map-hint { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,0.92); border: 1px solid var(--panel-border); box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-radius: 8px; padding: 8px 12px; font-size: 0.95rem; color: #333; z-index: 2147483647; pointer-events: none; }
 /* 定位与筛选表单：两列紧凑排版 */
