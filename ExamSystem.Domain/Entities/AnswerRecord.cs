@@ -100,5 +100,21 @@ public class AnswerRecord
     /// 人工评分量表明细（JSON）：Rubric各项得分
     /// </summary>
     public string? RubricScoresJson { get; set; }
+
+    /// <summary>
+    /// 地图绘制数据（JSON）：存储学生绘制的图形数据
+    /// 格式：{"overlays": [{"id": "ov-1", "type": "marker", "point": {"lng": 106.63, "lat": 26.65}, "name": "标记1"}], "center": {"lng": 106.63, "lat": 26.65}, "zoom": 12}
+    /// </summary>
+    public string? MapDrawingData { get; set; }
+
+    /// <summary>
+    /// 地图中心点（JSON）：{"lng": 106.63, "lat": 26.65}
+    /// </summary>
+    public string? MapCenter { get; set; }
+
+    /// <summary>
+    /// 地图缩放级别
+    /// </summary>
+    public int? MapZoom { get; set; }
     }
 }

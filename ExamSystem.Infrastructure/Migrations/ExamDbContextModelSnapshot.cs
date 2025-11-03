@@ -47,6 +47,15 @@ namespace ExamSystem.Infrastructure.Migrations
                     b.Property<bool>("IsGraded")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("MapCenter")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MapDrawingData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("MapZoom")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("QuestionId")
                         .HasColumnType("INTEGER");
 
@@ -71,6 +80,90 @@ namespace ExamSystem.Infrastructure.Migrations
                     b.HasIndex("RecordId");
 
                     b.ToTable("AnswerRecords");
+                });
+
+            modelBuilder.Entity("ExamSystem.Domain.Entities.Building", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("addr");
+
+                    b.Property<string>("Amap")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("amap");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("city");
+
+                    b.Property<string>("CityCn")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("city_cn");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("create_date");
+
+                    b.Property<int?>("CreatorId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("creator");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("deleted");
+
+                    b.Property<string>("Gps")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("gps");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("location");
+
+                    b.Property<string>("OrgArea")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("org_area");
+
+                    b.Property<string>("OrgCity")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("org_city");
+
+                    b.Property<string>("OrgName")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("org_name");
+
+                    b.Property<byte>("OrgType")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("org_type");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("update_date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityCn");
+
+                    b.HasIndex("Deleted");
+
+                    b.HasIndex("OrgType");
+
+                    b.HasIndex("CityCn", "OrgType", "Deleted");
+
+                    b.ToTable("t_building");
                 });
 
             modelBuilder.Entity("ExamSystem.Domain.Entities.ExamPaper", b =>
@@ -202,6 +295,54 @@ namespace ExamSystem.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ExamRecords");
+                });
+
+            modelBuilder.Entity("ExamSystem.Domain.Entities.MapDrawingData", b =>
+                {
+                    b.Property<int>("DrawingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AnswerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CoordinatesJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Label")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ShapeType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StyleJson")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("DrawingId");
+
+                    b.HasIndex("AnswerId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("ShapeType");
+
+                    b.ToTable("MapDrawingData");
                 });
 
             modelBuilder.Entity("ExamSystem.Domain.Entities.Notification", b =>
@@ -408,12 +549,12 @@ namespace ExamSystem.Infrastructure.Migrations
                         new
                         {
                             BankId = 1,
-                            CreatedAt = new DateTime(2025, 10, 27, 1, 34, 3, 353, DateTimeKind.Local).AddTicks(311),
+                            CreatedAt = new DateTime(2025, 11, 1, 23, 52, 28, 46, DateTimeKind.Local).AddTicks(7127),
                             CreatorId = 1,
                             Description = "系统默认题库",
                             IsActive = true,
                             Name = "默认题库",
-                            UpdatedAt = new DateTime(2025, 10, 27, 1, 34, 3, 353, DateTimeKind.Local).AddTicks(312)
+                            UpdatedAt = new DateTime(2025, 11, 1, 23, 52, 28, 46, DateTimeKind.Local).AddTicks(7128)
                         });
                 });
 
@@ -508,7 +649,7 @@ namespace ExamSystem.Infrastructure.Migrations
                         new
                         {
                             UserId = 1,
-                            CreatedAt = new DateTime(2025, 10, 27, 1, 34, 3, 353, DateTimeKind.Local).AddTicks(227),
+                            CreatedAt = new DateTime(2025, 11, 1, 23, 52, 28, 46, DateTimeKind.Local).AddTicks(7001),
                             Email = "admin@exam.com",
                             IsActive = true,
                             LoginFailCount = 0,
@@ -580,6 +721,17 @@ namespace ExamSystem.Infrastructure.Migrations
                     b.Navigation("Grader");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ExamSystem.Domain.Entities.MapDrawingData", b =>
+                {
+                    b.HasOne("ExamSystem.Domain.Entities.AnswerRecord", "AnswerRecord")
+                        .WithMany()
+                        .HasForeignKey("AnswerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AnswerRecord");
                 });
 
             modelBuilder.Entity("ExamSystem.Domain.Entities.Notification", b =>

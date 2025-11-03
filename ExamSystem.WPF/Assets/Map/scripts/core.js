@@ -72,7 +72,15 @@
 
   function onBridgeMessage(message){
     try {
-      const { messageType, payload } = message;
+      const { messageType, payload, type } = message;
+      
+      // 处理新的消息格式（type字段）
+      if (type === 'getMapDrawingData') {
+        handleGetMapDrawingData();
+        return;
+      }
+      
+      // 处理原有的消息格式（messageType字段）
       switch(messageType){
         case 'LoadQuestion':
           handleLoadQuestion(payload);
@@ -91,6 +99,39 @@
       }
     } catch (e) {
       log(`[exception] ${e.message}`);
+    }
+  }
+
+  function handleGetMapDrawingData() {
+    try {
+      const durationSec = state.drawStartTime ? Math.round((Date.now() - state.drawStartTime)/1000) : 0;
+      const responseData = JSON.stringify({
+        questionId: state.questionId,
+        overlays: state.studentOverlays,
+        drawDurationSeconds: durationSec
+      });
+      
+      // 发送响应消息
+      const response = {
+        type: 'mapDrawingDataResponse',
+        data: responseData
+      };
+      
+      if (window.chrome && window.chrome.webview) {
+        window.chrome.webview.postMessage(response);
+      }
+      
+      log(`[GetMapDrawingData] returned ${state.studentOverlays.length} overlays, duration=${durationSec}s`);
+    } catch (e) {
+      log(`[GetMapDrawingData] error: ${e.message}`);
+      // 发送空响应
+      const response = {
+        type: 'mapDrawingDataResponse',
+        data: ''
+      };
+      if (window.chrome && window.chrome.webview) {
+        window.chrome.webview.postMessage(response);
+      }
     }
   }
 

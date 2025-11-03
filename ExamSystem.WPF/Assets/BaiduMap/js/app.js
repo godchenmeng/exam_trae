@@ -23,6 +23,9 @@ const App = {
   buildingData: { dz: [], zz: [], zd: [] },
   // 确认定位按钮的目标缩放级别（数值越大越"放大"）。如需改为更远视野，可将其改小。
   confirmCenterZoom: 18,
+  // 只读模式相关
+  isReviewMode: false,
+  reviewMapData: null,
 
   cityCenters: {
     guiyang: { lat: 26.65, lng: 106.63, zoom: 12 },
@@ -36,18 +39,37 @@ const App = {
     qianxinan: { lat: 25.09, lng: 104.90, zoom: 11 }
   },
 
+
   init() {
+    
     // 初始化地图（BMapGL）
     this.map = new BMapGL.Map('map');
-    const c = this.cityCenters.guiyang;
-    this.map.centerAndZoom(new BMapGL.Point(c.lng, c.lat), c.zoom);
+    
+    // 根据模式设置地图中心和缩放
+    let center, zoom;
+    if (this.isReviewMode && this.reviewCenter) {
+      center = new BMapGL.Point(this.reviewCenter.lng, this.reviewCenter.lat);
+      zoom = this.reviewZoom || 12;
+    } else {
+      const c = this.cityCenters.guiyang;
+      center = new BMapGL.Point(c.lng, c.lat);
+      zoom = c.zoom;
+    }
+    
+    this.map.centerAndZoom(center, zoom);
     this.map.enableScrollWheelZoom(true);
     this.map.addControl(new BMapGL.ZoomControl());
     this.map.addControl(new BMapGL.ScaleControl());
     this.map.addControl(new BMapGL.MapTypeControl({anchor: BMapGL.BMAP_ANCHOR_TOP_RIGHT}));
 
-    // 绘图管理器（BMapGLLib DrawingManager）
-    this.initDrawingManager();
+    // 如果是只读模式，隐藏编辑工具
+    if (this.isReviewMode) {
+      this.hideEditingTools();
+      this.loadReviewMapData();
+    } else {
+      // 绘图管理器（BMapGLLib DrawingManager）
+      this.initDrawingManager();
+    }
 
     // 表单验证
     this.initFormValidation();
@@ -157,7 +179,13 @@ const App = {
 
       const id = 'ov-' + (this.overlays.length + 1);
       const name = this.defaultOverlayName(type, this.overlays.length + 1);
+      // 记录样式/图标以便序列化
       const item = { id, overlay, type, name };
+      if (type === 'marker' && this.selectedMarkerIcon) {
+        // 同时保存到 style.iconUrl 与 icon.url，便于不同解析端兼容
+        item.style = Object.assign({}, item.style, { iconUrl: this.selectedMarkerIcon });
+        item.icon = { url: this.selectedMarkerIcon };
+      }
       this.overlays.push(item);
       // 在地图上显示图形名称
       this.attachOverlayLabel(item);
@@ -1134,6 +1162,13 @@ const App = {
         case 'marker': {
           const p = ov.overlay.getPosition();
           o.point = { lng: p.lng, lat: p.lat };
+          // 输出图标（两种字段，兼容review.js的 data.icon.url 与后端的 style.iconUrl）
+          if (ov.icon && ov.icon.url) {
+            o.icon = { url: ov.icon.url };
+          }
+          if (ov.style && ov.style.iconUrl) {
+            o.style = Object.assign({}, ov.style);
+          }
           break;
         }
         case 'circle': {
@@ -1145,12 +1180,54 @@ const App = {
         default: {
           const path = ov.overlay.getPath();
           o.path = path.map(pt => ({ lng: pt.lng, lat: pt.lat }));
+          // 其他图形暂不输出样式细节，如需可在此扩展 strokeColor 等
           break;
         }
       }
       return o;
     });
     return { center, zoom, overlays: items };
+  },
+
+  // 获取地图绘制答案数据，供WPF调用
+  getMapDrawingAnswerData() {
+    try {
+      const data = this.serializeOverlays();
+      console.log('获取地图绘制答案数据:', data);
+      return JSON.stringify(data);
+    } catch (error) {
+      console.error('获取地图绘制答案数据失败:', error);
+      return JSON.stringify({ center: null, zoom: null, overlays: [] });
+    }
+  },
+
+  // 检查是否有绘制内容
+  hasDrawingContent() {
+    return this.overlays && this.overlays.length > 0;
+  },
+
+  // 获取绘制统计信息
+  getDrawingStats() {
+    const stats = {
+      totalCount: this.overlays.length,
+      markerCount: 0,
+      polylineCount: 0,
+      polygonCount: 0,
+      rectangleCount: 0,
+      circleCount: 0
+    };
+    
+    this.overlays.forEach(ov => {
+      switch (ov.type) {
+        case 'marker': stats.markerCount++; break;
+        case 'polyline': stats.polylineCount++; break;
+        case 'polygon': stats.polygonCount++; break;
+        case 'rectangle': stats.rectangleCount++; break;
+        case 'circle': stats.circleCount++; break;
+      }
+    });
+    
+    return stats;
   },
 
   importOverlays(data) {
@@ -1167,6 +1244,16 @@ const App = {
           case 'marker': {
             const pt = new BMapGL.Point(o.point.lng, o.point.lat);
             overlay = new BMapGL.Marker(pt);
+            // 应用图标（支持两种来源字段）
+            const iconUrl = (o.icon && o.icon.url) ? o.icon.url : (o.style && o.style.iconUrl ? o.style.iconUrl : null);
+            if (iconUrl) {
+              try {
+                const icon = new BMapGL.Icon(iconUrl, new BMapGL.Size(36,36), { anchor: new BMapGL.Size(18,36) });
+                overlay.setIcon(icon);
+              } catch(err) {
+                console.warn('导入标记图标失败:', err);
+              }
+            }
             break;
           }
           case 'circle': {
@@ -1193,6 +1280,14 @@ const App = {
           const id = o.id || ('ov-' + (idx+1));
           const name = o.name || this.defaultOverlayName(o.type, idx+1);
           const item = { id, overlay, type: o.type, name };
+          // 保存导入的图标信息到 overlays 项目，确保再次序列化时不丢失
+          if (o.type === 'marker') {
+            const iconUrl = (o.icon && o.icon.url) ? o.icon.url : (o.style && o.style.iconUrl ? o.style.iconUrl : null);
+            if (iconUrl) {
+              item.style = Object.assign({}, item.style, { iconUrl });
+              item.icon = { url: iconUrl };
+            }
+          }
           this.overlays.push(item);
           // 显示导入图形的名称标注
           this.attachOverlayLabel(item);
@@ -1442,6 +1537,13 @@ const App = {
               const mapData = this.serializeOverlays();
               this.notifyWPF('mapDataResponse', mapData);
               break;
+            case 'getMapDrawingData':
+              // 返回地图绘制答案数据
+              console.log('收到获取地图绘制数据请求');
+              const drawingData = this.getMapDrawingAnswerData();
+              console.log('返回地图绘制数据:', drawingData);
+              this.notifyWPF('mapDrawingDataResponse', { data: drawingData });
+              break;
             default:
               console.warn('未知消息类型:', message.type);
           }
@@ -1473,6 +1575,152 @@ const App = {
       
       // 从记录中删除
       delete this.customOverlays[overlayId];
+    }
+  },
+
+  // 隐藏编辑工具（只读模式）
+  hideEditingTools() {
+    // 隐藏绘图工具栏
+    const toolbar = document.querySelector('.bottom-toolbar');
+    if (toolbar) toolbar.style.display = 'none';
+    
+    // 隐藏控制面板
+    const controlPanels = document.querySelector('.control-panels');
+    if (controlPanels) controlPanels.style.display = 'none';
+    
+    // 隐藏地图提示
+    const mapHint = document.querySelector('#mapHint');
+    if (mapHint) mapHint.style.display = 'none';
+    
+    // 添加只读模式提示
+    const mapContainer = document.querySelector('#map');
+    if (mapContainer) {
+      const reviewHint = document.createElement('div');
+      reviewHint.className = 'review-hint';
+      reviewHint.innerHTML = '<strong>查看模式：</strong>正在显示考生的地图绘制答案';
+      reviewHint.style.cssText = `
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 123, 255, 0.9);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      `;
+      mapContainer.appendChild(reviewHint);
+    }
+  },
+
+  // 加载只读模式的地图数据
+  loadReviewMapData() {
+    if (!this.reviewMapData || !Array.isArray(this.reviewMapData)) {
+      console.warn('没有有效的地图数据可加载');
+      return;
+    }
+
+    console.log('加载地图数据:', this.reviewMapData);
+
+    // 清空现有覆盖物
+    this.overlays = [];
+    
+    // 加载每个覆盖物
+    this.reviewMapData.forEach((item, index) => {
+      try {
+        this.loadReviewOverlay(item, index);
+      } catch (e) {
+        console.error('加载覆盖物失败:', item, e);
+      }
+    });
+
+    // 更新覆盖物列表显示
+    this.renderOverlayList();
+  },
+
+  // 加载单个只读覆盖物
+  loadReviewOverlay(data, index) {
+    let overlay = null;
+    const overlayId = `review_${index}`;
+
+    switch (data.type) {
+      case 'marker':
+        overlay = new BMapGL.Marker(new BMapGL.Point(data.lng, data.lat));
+        if (data.iconUrl) {
+          const icon = new BMapGL.Icon(data.iconUrl, new BMapGL.Size(32, 32));
+          overlay.setIcon(icon);
+        }
+        break;
+
+      case 'polyline':
+        if (data.points && data.points.length > 1) {
+          const points = data.points.map(p => new BMapGL.Point(p.lng, p.lat));
+          overlay = new BMapGL.Polyline(points, {
+            strokeColor: data.strokeColor || '#FF0000',
+            strokeWeight: data.strokeWeight || 3,
+            strokeOpacity: data.strokeOpacity || 0.8
+          });
+        }
+        break;
+
+      case 'polygon':
+        if (data.points && data.points.length > 2) {
+          const points = data.points.map(p => new BMapGL.Point(p.lng, p.lat));
+          overlay = new BMapGL.Polygon(points, {
+            strokeColor: data.strokeColor || '#FF0000',
+            strokeWeight: data.strokeWeight || 2,
+            strokeOpacity: data.strokeOpacity || 0.8,
+            fillColor: data.fillColor || '#FF0000',
+            fillOpacity: data.fillOpacity || 0.3
+          });
+        }
+        break;
+
+      case 'rectangle':
+        if (data.bounds) {
+          const sw = new BMapGL.Point(data.bounds.sw.lng, data.bounds.sw.lat);
+          const ne = new BMapGL.Point(data.bounds.ne.lng, data.bounds.ne.lat);
+          overlay = new BMapGL.Polygon([
+            sw,
+            new BMapGL.Point(ne.lng, sw.lat),
+            ne,
+            new BMapGL.Point(sw.lng, ne.lat)
+          ], {
+            strokeColor: data.strokeColor || '#FF0000',
+            strokeWeight: data.strokeWeight || 2,
+            strokeOpacity: data.strokeOpacity || 0.8,
+            fillColor: data.fillColor || '#FF0000',
+            fillOpacity: data.fillOpacity || 0.3
+          });
+        }
+        break;
+
+      case 'circle':
+        if (data.center && data.radius) {
+          overlay = new BMapGL.Circle(
+            new BMapGL.Point(data.center.lng, data.center.lat),
+            data.radius,
+            {
+              strokeColor: data.strokeColor || '#FF0000',
+              strokeWeight: data.strokeWeight || 2,
+              strokeOpacity: data.strokeOpacity || 0.8,
+              fillColor: data.fillColor || '#FF0000',
+              fillOpacity: data.fillOpacity || 0.3
+            }
+          );
+        }
+        break;
+    }
+
+    if (overlay) {
+      this.map.addOverlay(overlay);
+      this.overlays.push({
+        id: overlayId,
+        overlay: overlay,
+        type: data.type,
+        name: data.name || `${data.type}_${index + 1}`
+      });
     }
   }
 };

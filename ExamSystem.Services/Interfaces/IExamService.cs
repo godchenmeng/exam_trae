@@ -37,6 +37,17 @@ namespace ExamSystem.Services.Interfaces
     Task<bool> SaveAnswerAsync(int recordId, int questionId, string userAnswer);
     
     /// <summary>
+    /// 保存地图绘制答案
+    /// </summary>
+    /// <param name="recordId">考试记录ID</param>
+    /// <param name="questionId">题目ID</param>
+    /// <param name="mapDrawingData">地图绘制数据JSON</param>
+    /// <param name="mapCenter">地图中心点JSON</param>
+    /// <param name="mapZoom">地图缩放级别</param>
+    /// <returns>保存是否成功</returns>
+    Task<bool> SaveMapDrawingAnswerAsync(int recordId, int questionId, string mapDrawingData, string? mapCenter = null, int? mapZoom = null);
+    
+    /// <summary>
     /// 提交考试
     /// </summary>
     /// <param name="recordId">考试记录ID</param>

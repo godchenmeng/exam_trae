@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net8.0\MapDrawingMigration.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net8.0\MapDrawingMigration.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net8.0\MapDrawingMigration.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\MapDrawingMigration.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net8.0\MapDrawingMigration.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\MapDrawingMigration.sourcelink.json

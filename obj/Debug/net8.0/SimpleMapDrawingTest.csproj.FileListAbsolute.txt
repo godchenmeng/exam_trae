@@ -1,0 +1,6 @@
+E:\Project\exam_trae\obj\Debug\net8.0\SimpleMapDrawingTest.csproj.AssemblyReference.cache
+E:\Project\exam_trae\obj\Debug\net8.0\SimpleMapDrawingTest.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project\exam_trae\obj\Debug\net8.0\SimpleMapDrawingTest.AssemblyInfoInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\SimpleMapDrawingTest.AssemblyInfo.cs
+E:\Project\exam_trae\obj\Debug\net8.0\SimpleMapDrawingTest.csproj.CoreCompileInputs.cache
+E:\Project\exam_trae\obj\Debug\net8.0\SimpleMapDrawingTest.sourcelink.json

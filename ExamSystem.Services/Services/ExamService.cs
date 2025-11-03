@@ -168,6 +168,50 @@ public class ExamService : IExamService
     }
 
     /// <summary>
+    /// 保存地图绘制答案
+    /// </summary>
+    /// <param name="recordId">考试记录ID</param>
+    /// <param name="questionId">题目ID</param>
+    /// <param name="mapDrawingData">地图绘制数据JSON</param>
+    /// <param name="mapCenter">地图中心点JSON</param>
+    /// <param name="mapZoom">地图缩放级别</param>
+    /// <returns>保存是否成功</returns>
+    public async Task<bool> SaveMapDrawingAnswerAsync(int recordId, int questionId, string mapDrawingData, string? mapCenter = null, int? mapZoom = null)
+    {
+        try
+        {
+            var answerRecord = await _context.AnswerRecords
+                .FirstOrDefaultAsync(ar => ar.RecordId == recordId && ar.QuestionId == questionId);
+
+            if (answerRecord == null)
+            {
+                _logger.LogWarning("答题记录不存在，记录ID: {RecordId}，题目ID: {QuestionId}", recordId, questionId);
+                return false;
+            }
+
+            // 保存地图绘制数据
+            answerRecord.MapDrawingData = mapDrawingData;
+            answerRecord.MapCenter = mapCenter;
+            answerRecord.MapZoom = mapZoom;
+            answerRecord.AnswerTime = DateTime.Now;
+
+            // 同时将地图绘制数据作为用户答案保存（用于兼容性）
+            answerRecord.UserAnswer = mapDrawingData;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogDebug("保存地图绘制答案成功，记录ID: {RecordId}，题目ID: {QuestionId}，数据长度: {DataLength}", 
+                recordId, questionId, mapDrawingData?.Length ?? 0);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "保存地图绘制答案失败，记录ID: {RecordId}，题目ID: {QuestionId}", recordId, questionId);
+            return false;
+        }
+    }
+
+    /// <summary>
     /// 提交考试
     /// </summary>
     public async Task<bool> SubmitExamAsync(int recordId)

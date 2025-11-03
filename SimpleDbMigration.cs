@@ -28,6 +28,11 @@ ALTER TABLE AnswerRecords ADD COLUMN DrawDurationSeconds INTEGER NOT NULL DEFAUL
 ALTER TABLE AnswerRecords ADD COLUMN ClientInfoJson TEXT;
 ALTER TABLE AnswerRecords ADD COLUMN RubricScoresJson TEXT;
 
+-- AnswerRecords 表新增地图绘制答案字段
+ALTER TABLE AnswerRecords ADD COLUMN MapDrawingData TEXT;
+ALTER TABLE AnswerRecords ADD COLUMN MapCenter TEXT;
+ALTER TABLE AnswerRecords ADD COLUMN MapZoom INTEGER;
+
 COMMIT;
 ";
 

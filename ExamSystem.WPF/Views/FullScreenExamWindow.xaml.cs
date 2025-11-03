@@ -15,6 +15,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Domain.DTOs;
+using ExamSystem.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 
@@ -36,6 +37,9 @@ namespace ExamSystem.WPF.Views
         private readonly object _initializationLock = new object(); // 添加初始化锁
         private FullScreenExamViewModel? _viewModel;
         
+        // 地图绘制数据获取相关字段
+        private TaskCompletionSource<string>? _mapDrawingDataTcs;
+        
         public FullScreenExamWindow()
         {
             InitializeComponent();
@@ -54,6 +58,339 @@ namespace ExamSystem.WPF.Views
             
             // 监听DataContext变化
             this.DataContextChanged += OnDataContextChanged;
+        }
+
+        /// <summary>
+        /// 处理学生提交答案
+        /// </summary>
+        private void HandleSubmitAnswer(JsonElement message)
+        {
+            try
+            {
+                Debug.WriteLine("FullScreenExamWindow 收到学生提交答案消息");
+
+                // 从消息中提取数据
+                if (!message.TryGetProperty("data", out var dataProperty))
+                {
+                    Debug.WriteLine("FullScreenExamWindow 错误: SubmitAnswer消息缺少data属性");
+                    return;
+                }
+
+                // 提取questionId
+                int questionId = 0;
+                if (dataProperty.TryGetProperty("questionId", out var questionIdProperty))
+                {
+                    questionId = questionIdProperty.GetInt32();
+                }
+
+                // 提取overlays（地图绘制数据）
+                JsonElement overlaysElement = default;
+                bool hasOverlays = dataProperty.TryGetProperty("overlays", out overlaysElement);
+
+                // 提取绘制时长
+                int drawDurationSeconds = 0;
+                if (dataProperty.TryGetProperty("drawDurationSeconds", out var durationProperty))
+                {
+                    drawDurationSeconds = durationProperty.GetInt32();
+                }
+
+                Debug.WriteLine($"FullScreenExamWindow 提交答案数据 - QuestionId: {questionId}, HasOverlays: {hasOverlays}, Duration: {drawDurationSeconds}秒");
+
+                // 验证当前题目
+                if (_viewModel?.CurrentQuestion != null)
+                {
+                    // 转换前端overlays数据格式为后端MapDrawingDto格式
+                    var convertedOverlays = hasOverlays ? ConvertOverlaysToMapDrawingData(overlaysElement) : new List<MapDrawingDto>();
+                    var convertedOverlaysJson = JsonSerializer.Serialize(convertedOverlays);
+                    
+                    // 更新当前题目的地图绘制答案
+                    _viewModel.CurrentQuestion.MapDrawingAnswer = convertedOverlaysJson;
+                    _viewModel.CurrentQuestion.DrawDurationSeconds = drawDurationSeconds;
+
+                    // 异步保存答案和地图绘制数据
+                    var currentAnswerRecord = _viewModel.GetCurrentAnswerRecord();
+                    if (currentAnswerRecord != null)
+                    {
+                        // 保存地图绘制数据
+                        _ = SaveMapDrawingDataAsync(currentAnswerRecord.AnswerId, convertedOverlaysJson, isAutoSave: false);
+
+                        // 更新答案记录的绘制时长
+                        currentAnswerRecord.DrawDurationSeconds = drawDurationSeconds;
+
+                        Debug.WriteLine($"FullScreenExamWindow 学生答案提交成功 - AnswerId: {currentAnswerRecord.AnswerId}, 覆盖物数量: {convertedOverlays.Count}");
+                    }
+                    else
+                    {
+                        Debug.WriteLine("FullScreenExamWindow 错误: 无法获取当前答案记录");
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine("FullScreenExamWindow 错误: 当前题目为空");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"FullScreenExamWindow 处理学生提交答案失败: {ex.Message}");
+                Debug.WriteLine($"FullScreenExamWindow 异常堆栈: {ex.StackTrace}");
+            }
+        }
+
+        /// <summary>
+        /// 转换前端overlays数据格式为后端MapDrawingDto格式
+        /// </summary>
+        /// <param name="overlaysElement">前端overlays数据</param>
+        /// <returns>转换后的MapDrawingDto列表</returns>
+        private List<MapDrawingDto> ConvertOverlaysToMapDrawingData(JsonElement overlaysElement)
+        {
+            var result = new List<MapDrawingDto>();
+            
+            try
+            {
+                if (overlaysElement.ValueKind != JsonValueKind.Array)
+                {
+                    Debug.WriteLine("FullScreenExamWindow 警告: overlays不是数组格式");
+                    return result;
+                }
+
+                var currentAnswerRecord = _viewModel?.GetCurrentAnswerRecord();
+                int answerId = currentAnswerRecord?.AnswerId ?? 0;
+
+                int orderIndex = 0;
+                foreach (var overlay in overlaysElement.EnumerateArray())
+                {
+                    var mapDrawingDto = new MapDrawingDto
+                    {
+                        AnswerId = answerId,
+                        OrderIndex = orderIndex++,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    // 提取基本信息
+                    if (overlay.TryGetProperty("type", out var typeElement))
+                    {
+                        mapDrawingDto.ShapeType = ConvertShapeType(typeElement.GetString());
+                    }
+
+                    if (overlay.TryGetProperty("meta", out var metaElement) && 
+                        metaElement.TryGetProperty("label", out var labelElement))
+                    {
+                        mapDrawingDto.Label = labelElement.GetString();
+                    }
+
+                    // 提取坐标信息
+                    if (overlay.TryGetProperty("geometry", out var geometryElement))
+                    {
+                        mapDrawingDto.Coordinates = ExtractCoordinates(geometryElement, mapDrawingDto.ShapeType);
+                    }
+
+                    // 提取样式信息
+                    if (overlay.TryGetProperty("style", out var styleElement))
+                    {
+                        mapDrawingDto.Style = ExtractStyle(styleElement);
+                    }
+
+                    result.Add(mapDrawingDto);
+                }
+
+                Debug.WriteLine($"FullScreenExamWindow 转换overlays数据完成，共 {result.Count} 个图形");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"FullScreenExamWindow 转换overlays数据格式失败: {ex.Message}");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 转换图形类型
+        /// </summary>
+        /// <param name="frontendType">前端图形类型</param>
+        /// <returns>后端图形类型</returns>
+        private string ConvertShapeType(string? frontendType)
+        {
+            return frontendType?.ToLower() switch
+            {
+                "marker" => "Marker",
+                "polyline" => "Line", 
+                "polygon" => "Polygon",
+                "circle" => "Circle",
+                "rectangle" => "Rectangle",
+                _ => "Point"
+            };
+        }
+
+        /// <summary>
+        /// 提取坐标信息
+        /// </summary>
+        /// <param name="geometryElement">几何信息JSON元素</param>
+        /// <param name="shapeType">图形类型</param>
+        /// <returns>坐标列表</returns>
+        private List<MapCoordinate> ExtractCoordinates(JsonElement geometryElement, string shapeType)
+        {
+            var coordinates = new List<MapCoordinate>();
+
+            try
+            {
+                switch (shapeType.ToLower())
+                {
+                    case "marker":
+                    case "point":
+                        // 点：{ lng: 116.4, lat: 39.9 }
+                        if (geometryElement.TryGetProperty("lng", out var lng) && 
+                            geometryElement.TryGetProperty("lat", out var lat))
+                        {
+                            coordinates.Add(new MapCoordinate 
+                            { 
+                                Longitude = lng.GetDouble(), 
+                                Latitude = lat.GetDouble() 
+                            });
+                        }
+                        break;
+
+                    case "line":
+                    case "polygon":
+                        // 线/多边形：{ path: [ {lng:116.4,lat:39.9}, {lng:116.41,lat:39.91} ] }
+                        if (geometryElement.TryGetProperty("path", out var pathElement) && 
+                            pathElement.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var point in pathElement.EnumerateArray())
+                            {
+                                if (point.TryGetProperty("lng", out var pLng) && 
+                                    point.TryGetProperty("lat", out var pLat))
+                                {
+                                    coordinates.Add(new MapCoordinate 
+                                    { 
+                                        Longitude = pLng.GetDouble(), 
+                                        Latitude = pLat.GetDouble() 
+                                    });
+                                }
+                            }
+                        }
+                        break;
+
+                    case "circle":
+                        // 圆：{ center: {lng:116.4,lat:39.9}, radius: 1000 }
+                        if (geometryElement.TryGetProperty("center", out var centerElement))
+                        {
+                            if (centerElement.TryGetProperty("lng", out var cLng) && 
+                                centerElement.TryGetProperty("lat", out var cLat))
+                            {
+                                coordinates.Add(new MapCoordinate 
+                                { 
+                                    Longitude = cLng.GetDouble(), 
+                                    Latitude = cLat.GetDouble() 
+                                });
+                            }
+                        }
+                        // 半径信息可以存储在Altitude字段中
+                        if (geometryElement.TryGetProperty("radius", out var radiusElement) && coordinates.Count > 0)
+                        {
+                            coordinates[0].Altitude = radiusElement.GetDouble();
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"FullScreenExamWindow 提取坐标信息失败，图形类型: {shapeType}, 错误: {ex.Message}");
+            }
+
+            return coordinates;
+        }
+
+        /// <summary>
+        /// 提取样式信息
+        /// </summary>
+        /// <param name="styleElement">样式JSON元素</param>
+        /// <returns>地图绘制样式</returns>
+        private MapDrawingStyle ExtractStyle(JsonElement styleElement)
+        {
+            var style = new MapDrawingStyle();
+
+            try
+            {
+                if (styleElement.TryGetProperty("strokeColor", out var strokeColor))
+                {
+                    style.StrokeColor = strokeColor.GetString();
+                }
+
+                if (styleElement.TryGetProperty("fillColor", out var fillColor))
+                {
+                    style.FillColor = fillColor.GetString();
+                }
+
+                if (styleElement.TryGetProperty("strokeWeight", out var strokeWeight))
+                {
+                    style.StrokeWidth = strokeWeight.GetInt32();
+                }
+
+                if (styleElement.TryGetProperty("strokeOpacity", out var strokeOpacity))
+                {
+                    style.Opacity = strokeOpacity.GetDouble();
+                }
+
+                if (styleElement.TryGetProperty("fillOpacity", out var fillOpacity))
+                {
+                    style.IsFilled = fillOpacity.GetDouble() > 0;
+                }
+
+                // 兼容 marker 图标样式
+                if (styleElement.TryGetProperty("iconUrl", out var iconUrl))
+                {
+                    style.IconUrl = iconUrl.GetString();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"FullScreenExamWindow 提取样式信息失败: {ex.Message}");
+            }
+
+            return style;
+        }
+
+        /// <summary>
+        /// 处理地图绘制数据响应
+        /// </summary>
+        private void HandleMapDrawingDataResponse(JsonElement message)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("FullScreenExamWindow 收到地图绘制数据响应");
+                
+                // 获取数据
+                string data = "";
+                if (message.TryGetProperty("data", out var dataProperty))
+                {
+                    data = dataProperty.GetString() ?? "";
+                }
+
+                // 完成异步任务
+                var tcs = _mapDrawingDataTcs;
+                if (tcs != null)
+                {
+                    _mapDrawingDataTcs = null; // 清除引用
+                    tcs.SetResult(data);
+                    System.Diagnostics.Debug.WriteLine($"FullScreenExamWindow 地图绘制数据响应处理完成: {data.Length} 字符");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("FullScreenExamWindow 警告: 没有等待中的地图绘制数据请求");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamWindow 处理地图绘制数据响应失败: {ex.Message}");
+                
+                // 如果有等待中的任务，设置异常
+                var tcs = _mapDrawingDataTcs;
+                if (tcs != null)
+                {
+                    _mapDrawingDataTcs = null;
+                    tcs.SetException(ex);
+                }
+            }
         }
 
         /// <summary>
@@ -82,6 +419,9 @@ namespace ExamSystem.WPF.Views
             if (_viewModel != null)
             {
                 _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+                
+                // 设置窗口引用，用于地图绘制数据收集
+                _viewModel.SetExamWindow(this);
                 
                 // 检查初始状态：如果第一题就是地图绘制题，需要立即初始化地图
                 await CheckInitialMapDrawingState();
@@ -798,7 +1138,7 @@ namespace ExamSystem.WPF.Views
                 if (webView.CoreWebView2 != null)
                 {
                     Debug.WriteLine("FullScreenExamWindow CoreWebView2初始化成功，开始配置设置...");
-                    webView.CoreWebView2.OpenDevToolsWindow();
+                    //webView.CoreWebView2.OpenDevToolsWindow();
                     // 配置WebView2设置
                     var settings = webView.CoreWebView2.Settings;
                     settings.IsScriptEnabled = true;
@@ -986,6 +1326,11 @@ namespace ExamSystem.WPF.Views
                         }
                         break;
 
+                    case "SubmitAnswer":
+                        // 处理学生提交答案
+                        HandleSubmitAnswer(message);
+                        break;
+
                     case "mapDrawingData":
                         // 处理地图绘制数据保存
                         HandleMapDrawingData(message.GetProperty("data").ToString() ?? "");
@@ -1039,6 +1384,11 @@ namespace ExamSystem.WPF.Views
                             Debug.WriteLine("FullScreenExamWindow 错误: 城市名称为空");
                         }
                         break;
+
+                    case "mapDrawingDataResponse":
+                        // 处理地图绘制数据响应
+                        HandleMapDrawingDataResponse(message);
+                        break;
                 }
             }
             catch (Exception ex)
@@ -1056,14 +1406,37 @@ namespace ExamSystem.WPF.Views
             {
                 if (_viewModel?.CurrentQuestion != null)
                 {
+                    // 解析前端数据，提取overlays
+                    var jsonDoc = JsonDocument.Parse(data);
+                    var hasOverlays = jsonDoc.RootElement.TryGetProperty("overlays", out var overlaysElement);
+                    var drawDurationSeconds = 0;
+                    
+                    if (jsonDoc.RootElement.TryGetProperty("drawDurationSeconds", out var durationElement))
+                    {
+                        drawDurationSeconds = durationElement.GetInt32();
+                    }
+
+                    // 转换前端overlays数据格式为后端MapDrawingDto格式
+                    var convertedOverlays = hasOverlays ? ConvertOverlaysToMapDrawingData(overlaysElement) : new List<MapDrawingDto>();
+                    var convertedOverlaysJson = JsonSerializer.Serialize(convertedOverlays);
+
                     // 更新当前题目的地图绘制答案
-                    _viewModel.CurrentQuestion.MapDrawingAnswer = data;
+                    _viewModel.CurrentQuestion.MapDrawingAnswer = convertedOverlaysJson;
+                    _viewModel.CurrentQuestion.DrawDurationSeconds = drawDurationSeconds;
 
                     // 异步保存答案和地图绘制数据
                     var currentAnswerRecord = _viewModel.GetCurrentAnswerRecord();
-                    _ = SaveMapDrawingDataAsync(currentAnswerRecord?.AnswerId ?? 0, data);
+                    if (currentAnswerRecord != null)
+                    {
+                        // 更新答案记录的用户答案和绘制时长
+                        currentAnswerRecord.UserAnswer = convertedOverlaysJson;
+                        currentAnswerRecord.DrawDurationSeconds = drawDurationSeconds;
+                        
+                        // 保存地图绘制数据
+                        _ = SaveMapDrawingDataAsync(currentAnswerRecord.AnswerId, convertedOverlaysJson);
+                    }
 
-                    System.Diagnostics.Debug.WriteLine($"FullScreenExamWindow 地图绘制数据已更新: {data.Length} 字符");
+                    System.Diagnostics.Debug.WriteLine($"FullScreenExamWindow 地图绘制数据已更新: 转换了 {convertedOverlays.Count} 个图形");
                 }
             }
             catch (Exception ex)
@@ -1080,10 +1453,32 @@ namespace ExamSystem.WPF.Views
             try
             {
                 var currentAnswerRecord = _viewModel?.GetCurrentAnswerRecord();
-                if (currentAnswerRecord != null)
+                if (currentAnswerRecord != null && _viewModel?.CurrentQuestion != null)
                 {
+                    // 解析前端数据，提取overlays
+                    var jsonDoc = JsonDocument.Parse(data);
+                    var hasOverlays = jsonDoc.RootElement.TryGetProperty("overlays", out var overlaysElement);
+                    var drawDurationSeconds = 0;
+                    
+                    if (jsonDoc.RootElement.TryGetProperty("drawDurationSeconds", out var durationElement))
+                    {
+                        drawDurationSeconds = durationElement.GetInt32();
+                    }
+
+                    // 转换前端overlays数据格式为后端MapDrawingDto格式
+                    var convertedOverlays = hasOverlays ? ConvertOverlaysToMapDrawingData(overlaysElement) : new List<MapDrawingDto>();
+                    var convertedOverlaysJson = JsonSerializer.Serialize(convertedOverlays);
+
+                    // 更新当前题目的地图绘制答案
+                    _viewModel.CurrentQuestion.MapDrawingAnswer = convertedOverlaysJson;
+                    _viewModel.CurrentQuestion.DrawDurationSeconds = drawDurationSeconds;
+
+                    // 更新答案记录
+                    currentAnswerRecord.UserAnswer = convertedOverlaysJson;
+                    currentAnswerRecord.DrawDurationSeconds = drawDurationSeconds;
+
                     // 异步自动保存
-                    _ = SaveMapDrawingDataAsync(currentAnswerRecord.AnswerId, data, isAutoSave: true);
+                    _ = SaveMapDrawingDataAsync(currentAnswerRecord.AnswerId, convertedOverlaysJson, isAutoSave: true);
                 }
             }
             catch (Exception ex)
@@ -1217,6 +1612,88 @@ namespace ExamSystem.WPF.Views
                 {
                     MapWebView.CoreWebView2.PostWebMessageAsJson(errorJson);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 从WebView2获取地图绘制数据
+        /// </summary>
+        public async Task<string> GetMapDrawingDataAsync()
+        {
+            try
+            {
+                if (MapWebView?.CoreWebView2 != null && _viewModel?.CurrentQuestion?.QuestionType == "地图绘制题")
+                {
+                    Debug.WriteLine("FullScreenExamWindow 开始获取地图绘制数据...");
+                    
+                    // 创建一个TaskCompletionSource来等待WebView的响应
+                    var tcs = new TaskCompletionSource<string>();
+                    
+                    // 临时事件处理器来接收地图数据
+                    void OnMapDataReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+                    {
+                        try
+                        {
+                            var messageJson = e.WebMessageAsJson;
+                            var message = JsonSerializer.Deserialize<JsonElement>(messageJson);
+                            
+                            if (message.TryGetProperty("type", out var typeProperty) && 
+                                typeProperty.GetString() == "mapDrawingDataResponse")
+                            {
+                                var data = message.GetProperty("data").GetRawText() ?? "";
+                                Debug.WriteLine($"FullScreenExamWindow 收到地图绘制数据: {data.Length} 字符");
+                                tcs.SetResult(data);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"FullScreenExamWindow 处理地图数据响应失败: {ex.Message}");
+                            tcs.SetResult("");
+                        }
+                    }
+                    
+                    // 订阅消息事件
+                    MapWebView.CoreWebView2.WebMessageReceived += OnMapDataReceived;
+                    
+                    try
+                    {
+                        // 向WebView发送获取数据的请求
+                        var requestMessage = new { type = "getMapDrawingData" };
+                        var requestJson = JsonSerializer.Serialize(requestMessage);
+                        MapWebView.CoreWebView2.PostWebMessageAsJson(requestJson);
+                        
+                        Debug.WriteLine("FullScreenExamWindow 已发送获取地图数据请求");
+                        
+                        // 等待响应，最多等待5秒
+                        var timeoutTask = Task.Delay(5000);
+                        var completedTask = await Task.WhenAny(tcs.Task, timeoutTask);
+                        
+                        if (completedTask == tcs.Task)
+                        {
+                            return await tcs.Task;
+                        }
+                        else
+                        {
+                            Debug.WriteLine("FullScreenExamWindow 获取地图数据超时");
+                            return "";
+                        }
+                    }
+                    finally
+                    {
+                        // 取消订阅
+                        MapWebView.CoreWebView2.WebMessageReceived -= OnMapDataReceived;
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine("FullScreenExamWindow WebView未初始化或当前不是地图绘制题");
+                    return "";
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"FullScreenExamWindow 获取地图绘制数据失败: {ex.Message}");
+                return "";
             }
         }
 

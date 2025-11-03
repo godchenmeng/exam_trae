@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>地图调试页面</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        #map {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+            font-size: 12px;
+        }
+        
+        .error {
+            color: red;
+        }
+        
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-info" id="debugInfo">
+        <div>调试信息：</div>
+        <div id="status">初始化中...</div>
+    </div>
+    
+    <div id="map"></div>
+
+    <script>
+        const debugInfo = document.getElementById('status');
+        
+        function log(message, isError = false) {
+            console.log(message);
+            debugInfo.innerHTML += '<br>' + (isError ? '<span class="error">' : '<span class="success">') + message + '</span>';
+        }
+        
+        // 检查URL参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const mapData = urlParams.get('mapData');
+        const center = urlParams.get('center');
+        const zoom = urlParams.get('zoom');
+        
+        log('URL参数检查:');
+        log('mapData: ' + (mapData ? '存在' : '不存在'));
+        log('center: ' + (center ? center : '不存在'));
+        log('zoom: ' + (zoom ? zoom : '不存在'));
+        
+        // 检查百度地图API
+        if (typeof BMapGL === 'undefined') {
+            log('百度地图API未加载', true);
+        } else {
+            log('百度地图API已加载');
+            
+            try {
+                // 初始化地图
+                const map = new BMapGL.Map('map');
+                log('地图对象创建成功');
+                
+                // 设置中心点
+                let centerPoint;
+                if (center) {
+                    try {
+                        const centerObj = JSON.parse(decodeURIComponent(center));
+                        centerPoint = new BMapGL.Point(centerObj.lng, centerObj.lat);
+                        log('使用URL中心点: ' + centerObj.lng + ', ' + centerObj.lat);
+                    } catch (e) {
+                        log('解析中心点失败: ' + e.message, true);
+                        centerPoint = new BMapGL.Point(116.404, 39.915);
+                        log('使用默认中心点');
+                    }
+                } else {
+                    centerPoint = new BMapGL.Point(116.404, 39.915);
+                    log('使用默认中心点');
+                }
+                
+                const zoomLevel = zoom ? parseInt(zoom) : 12;
+                map.centerAndZoom(centerPoint, zoomLevel);
+                map.enableScrollWheelZoom(true);
+                
+                log('地图初始化完成，缩放级别: ' + zoomLevel);
+                
+                // 添加控件
+                map.addControl(new BMapGL.ZoomControl());
+                map.addControl(new BMapGL.ScaleControl());
+                log('地图控件添加完成');
+                
+                // 解析地图数据
+                if (mapData) {
+                    try {
+                        const decodedData = decodeURIComponent(mapData);
+                        const overlaysData = JSON.parse(decodedData);
+                        log('地图数据解析成功，覆盖物数量: ' + overlaysData.length);
+                        
+                        // 添加测试标记
+                        overlaysData.forEach((item, index) => {
+                            if (item.type === 'marker' && item.position) {
+                                const marker = new BMapGL.Marker(new BMapGL.Point(item.position.lng, item.position.lat));
+                                map.addOverlay(marker);
+                                log('添加标记: ' + (item.name || '标记' + (index + 1)));
+                            }
+                        });
+                        
+                    } catch (e) {
+                        log('解析地图数据失败: ' + e.message, true);
+                    }
+                } else {
+                    // 添加默认测试标记
+                    const testMarker = new BMapGL.Marker(centerPoint);
+                    map.addOverlay(testMarker);
+                    log('添加默认测试标记');
+                }
+                
+            } catch (e) {
+                log('地图初始化失败: ' + e.message, true);
+            }
+        }
+    </script>
+    
+    <!-- 百度地图API -->
+    <script src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=E4805d16520de693a3fe707cdc962045"></script>
+</body>
+</html>

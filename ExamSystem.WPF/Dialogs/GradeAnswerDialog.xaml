@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="clr-namespace:ExamSystem.WPF.Converters"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="人工评分" Height="700" Width="1100" WindowStartupLocation="CenterOwner"
         Icon="pack://siteoforigin:,,,/logo.png">
     <Window.Resources>
@@ -242,7 +243,47 @@
                     </GroupBox>
                     <GroupBox Header="考生答案">
                         <Border Background="{StaticResource SurfaceBrush}" Padding="10" CornerRadius="6">
-                            <TextBlock Text="{Binding SelectedSubjectiveAnswer.UserAnswer, Converter={StaticResource TrueFalseToChineseTextConverter}}" TextWrapping="Wrap" FontSize="14"/>
+                            <Grid>
+                                <!-- 普通题型答案显示 -->
+                                <TextBlock Text="{Binding SelectedSubjectiveAnswer.UserAnswer, Converter={StaticResource TrueFalseToChineseTextConverter}}" 
+                                           TextWrapping="Wrap" FontSize="14"
+                                           Visibility="{Binding SelectedSubjectiveAnswer.IsMapDrawingQuestion, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                                
+                                <!-- 地图绘制题答案显示 -->
+                                <Grid Visibility="{Binding SelectedSubjectiveAnswer.IsMapDrawingQuestion, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="400"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <!-- 地图绘制题说明 -->
+                                    <TextBlock Grid.Row="0" Text="考生地图绘制答案：" FontWeight="Bold" Margin="0,0,0,8"/>
+                                    
+                                    <!-- WebView2 地图显示区域 -->
+                                    <Border Grid.Row="1" BorderBrush="#DDD" BorderThickness="1" CornerRadius="4">
+                                        <Grid>
+                                            <!-- WebView2 控件 -->
+                                            <wv2:WebView2 x:Name="MapWebView" 
+                                                          Source="{Binding MapViewerUrl}"
+                                                          Visibility="{Binding IsMapLoaded, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                            
+                                            <!-- 加载提示 -->
+                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                        Visibility="{Binding IsMapLoaded, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                                <ProgressBar IsIndeterminate="True" Width="100" Height="4" Margin="0,0,0,10"/>
+                                                <TextBlock Text="加载考生地图答案..." HorizontalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                                            </StackPanel>
+                                            
+                                            <!-- 错误提示 -->
+                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                        Visibility="{Binding HasMapError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                <TextBlock Text="❌ 地图加载失败" HorizontalAlignment="Center" Foreground="Red" FontSize="16"/>
+                                                <TextBlock Text="{Binding MapErrorMessage}" HorizontalAlignment="Center" Foreground="Red" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Grid>
                         </Border>
                     </GroupBox>
                     <GroupBox Header="标准答案">

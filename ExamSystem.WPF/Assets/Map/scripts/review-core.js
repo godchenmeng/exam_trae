@@ -1031,6 +1031,22 @@ let mapReviewCore;
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
     mapReviewCore = new MapReviewCore();
+    // WebView2 消息桥接：监听来自 WPF 的消息
+    try {
+        if (window.chrome && window.chrome.webview) {
+            window.chrome.webview.addEventListener('message', (ev) => {
+                const msg = ev && ev.data ? ev.data : ev;
+                if (mapReviewCore) {
+                    mapReviewCore.handleMessage(msg);
+                }
+            });
+            console.log('[bridge] WebView2 message listener attached.');
+        } else {
+            console.log('[bridge] WebView2 not available.');
+        }
+    } catch (bridgeErr) {
+        console.error('[bridge] attach listener failed:', bridgeErr);
+    }
 });
 
 // 暴露给WPF的全局函数

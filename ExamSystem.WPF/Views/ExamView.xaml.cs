@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Domain.DTOs;
+using ExamSystem.Domain.Entities;
 using ExamSystem.WPF.ViewModels;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
@@ -15,6 +16,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 
 namespace ExamSystem.WPF.Views
 {
@@ -495,19 +497,24 @@ namespace ExamSystem.WPF.Views
                     var currentAnswerRecord = _viewModel.GetCurrentAnswerRecord();
                     if (currentAnswerRecord != null)
                     {
-                        currentAnswerRecord.UserAnswer = data;
+                        // 解析前端overlays数据并转换为后端格式
+                        var overlaysElement = JsonSerializer.Deserialize<JsonElement>(data);
+                        var convertedOverlays = ConvertOverlaysToMapDrawingData(overlaysElement);
+                        var convertedOverlaysJson = JsonSerializer.Serialize(convertedOverlays);
+                        
+                        currentAnswerRecord.UserAnswer = convertedOverlaysJson;
                         currentAnswerRecord.AnswerTime = DateTime.Now;
                         
                         // 异步保存答案和地图绘制数据
-                        _ = SaveMapDrawingDataAsync(currentAnswerRecord.AnswerId, data);
+                        _ = SaveMapDrawingDataAsync(currentAnswerRecord.AnswerId, convertedOverlaysJson);
                         
-                        System.Diagnostics.Debug.WriteLine($"地图绘制数据已更新: {data.Length} 字符");
+                        System.Diagnostics.Debug.WriteLine($"ExamView 地图绘制数据已更新: {convertedOverlays.Count} 个图形");
                     }
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"处理地图绘制数据失败: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"ExamView 处理地图绘制数据失败: {ex.Message}");
             }
         }
 
@@ -734,20 +741,20 @@ namespace ExamSystem.WPF.Views
                 
                 if (File.Exists(filePath))
                 {
-                    var content = File.ReadAllBytes(filePath);
+                    var content = await File.ReadAllBytesAsync(filePath);
                     var contentType = GetContentType(filePath);
                     
                     response.ContentType = contentType;
                     response.ContentLength64 = content.Length;
                     response.StatusCode = 200;
                     
-                    response.OutputStream.Write(content, 0, content.Length);
+                    await response.OutputStream.WriteAsync(content, 0, content.Length);
                 }
                 else
                 {
                     response.StatusCode = 404;
                     var errorBytes = System.Text.Encoding.UTF8.GetBytes("File not found");
-                    response.OutputStream.Write(errorBytes, 0, errorBytes.Length);
+                    await response.OutputStream.WriteAsync(errorBytes, 0, errorBytes.Length);
                 }
                 
                 response.OutputStream.Close();
@@ -783,6 +790,220 @@ namespace ExamSystem.WPF.Views
                 ".ico" => "image/x-icon",
                 _ => "application/octet-stream"
             };
+        }
+
+        /// <summary>
+        /// 转换前端overlays数据格式为后端MapDrawingDto格式
+        /// </summary>
+        /// <param name="overlaysElement">前端overlays数据</param>
+        /// <returns>转换后的MapDrawingDto列表</returns>
+        private List<MapDrawingDto> ConvertOverlaysToMapDrawingData(JsonElement overlaysElement)
+        {
+            var result = new List<MapDrawingDto>();
+            
+            try
+            {
+                if (overlaysElement.ValueKind != JsonValueKind.Array)
+                {
+                    Debug.WriteLine("ExamView 警告: overlays不是数组格式");
+                    return result;
+                }
+
+                var currentAnswerRecord = _viewModel?.GetCurrentAnswerRecord();
+                int answerId = currentAnswerRecord?.AnswerId ?? 0;
+
+                int orderIndex = 0;
+                foreach (var overlay in overlaysElement.EnumerateArray())
+                {
+                    var mapDrawingDto = new MapDrawingDto
+                    {
+                        AnswerId = answerId,
+                        OrderIndex = orderIndex++,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    // 提取基本信息
+                    if (overlay.TryGetProperty("type", out var typeElement))
+                    {
+                        mapDrawingDto.ShapeType = ConvertShapeType(typeElement.GetString());
+                    }
+
+                    if (overlay.TryGetProperty("meta", out var metaElement) && 
+                        metaElement.TryGetProperty("label", out var labelElement))
+                    {
+                        mapDrawingDto.Label = labelElement.GetString();
+                    }
+
+                    // 提取坐标信息
+                    if (overlay.TryGetProperty("geometry", out var geometryElement))
+                    {
+                        mapDrawingDto.Coordinates = ExtractCoordinates(geometryElement, mapDrawingDto.ShapeType);
+                    }
+
+                    // 提取样式信息
+                    if (overlay.TryGetProperty("style", out var styleElement))
+                    {
+                        mapDrawingDto.Style = ExtractStyle(styleElement);
+                    }
+
+                    result.Add(mapDrawingDto);
+                }
+
+                Debug.WriteLine($"ExamView 转换overlays数据完成，共 {result.Count} 个图形");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ExamView 转换overlays数据格式失败: {ex.Message}");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 转换图形类型
+        /// </summary>
+        /// <param name="frontendType">前端图形类型</param>
+        /// <returns>后端图形类型</returns>
+        private string ConvertShapeType(string? frontendType)
+        {
+            return frontendType?.ToLower() switch
+            {
+                "marker" => "Marker",
+                "polyline" => "Line", 
+                "polygon" => "Polygon",
+                "circle" => "Circle",
+                "rectangle" => "Rectangle",
+                _ => "Point"
+            };
+        }
+
+        /// <summary>
+        /// 提取坐标信息
+        /// </summary>
+        /// <param name="geometryElement">几何信息JSON元素</param>
+        /// <param name="shapeType">图形类型</param>
+        /// <returns>坐标列表</returns>
+        private List<MapCoordinate> ExtractCoordinates(JsonElement geometryElement, string shapeType)
+        {
+            var coordinates = new List<MapCoordinate>();
+
+            try
+            {
+                switch (shapeType.ToLower())
+                {
+                    case "marker":
+                    case "point":
+                        // 点：{ lng: 116.4, lat: 39.9 }
+                        if (geometryElement.TryGetProperty("lng", out var lng) && 
+                            geometryElement.TryGetProperty("lat", out var lat))
+                        {
+                            coordinates.Add(new MapCoordinate 
+                            { 
+                                Longitude = lng.GetDouble(), 
+                                Latitude = lat.GetDouble() 
+                            });
+                        }
+                        break;
+
+                    case "line":
+                    case "polygon":
+                        // 线/多边形：{ path: [ {lng:116.4,lat:39.9}, {lng:116.41,lat:39.91} ] }
+                        if (geometryElement.TryGetProperty("path", out var pathElement) && 
+                            pathElement.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var point in pathElement.EnumerateArray())
+                            {
+                                if (point.TryGetProperty("lng", out var pLng) && 
+                                    point.TryGetProperty("lat", out var pLat))
+                                {
+                                    coordinates.Add(new MapCoordinate 
+                                    { 
+                                        Longitude = pLng.GetDouble(), 
+                                        Latitude = pLat.GetDouble() 
+                                    });
+                                }
+                            }
+                        }
+                        break;
+
+                    case "circle":
+                        // 圆：{ center: {lng:116.4,lat:39.9}, radius: 1000 }
+                        if (geometryElement.TryGetProperty("center", out var centerElement))
+                        {
+                            if (centerElement.TryGetProperty("lng", out var cLng) && 
+                                centerElement.TryGetProperty("lat", out var cLat))
+                            {
+                                coordinates.Add(new MapCoordinate 
+                                { 
+                                    Longitude = cLng.GetDouble(), 
+                                    Latitude = cLat.GetDouble() 
+                                });
+                            }
+                        }
+                        // 半径信息可以存储在Altitude字段中
+                        if (geometryElement.TryGetProperty("radius", out var radiusElement) && coordinates.Count > 0)
+                        {
+                            coordinates[0].Altitude = radiusElement.GetDouble();
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ExamView 提取坐标信息失败，图形类型: {shapeType}, 错误: {ex.Message}");
+            }
+
+            return coordinates;
+        }
+
+        /// <summary>
+        /// 提取样式信息
+        /// </summary>
+        /// <param name="styleElement">样式JSON元素</param>
+        /// <returns>地图绘制样式</returns>
+        private MapDrawingStyle ExtractStyle(JsonElement styleElement)
+        {
+            var style = new MapDrawingStyle();
+
+            try
+            {
+                if (styleElement.TryGetProperty("strokeColor", out var strokeColor))
+                {
+                    style.StrokeColor = strokeColor.GetString();
+                }
+
+                if (styleElement.TryGetProperty("fillColor", out var fillColor))
+                {
+                    style.FillColor = fillColor.GetString();
+                }
+
+                if (styleElement.TryGetProperty("strokeWeight", out var strokeWeight))
+                {
+                    style.StrokeWidth = strokeWeight.GetInt32();
+                }
+
+                if (styleElement.TryGetProperty("strokeOpacity", out var strokeOpacity))
+                {
+                    style.Opacity = strokeOpacity.GetDouble();
+                }
+
+                if (styleElement.TryGetProperty("fillOpacity", out var fillOpacity))
+                {
+                    style.IsFilled = fillOpacity.GetDouble() > 0;
+                }
+
+                // 兼容 marker 图标样式
+                if (styleElement.TryGetProperty("iconUrl", out var iconUrl))
+                {
+                    style.IconUrl = iconUrl.GetString();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"ExamView 提取样式信息失败: {ex.Message}");
+            }
+
+            return style;
         }
 
         #endregion

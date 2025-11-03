@@ -1,0 +1,51 @@
+2025-11-03 00:00:01.268 +08:00 [INF] PermissionService.HasPermission: Role=Teacher, Operation=SendNotification, Result=True
+2025-11-03 00:00:10.874 +08:00 [INF] PermissionService.HasPermission: Role=Teacher, Operation=SendNotification, Result=True
+2025-11-03 00:00:11.355 +08:00 [INF] PermissionService.HasPermission: Role=Teacher, Operation=SendNotification, Result=True
+2025-11-03 00:00:25.454 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-03 00:00:25.454 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-03 00:00:25.455 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-11-03 00:00:25.455 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-11-03 00:00:25.455 +08:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-11-03 00:00:25.455 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "e"."RecordId", "e"."CorrectCount", "e"."CreatedAt", "e"."EndTime", "e"."GradedAt", "e"."GraderId", "e"."IsPassed", "e"."ObjectiveScore", "e"."PaperId", "e"."RemainingTime", "e"."StartTime", "e"."Status", "e"."SubjectiveScore", "e"."SubmitTime", "e"."TotalCount", "e"."TotalScore", "e"."UserId", "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username", "e0"."PaperId", "e0"."AllowRetake", "e0"."AllowViewAnswer", "e0"."CreatedAt", "e0"."CreatorId", "e0"."Description", "e0"."Duration", "e0"."EndTime", "e0"."IsActive", "e0"."IsPublished", "e0"."IsRandomOrder", "e0"."Name", "e0"."PassScore", "e0"."StartTime", "e0"."Status", "e0"."TotalScore", "e0"."UpdatedAt", "a"."AnswerId", "a"."AnswerTime", "a"."ClientInfoJson", "a"."Comment", "a"."DrawDurationSeconds", "a"."GradeTime", "a"."GraderId", "a"."IsCorrect", "a"."IsGraded", "a"."MapCenter", "a"."MapDrawingData", "a"."MapZoom", "a"."QuestionId", "a"."RecordId", "a"."RubricScoresJson", "a"."Score", "a"."UserAnswer"
+FROM "ExamRecords" AS "e"
+INNER JOIN "Users" AS "u" ON "e"."UserId" = "u"."UserId"
+INNER JOIN "ExamPapers" AS "e0" ON "e"."PaperId" = "e0"."PaperId"
+LEFT JOIN "AnswerRecords" AS "a" ON "e"."RecordId" = "a"."RecordId"
+WHERE "e"."Status" IN (4, 3, 5)
+ORDER BY "e"."StartTime" DESC, "e"."RecordId", "u"."UserId", "e0"."PaperId"
+2025-11-03 00:00:25.455 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "e"."RecordId", "e"."CorrectCount", "e"."CreatedAt", "e"."EndTime", "e"."GradedAt", "e"."GraderId", "e"."IsPassed", "e"."ObjectiveScore", "e"."PaperId", "e"."RemainingTime", "e"."StartTime", "e"."Status", "e"."SubjectiveScore", "e"."SubmitTime", "e"."TotalCount", "e"."TotalScore", "e"."UserId", "u"."UserId", "u"."CreatedAt", "u"."Email", "u"."IsActive", "u"."LastLoginAt", "u"."LockoutEnd", "u"."LoginFailCount", "u"."PasswordHash", "u"."Phone", "u"."RealName", "u"."Role", "u"."Username", "e0"."PaperId", "e0"."AllowRetake", "e0"."AllowViewAnswer", "e0"."CreatedAt", "e0"."CreatorId", "e0"."Description", "e0"."Duration", "e0"."EndTime", "e0"."IsActive", "e0"."IsPublished", "e0"."IsRandomOrder", "e0"."Name", "e0"."PassScore", "e0"."StartTime", "e0"."Status", "e0"."TotalScore", "e0"."UpdatedAt", "a"."AnswerId", "a"."AnswerTime", "a"."ClientInfoJson", "a"."Comment", "a"."DrawDurationSeconds", "a"."GradeTime", "a"."GraderId", "a"."IsCorrect", "a"."IsGraded", "a"."MapCenter", "a"."MapDrawingData", "a"."MapZoom", "a"."QuestionId", "a"."RecordId", "a"."RubricScoresJson", "a"."Score", "a"."UserAnswer"
+FROM "ExamRecords" AS "e"
+INNER JOIN "Users" AS "u" ON "e"."UserId" = "u"."UserId"
+INNER JOIN "ExamPapers" AS "e0" ON "e"."PaperId" = "e0"."PaperId"
+LEFT JOIN "AnswerRecords" AS "a" ON "e"."RecordId" = "a"."RecordId"
+WHERE "e"."Status" IN (4, 3, 5)
+ORDER BY "e"."StartTime" DESC, "e"."RecordId", "u"."UserId", "e0"."PaperId"
+2025-11-03 00:00:25.455 +08:00 [DBG] Closing data reader to 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-03 00:00:25.455 +08:00 [DBG] A data reader for 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' is being disposed after spending 0ms reading results.
+2025-11-03 00:00:25.455 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-03 00:00:25.455 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-03 00:00:25.456 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-03 00:00:25.456 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-03 00:00:25.456 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-11-03 00:00:25.456 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-11-03 00:00:25.456 +08:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-11-03 00:00:25.456 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "e"."PaperId", "e"."AllowRetake", "e"."AllowViewAnswer", "e"."CreatedAt", "e"."CreatorId", "e"."Description", "e"."Duration", "e"."EndTime", "e"."IsActive", "e"."IsPublished", "e"."IsRandomOrder", "e"."Name", "e"."PassScore", "e"."StartTime", "e"."Status", "e"."TotalScore", "e"."UpdatedAt"
+FROM "ExamPapers" AS "e"
+2025-11-03 00:00:25.456 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "e"."PaperId", "e"."AllowRetake", "e"."AllowViewAnswer", "e"."CreatedAt", "e"."CreatorId", "e"."Description", "e"."Duration", "e"."EndTime", "e"."IsActive", "e"."IsPublished", "e"."IsRandomOrder", "e"."Name", "e"."PassScore", "e"."StartTime", "e"."Status", "e"."TotalScore", "e"."UpdatedAt"
+FROM "ExamPapers" AS "e"
+2025-11-03 00:00:25.456 +08:00 [DBG] Closing data reader to 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-03 00:00:25.456 +08:00 [DBG] A data reader for 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' is being disposed after spending 0ms reading results.
+2025-11-03 00:00:25.456 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-03 00:00:25.456 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-03 00:00:25.496 +08:00 [INF] PermissionService.HasPermission: Role=Teacher, Operation=SendNotification, Result=True
+2025-11-03 00:00:26.470 +08:00 [INF] PermissionService.HasPermission: Role=Teacher, Operation=SendNotification, Result=True
+2025-11-03 00:00:26.539 +08:00 [INF] 用户已退出登录，清空当前用户状态
+2025-11-03 00:00:26.605 +08:00 [INF] PermissionService.HasPermission: Role=Teacher, Operation=SendNotification, Result=True
+2025-11-03 00:00:27.576 +08:00 [INF] PermissionService.HasPermission: Role=Teacher, Operation=SendNotification, Result=True
+2025-11-03 00:00:28.190 +08:00 [DBG] 'ExamDbContext' disposed.
+2025-11-03 00:00:28.191 +08:00 [DBG] Disposing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-03 00:00:28.191 +08:00 [DBG] Disposed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).

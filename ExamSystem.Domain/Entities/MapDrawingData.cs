@@ -131,6 +131,11 @@ namespace ExamSystem.Domain.Entities
         /// 线型 (solid, dashed, dotted)
         /// </summary>
         public string LineStyle { get; set; } = "solid";
+
+        /// <summary>
+        /// 标记图标URL（仅对Marker类型有效）
+        /// </summary>
+        public string? IconUrl { get; set; }
     }
 
     /// <summary>

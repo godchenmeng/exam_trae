@@ -4,14 +4,17 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using ExamSystem.Domain.DTOs;
 using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
 using ExamSystem.WPF.Commands;
+using ExamSystem.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ExamSystem.WPF.ViewModels
@@ -27,6 +30,7 @@ namespace ExamSystem.WPF.ViewModels
         private readonly DispatcherTimer _timer;
         private readonly int _paperId;
         private readonly string _paperTitle;
+        private FullScreenExamWindow? _examWindow;
         
         private bool _isLoading;
         private string _examTitle = string.Empty;
@@ -68,6 +72,177 @@ namespace ExamSystem.WPF.ViewModels
         }
 
         #region 属性
+
+        /// <summary>
+        /// 设置考试窗口引用
+        /// </summary>
+        public void SetExamWindow(FullScreenExamWindow window)
+        {
+            _examWindow = window;
+        }
+
+        /// <summary>
+        /// 收集所有地图绘制题的数据
+        /// </summary>
+        private async Task CollectAllMapDrawingDataAsync()
+        {
+            try
+            {
+                if (_examWindow == null || _answerRecords == null || _examRecord == null)
+                {
+                    return;
+                }
+
+                System.Diagnostics.Debug.WriteLine("FullScreenExamViewModel 开始收集所有地图绘制题数据...");
+
+                // 遍历所有答题记录，找出地图绘制题
+                for (int i = 0; i < _answerRecords.Count; i++)
+                {
+                    var answerRecord = _answerRecords[i];
+                    var question = answerRecord.Question;
+                    
+                    if (question?.QuestionType == QuestionType.MapDrawing)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 发现地图绘制题: 题目{i + 1}");
+                        
+                        string? mapData = null;
+                        
+                        // 如果当前题目就是地图绘制题，直接从WebView获取数据
+                        if (CurrentQuestionIndex == i + 1)
+                        {
+                            var rawMapData = await _examWindow.GetMapDrawingDataAsync();
+                            if (!string.IsNullOrEmpty(rawMapData))
+                            {
+                                try
+                                {
+                                    // 解析外层JSON，提取data字段
+                                    var outerJsonDoc = System.Text.Json.JsonDocument.Parse(rawMapData);
+                                    string? innerDataString = null;
+                                    
+                                    if (outerJsonDoc.RootElement.TryGetProperty("data", out var dataElement))
+                                    {
+                                        innerDataString = dataElement.GetString();
+                                    }
+                                    
+                                    if (string.IsNullOrEmpty(innerDataString))
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("警告: 未找到data字段或data字段为空");
+                                        continue;
+                                    }
+
+                                    // 解析内层JSON数据，提取完整的地图信息
+                                    var innerJsonDoc = System.Text.Json.JsonDocument.Parse(innerDataString);
+                                    var hasOverlays = innerJsonDoc.RootElement.TryGetProperty("overlays", out var overlaysElement);
+                                    var hasCenter = innerJsonDoc.RootElement.TryGetProperty("center", out var centerElement);
+                                    var hasZoom = innerJsonDoc.RootElement.TryGetProperty("zoom", out var zoomElement);
+
+                                    // 构建包含完整信息的地图数据对象
+                                    var completeMapData = new Dictionary<string, object>();
+                                    
+                                    // 转换前端overlays数据格式为后端MapDrawingDto格式
+                                    var convertedOverlays = hasOverlays ? ConvertOverlaysToMapDrawingData(overlaysElement) : new List<MapDrawingDto>();
+                                    completeMapData["overlays"] = convertedOverlays;
+                                    
+                                    // 保留center和zoom信息
+                                    if (hasCenter)
+                                    {
+                                        completeMapData["center"] = System.Text.Json.JsonSerializer.Deserialize<object>(centerElement.GetRawText());
+                                    }
+                                    if (hasZoom)
+                                    {
+                                        completeMapData["zoom"] = zoomElement.GetInt32();
+                                    }
+                                    
+                                    mapData = System.Text.Json.JsonSerializer.Serialize(completeMapData);
+
+                                    if (CurrentQuestion != null)
+                                    {
+                                        CurrentQuestion.MapDrawingAnswer = mapData;
+                                    }
+                                    answerRecord.UserAnswer = mapData;
+                                    
+                                    System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 收集到当前题目地图数据: 转换了 {convertedOverlays.Count} 个图形");
+                                }
+                                catch (Exception convertEx)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"转换地图数据格式失败: {convertEx.Message}");
+                                    // 如果转换失败，使用原始数据
+                                    mapData = rawMapData;
+                                    if (CurrentQuestion != null)
+                                    {
+                                        CurrentQuestion.MapDrawingAnswer = mapData;
+                                    }
+                                    answerRecord.UserAnswer = mapData;
+                                }
+                            }
+                        }
+                        // 对于其他地图绘制题，使用已保存的数据
+                        else if (!string.IsNullOrEmpty(answerRecord.UserAnswer))
+                        {
+                            mapData = answerRecord.UserAnswer;
+                            System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 使用已保存的地图数据: 题目{i + 1}");
+                        }
+
+                        // 使用专门的地图绘制答案保存方法
+                        if (!string.IsNullOrEmpty(mapData))
+                        {
+                            try
+                            {
+                                // 解析地图数据以提取中心点和缩放级别
+                                string? mapCenter = null;
+                                int? mapZoom = null;
+                                
+                                if (mapData.Contains("\"center\"") && mapData.Contains("\"zoom\""))
+                                {
+                                    try
+                                    {
+                                        var jsonDoc = System.Text.Json.JsonDocument.Parse(mapData);
+                                        if (jsonDoc.RootElement.TryGetProperty("center", out var centerElement))
+                                        {
+                                            mapCenter = centerElement.GetRawText();
+                                        }
+                                        if (jsonDoc.RootElement.TryGetProperty("zoom", out var zoomElement))
+                                        {
+                                            mapZoom = zoomElement.GetInt32();
+                                        }
+                                    }
+                                    catch (Exception parseEx)
+                                    {
+                                        System.Diagnostics.Debug.WriteLine($"解析地图数据失败: {parseEx.Message}");
+                                    }
+                                }
+
+                                var saveResult = await _examService.SaveMapDrawingAnswerAsync(
+                                    _examRecord.RecordId, 
+                                    question.QuestionId, 
+                                    mapData, 
+                                    mapCenter, 
+                                    mapZoom);
+                                
+                                if (saveResult)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"地图绘制答案保存成功: 题目{question.QuestionId}");
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"地图绘制答案保存失败: 题目{question.QuestionId}");
+                                }
+                            }
+                            catch (Exception saveEx)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"保存地图绘制答案异常: {saveEx.Message}");
+                            }
+                        }
+                    }
+                }
+
+                System.Diagnostics.Debug.WriteLine("FullScreenExamViewModel 地图绘制题数据收集完成");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 收集地图绘制数据失败: {ex.Message}");
+            }
+        }
 
         /// <summary>
         /// 是否正在加载
@@ -818,6 +993,12 @@ namespace ExamSystem.WPF.ViewModels
                     {
                         userAnswer = CurrentQuestion.EssayAnswer ?? string.Empty;
                     }
+                    else if (IsMapDrawing)
+                    {
+
+                        await CollectAllMapDrawingDataAsync();
+                        userAnswer = CurrentQuestion.MapDrawingAnswer ?? string.Empty;
+                    }
 
                     var idx = CurrentQuestionIndex - 1;
                     if (idx >= 0 && idx < _answerRecords.Count)
@@ -873,6 +1054,9 @@ namespace ExamSystem.WPF.ViewModels
 
                     // 保存当前答案
                     await SaveCurrentAnswer();
+
+                    // 收集所有地图绘制题的数据
+                    await CollectAllMapDrawingDataAsync();
 
                     var success = false;
                     if (_examRecord != null)
@@ -965,6 +1149,346 @@ namespace ExamSystem.WPF.ViewModels
 
         #endregion
 
+        #region 地图绘制数据转换方法
+
+        /// <summary>
+        /// 转换前端overlays数据为后端MapDrawingDto格式
+        /// </summary>
+        private List<MapDrawingDto> ConvertOverlaysToMapDrawingData(JsonElement overlaysElement)
+        {
+            var result = new List<MapDrawingDto>();
+
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel ConvertOverlaysToMapDrawingData 开始转换");
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel overlaysElement类型: {overlaysElement.ValueKind}");
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel overlaysElement内容: {overlaysElement.GetRawText()}");
+                
+                if (overlaysElement.ValueKind != JsonValueKind.Array)
+                {
+                    System.Diagnostics.Debug.WriteLine("FullScreenExamViewModel 警告: overlays不是数组格式");
+                    return result;
+                }
+
+                var currentAnswerRecord = GetCurrentAnswerRecord();
+                int answerId = currentAnswerRecord?.AnswerId ?? 0;
+
+                int orderIndex = 0;
+                foreach (var overlay in overlaysElement.EnumerateArray())
+                {
+                    System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 处理第 {orderIndex} 个overlay: {overlay.GetRawText()}");
+                    
+                    var mapDrawingDto = new MapDrawingDto
+                    {
+                        AnswerId = answerId,
+                        OrderIndex = orderIndex++,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    // 提取基本信息
+                    if (overlay.TryGetProperty("type", out var typeElement))
+                    {
+                        mapDrawingDto.ShapeType = ConvertShapeType(typeElement.GetString());
+                        System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 图形类型: {typeElement.GetString()} -> {mapDrawingDto.ShapeType}");
+                    }
+
+                    // 提取标签信息 - 新格式使用name字段
+                    if (overlay.TryGetProperty("name", out var nameElement))
+                    {
+                        mapDrawingDto.Label = nameElement.GetString();
+                        System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 标签(name): {mapDrawingDto.Label}");
+                    }
+                    else if (overlay.TryGetProperty("meta", out var metaElement) && 
+                             metaElement.TryGetProperty("label", out var labelElement))
+                    {
+                        mapDrawingDto.Label = labelElement.GetString();
+                        System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 标签(meta.label): {mapDrawingDto.Label}");
+                    }
+
+                    // 提取坐标信息 - 支持新格式和旧格式
+                    mapDrawingDto.Coordinates = ExtractCoordinatesFromNewFormat(overlay, mapDrawingDto.ShapeType);
+                    System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 坐标数量: {mapDrawingDto.Coordinates.Count}");
+                    if (mapDrawingDto.Coordinates.Count > 0)
+                    {
+                        var firstCoord = mapDrawingDto.Coordinates[0];
+                        System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 第一个坐标: 经度={firstCoord.Longitude}, 纬度={firstCoord.Latitude}");
+                    }
+                    if (overlay.TryGetProperty("style", out var styleElement))
+                    {
+                        mapDrawingDto.Style = ExtractStyle(styleElement);
+                    }
+                    else
+                    {
+                        // 为新格式设置默认样式
+                        mapDrawingDto.Style = new MapDrawingStyle
+                        {
+                            StrokeColor = "#ff0000",
+                            FillColor = "#ff0000",
+                            StrokeWidth = 2,
+                            Opacity = 1.0,
+                            IsFilled = false
+                        };
+                    }
+
+                    result.Add(mapDrawingDto);
+                }
+
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 转换overlays数据完成，共 {result.Count} 个图形");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 转换overlays数据格式失败: {ex.Message}");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 转换图形类型
+        /// </summary>
+        /// <param name="frontendType">前端图形类型</param>
+        /// <returns>后端图形类型</returns>
+        private string ConvertShapeType(string? frontendType)
+        {
+            return frontendType?.ToLower() switch
+            {
+                "marker" => "Marker",
+                "polyline" => "Line", 
+                "polygon" => "Polygon",
+                "circle" => "Circle",
+                "rectangle" => "Rectangle",
+                _ => "Point"
+            };
+        }
+
+        /// <summary>
+        /// 提取坐标信息
+        /// </summary>
+        /// <param name="geometryElement">几何信息JSON元素</param>
+        /// <param name="shapeType">图形类型</param>
+        /// <returns>坐标列表</returns>
+        /// <summary>
+        /// 从新格式的overlay数据中提取坐标信息
+        /// </summary>
+        /// <param name="overlay">overlay对象</param>
+        /// <param name="shapeType">图形类型</param>
+        /// <returns>坐标列表</returns>
+        private List<MapCoordinate> ExtractCoordinatesFromNewFormat(JsonElement overlay, string shapeType)
+        {
+            var coordinates = new List<MapCoordinate>();
+
+            try
+            {
+                switch (shapeType.ToLower())
+                {
+                    case "marker":
+                    case "point":
+                        // 新格式：{ point: { lng: 116.4, lat: 39.9 } }
+                        if (overlay.TryGetProperty("point", out var pointElement))
+                        {
+                            if (pointElement.TryGetProperty("lng", out var lng) && 
+                                pointElement.TryGetProperty("lat", out var lat))
+                            {
+                                coordinates.Add(new MapCoordinate 
+                                { 
+                                    Longitude = lng.GetDouble(), 
+                                    Latitude = lat.GetDouble() 
+                                });
+                            }
+                        }
+                        // 兼容旧格式
+                        else if (overlay.TryGetProperty("geometry", out var geometryElement))
+                        {
+                            coordinates = ExtractCoordinates(geometryElement, shapeType);
+                        }
+                        break;
+
+                    case "line":
+                    case "polygon":
+                        // 新格式可能直接在overlay中有path字段，或者在geometry中
+                        if (overlay.TryGetProperty("path", out var pathElement) && 
+                            pathElement.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var point in pathElement.EnumerateArray())
+                            {
+                                if (point.TryGetProperty("lng", out var pLng) && 
+                                    point.TryGetProperty("lat", out var pLat))
+                                {
+                                    coordinates.Add(new MapCoordinate 
+                                    { 
+                                        Longitude = pLng.GetDouble(), 
+                                        Latitude = pLat.GetDouble() 
+                                    });
+                                }
+                            }
+                        }
+                        // 兼容旧格式
+                        else if (overlay.TryGetProperty("geometry", out var geometryElement))
+                        {
+                            coordinates = ExtractCoordinates(geometryElement, shapeType);
+                        }
+                        break;
+
+                    case "circle":
+                        // 新格式可能直接在overlay中有center和radius字段
+                        if (overlay.TryGetProperty("center", out var centerElement))
+                        {
+                            if (centerElement.TryGetProperty("lng", out var cLng) && 
+                                centerElement.TryGetProperty("lat", out var cLat))
+                            {
+                                coordinates.Add(new MapCoordinate 
+                                { 
+                                    Longitude = cLng.GetDouble(), 
+                                    Latitude = cLat.GetDouble() 
+                                });
+                            }
+                        }
+                        // 半径信息
+                        if (overlay.TryGetProperty("radius", out var radiusElement) && coordinates.Count > 0)
+                        {
+                            coordinates[0].Altitude = radiusElement.GetDouble();
+                        }
+                        // 兼容旧格式
+                        else if (overlay.TryGetProperty("geometry", out var geometryElement))
+                        {
+                            coordinates = ExtractCoordinates(geometryElement, shapeType);
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 从新格式提取坐标信息失败，图形类型: {shapeType}, 错误: {ex.Message}");
+            }
+
+            return coordinates;
+        }
+
+        private List<MapCoordinate> ExtractCoordinates(JsonElement geometryElement, string shapeType)
+        {
+            var coordinates = new List<MapCoordinate>();
+
+            try
+            {
+                switch (shapeType.ToLower())
+                {
+                    case "marker":
+                    case "point":
+                        // 点：{ lng: 116.4, lat: 39.9 }
+                        if (geometryElement.TryGetProperty("lng", out var lng) && 
+                            geometryElement.TryGetProperty("lat", out var lat))
+                        {
+                            coordinates.Add(new MapCoordinate 
+                            { 
+                                Longitude = lng.GetDouble(), 
+                                Latitude = lat.GetDouble() 
+                            });
+                        }
+                        break;
+
+                    case "line":
+                    case "polygon":
+                        // 线/多边形：{ path: [ {lng:116.4,lat:39.9}, {lng:116.41,lat:39.91} ] }
+                        if (geometryElement.TryGetProperty("path", out var pathElement) && 
+                            pathElement.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var point in pathElement.EnumerateArray())
+                            {
+                                if (point.TryGetProperty("lng", out var pLng) && 
+                                    point.TryGetProperty("lat", out var pLat))
+                                {
+                                    coordinates.Add(new MapCoordinate 
+                                    { 
+                                        Longitude = pLng.GetDouble(), 
+                                        Latitude = pLat.GetDouble() 
+                                    });
+                                }
+                            }
+                        }
+                        break;
+
+                    case "circle":
+                        // 圆：{ center: {lng:116.4,lat:39.9}, radius: 1000 }
+                        if (geometryElement.TryGetProperty("center", out var centerElement))
+                        {
+                            if (centerElement.TryGetProperty("lng", out var cLng) && 
+                                centerElement.TryGetProperty("lat", out var cLat))
+                            {
+                                coordinates.Add(new MapCoordinate 
+                                { 
+                                    Longitude = cLng.GetDouble(), 
+                                    Latitude = cLat.GetDouble() 
+                                });
+                            }
+                        }
+                        // 半径信息可以存储在Altitude字段中
+                        if (geometryElement.TryGetProperty("radius", out var radiusElement) && coordinates.Count > 0)
+                        {
+                            coordinates[0].Altitude = radiusElement.GetDouble();
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 提取坐标信息失败，图形类型: {shapeType}, 错误: {ex.Message}");
+            }
+
+            return coordinates;
+        }
+
+        /// <summary>
+        /// 提取样式信息
+        /// </summary>
+        /// <param name="styleElement">样式JSON元素</param>
+        /// <returns>地图绘制样式</returns>
+        private MapDrawingStyle ExtractStyle(JsonElement styleElement)
+        {
+            var style = new MapDrawingStyle();
+
+            try
+            {
+                if (styleElement.TryGetProperty("strokeColor", out var strokeColor))
+                {
+                    style.StrokeColor = strokeColor.GetString();
+                }
+
+                if (styleElement.TryGetProperty("fillColor", out var fillColor))
+                {
+                    style.FillColor = fillColor.GetString();
+                }
+
+                if (styleElement.TryGetProperty("strokeWeight", out var strokeWeight))
+                {
+                    style.StrokeWidth = strokeWeight.GetInt32();
+                }
+
+                if (styleElement.TryGetProperty("strokeOpacity", out var strokeOpacity))
+                {
+                    style.Opacity = strokeOpacity.GetDouble();
+                }
+
+                if (styleElement.TryGetProperty("fillOpacity", out var fillOpacity))
+                {
+                    style.IsFilled = fillOpacity.GetDouble() > 0;
+                }
+
+                // 兼容 marker 图标样式
+                if (styleElement.TryGetProperty("iconUrl", out var iconUrl))
+                {
+                    style.IconUrl = iconUrl.GetString();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"FullScreenExamViewModel 提取样式信息失败: {ex.Message}");
+            }
+
+            return style;
+        }
+
+        #endregion
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -1038,6 +1562,18 @@ namespace ExamSystem.WPF.ViewModels
             set
             {
                 _mapDrawingConfigJson = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // 地图绘制题绘制时长（秒）
+        private int _drawDurationSeconds;
+        public int DrawDurationSeconds
+        {
+            get => _drawDurationSeconds;
+            set
+            {
+                _drawDurationSeconds = value;
                 OnPropertyChanged();
             }
         }
