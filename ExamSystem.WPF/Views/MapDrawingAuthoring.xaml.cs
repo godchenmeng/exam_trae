@@ -18,10 +18,10 @@ namespace ExamSystem.WPF.Views
     /// </summary>
     public partial class MapDrawingAuthoring : Window
     {
-        private WebView2 _webView;
-        private MapDrawingAuthoringViewModel _viewModel;
-        private HttpListener _httpServer;
-        private Thread _serverThread;
+        private WebView2? _webView;
+        private MapDrawingAuthoringViewModel? _viewModel;
+        private HttpListener? _httpServer;
+        private Thread? _serverThread;
         private int _serverPort = 0;
 
         public MapDrawingAuthoring()
@@ -102,14 +102,15 @@ namespace ExamSystem.WPF.Views
             return startPort; // 如果都不可用，返回默认端口
         }
 
-        private async Task HandleHttpRequest(HttpListenerContext context)
+        private void HandleHttpRequest(HttpListenerContext context)
         {
             try
             {
                 var request = context.Request;
                 var response = context.Response;
                 
-                var urlPath = request.Url.AbsolutePath.TrimStart('/');
+                var url = request.Url;
+                var urlPath = url?.AbsolutePath?.TrimStart('/') ?? string.Empty;
 
 
                 if (string.IsNullOrEmpty(urlPath))
@@ -300,10 +301,13 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private void WebView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        private void WebView_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
         {
-            _webView.CoreWebView2.OpenDevToolsWindow();
-            if (e.IsSuccess && _webView.CoreWebView2 != null)
+            if (_webView?.CoreWebView2 != null)
+            {
+                _webView.CoreWebView2.OpenDevToolsWindow();
+            }
+            if (e.IsSuccess && _webView?.CoreWebView2 != null)
             {
                 // 设置消息监听
                 _webView.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
@@ -316,12 +320,12 @@ namespace ExamSystem.WPF.Views
             }
             else
             {
-                _viewModel.IsMapLoading = false;
+                _viewModel!.IsMapLoading = false;
                 MessageBox.Show("地图页面导航失败，请检查地图文件与初始化", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void CoreWebView2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        private void CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
             try
             {
@@ -334,7 +338,7 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private void OnSaveCompleted(object sender, EventArgs e)
+        private void OnSaveCompleted(object? sender, EventArgs e)
         {
             DialogResult = true;
             Close();
@@ -375,7 +379,7 @@ namespace ExamSystem.WPF.Views
             base.OnClosed(e);
         }
 
-        private void WebView_CoreWebView2InitializationCompleted(object sender, CoreWebView2InitializationCompletedEventArgs e)
+        private void WebView_CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
         {
             if (!e.IsSuccess)
             {
@@ -384,30 +388,30 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private void CoreWebView2_NavigationStarting(object sender, CoreWebView2NavigationStartingEventArgs e)
+        private void CoreWebView2_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
         {
             Debug.WriteLine($"导航开始: {e.Uri}");
         }
 
-        private void CoreWebView2_DOMContentLoaded(object sender, CoreWebView2DOMContentLoadedEventArgs e)
+        private void CoreWebView2_DOMContentLoaded(object? sender, CoreWebView2DOMContentLoadedEventArgs e)
         {
             Debug.WriteLine("DOM内容加载完成");
         }
 
-        private void CoreWebView2_ConsoleMessage(object sender, object e)
+        private void CoreWebView2_ConsoleMessage(object? sender, object e)
         {
             // 由于WebView2版本兼容性问题，暂时使用object类型
             Debug.WriteLine($"控制台消息: {e}");
         }
 
-        private void CoreWebView2_PermissionRequested(object sender, CoreWebView2PermissionRequestedEventArgs e)
+        private void CoreWebView2_PermissionRequested(object? sender, CoreWebView2PermissionRequestedEventArgs e)
         {
             // 自动允许所有权限请求
             e.State = CoreWebView2PermissionState.Allow;
             Debug.WriteLine($"权限请求已允许: {e.PermissionKind} for {e.Uri}");
         }
 
-        private void CoreWebView2_WebResourceRequested(object sender, CoreWebView2WebResourceRequestedEventArgs e)
+        private void CoreWebView2_WebResourceRequested(object? sender, CoreWebView2WebResourceRequestedEventArgs e)
         {
             try
             {

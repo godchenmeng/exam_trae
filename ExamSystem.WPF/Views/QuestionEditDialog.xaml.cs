@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using ExamSystem.WPF.ViewModels;
+using ExamSystem.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ExamSystem.WPF.Views
@@ -56,11 +57,14 @@ namespace ExamSystem.WPF.Views
             if (DataContext is ViewModels.QuestionEditViewModel vm && sender is RadioButton rb && rb.DataContext is ViewModels.QuestionOptionEditViewModel option)
             {
                 // 保证单选题只有一个选项被选中
-                foreach (var opt in vm.Options)
+                if (vm.Options != null)
                 {
-                    if (!ReferenceEquals(opt, option) && opt.IsCorrect)
+                    foreach (var opt in vm.Options)
                     {
-                        opt.IsCorrect = false;
+                        if (!ReferenceEquals(opt, option) && opt.IsCorrect)
+                        {
+                            opt.IsCorrect = false;
+                        }
                     }
                 }
                 option.IsCorrect = true;
@@ -85,18 +89,32 @@ namespace ExamSystem.WPF.Views
                 var provider = app.GetServices();
                 var vm = provider.GetRequiredService<MapDrawingAuthoringViewModel>();
 
-                // 将当前对话框的基础信息传入地图编辑器
-                vm.Question.BankId = _viewModel.BankId;
+                // 将当前对话框的基础信息传入地图编辑器（增加空值保护）
+                if (vm.Question == null)
+                {
+                    vm.Question = new Question();
+                }
                 vm.Question.QuestionType = Domain.Enums.QuestionType.MapDrawing;
-                vm.Question.Title = string.IsNullOrWhiteSpace(_viewModel.Question.Title) ? "地图绘制题" : _viewModel.Question.Title;
-                vm.Question.Content = _viewModel.Question.Content;
-                vm.Question.Score = _viewModel.Question.Score > 0 ? _viewModel.Question.Score : 10m;
+                vm.Question.BankId = _viewModel?.BankId ?? vm.Question.BankId;
+                if (_viewModel?.Question != null)
+                {
+                    vm.Question.Title = string.IsNullOrWhiteSpace(_viewModel.Question.Title) ? "地图绘制题" : _viewModel.Question.Title;
+                    vm.Question.Content = _viewModel.Question.Content ?? string.Empty;
+                    vm.Question.Score = _viewModel.Question.Score > 0 ? _viewModel.Question.Score : 10m;
+                }
+                else
+                {
+                    vm.Question.Title = string.IsNullOrWhiteSpace(vm.Question.Title) ? "地图绘制题" : vm.Question.Title;
+                    vm.Question.Content = vm.Question.Content ?? string.Empty;
+                    vm.Question.Score = vm.Question.Score > 0 ? vm.Question.Score : 10m;
+                }
 
                 // 创建并显示地图绘制编辑器窗口
                 var dialog = new MapDrawingAuthoring(vm);
-                if (Application.Current.MainWindow != null && Application.Current.MainWindow != dialog)
+                var currentApp = Application.Current;
+                if (currentApp?.MainWindow != null && currentApp.MainWindow != dialog)
                 {
-                    dialog.Owner = Application.Current.MainWindow;
+                    dialog.Owner = currentApp.MainWindow;
                 }
                 var result = dialog.ShowDialog();
                 if (result == true)

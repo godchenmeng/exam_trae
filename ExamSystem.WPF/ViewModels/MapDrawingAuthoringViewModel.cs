@@ -20,17 +20,17 @@ namespace ExamSystem.WPF.ViewModels
     {
         private readonly IMapDrawingService _mapDrawingService;
         private readonly IQuestionService _questionService;
-        private WebView2 _webView;
+        private WebView2? _webView;
 
         private bool _isLoading;
         private bool _isMapLoading;
         private bool _canSave;
-        private string _validationMessage;
-        private string _layerInfoText;
-        private Question _question;
-        private MapDrawingConfig _mapConfig;
-        private ReviewRubric _reviewRubric;
-        private BuildingLayersConfig _buildingLayersConfig;
+        private string _validationMessage = string.Empty;
+        private string _layerInfoText = string.Empty;
+        private Question? _question;
+        private MapDrawingConfig? _mapConfig;
+        private ReviewRubric? _reviewRubric;
+        private BuildingLayersConfig? _buildingLayersConfig;
 
         public MapDrawingAuthoringViewModel(IMapDrawingService mapDrawingService, IQuestionService questionService)
         {
@@ -75,7 +75,7 @@ namespace ExamSystem.WPF.ViewModels
             set => SetProperty(ref _layerInfoText, value);
         }
 
-        public Question Question
+        public Question? Question
         {
             get => _question;
             set
@@ -88,7 +88,7 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        public MapDrawingConfig MapConfig
+        public MapDrawingConfig? MapConfig
         {
             get => _mapConfig;
             set
@@ -100,7 +100,7 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        public ReviewRubric ReviewRubric
+        public ReviewRubric? ReviewRubric
         {
             get => _reviewRubric;
             set
@@ -112,7 +112,7 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        public BuildingLayersConfig BuildingLayersConfig
+        public BuildingLayersConfig? BuildingLayersConfig
         {
             get => _buildingLayersConfig;
             set => SetProperty(ref _buildingLayersConfig, value);
@@ -126,24 +126,24 @@ namespace ExamSystem.WPF.ViewModels
 
         #region Commands
 
-        public ICommand SaveCommand { get; private set; }
-        public ICommand PreviewMapCommand { get; private set; }
-        public ICommand SetGuidanceOverlaysCommand { get; private set; }
-        public ICommand SetReferenceAnswerCommand { get; private set; }
-        public ICommand ClearOverlaysCommand { get; private set; }
-        public ICommand PreviewQuestionCommand { get; private set; }
-        public ICommand AddRubricCriterionCommand { get; private set; }
-        public ICommand RemoveRubricCriterionCommand { get; private set; }
+        public ICommand? SaveCommand { get; private set; }
+        public ICommand? PreviewMapCommand { get; private set; }
+        public ICommand? SetGuidanceOverlaysCommand { get; private set; }
+        public ICommand? SetReferenceAnswerCommand { get; private set; }
+        public ICommand? ClearOverlaysCommand { get; private set; }
+        public ICommand? PreviewQuestionCommand { get; private set; }
+        public ICommand? AddRubricCriterionCommand { get; private set; }
+        public ICommand? RemoveRubricCriterionCommand { get; private set; }
 
         #endregion
 
         #region Events
 
-        public event EventHandler SaveCompleted;
-        public event EventHandler MapPreviewRequested;
-        public event EventHandler GuidanceOverlaysRequested;
-        public event EventHandler ReferenceAnswerRequested;
-        public event EventHandler ClearOverlaysRequested;
+        public event EventHandler? SaveCompleted;
+        public event EventHandler? MapPreviewRequested;
+        public event EventHandler? GuidanceOverlaysRequested;
+        public event EventHandler? ReferenceAnswerRequested;
+        public event EventHandler? ClearOverlaysRequested;
 
         #endregion
 
@@ -313,6 +313,12 @@ namespace ExamSystem.WPF.ViewModels
 
         private void UpdateLayerInfo()
         {
+            if (MapConfig == null || ReviewRubric?.Criteria == null)
+            {
+                LayerInfoText = "配置未加载";
+                return;
+            }
+
             var info = $"地图中心: ({MapConfig.CenterLat:F4}, {MapConfig.CenterLng:F4})\n";
             info += $"缩放级别: {MapConfig.ZoomLevel}\n";
             info += $"评分项数量: {ReviewRubric.Criteria.Count}";
@@ -331,35 +337,35 @@ namespace ExamSystem.WPF.ViewModels
                     return;
                 }
 
-                if (Question.QuestionId > 0)
+                if (Question!.QuestionId > 0)
                 {
                     // 更新现有题目
                     await _mapDrawingService.UpdateMapDrawingQuestionAsync(Question.QuestionId, new MapDrawingQuestionDto
                     {
-                        Title = Question.Title,
-                        Content = Question.Content,
-                        Score = Question.Score,
-                        TimeLimitSeconds = Question.TimeLimitSeconds,
-                        Tags = Question.Tags,
-                        Config = MapConfig,
-                        ReviewRubric = ReviewRubric,
-                        BuildingLayersConfig = BuildingLayersConfig
+                        Title = Question!.Title,
+                        Content = Question!.Content,
+                        Score = Question!.Score,
+                        TimeLimitSeconds = Question!.TimeLimitSeconds,
+                        Tags = Question!.Tags,
+                        Config = MapConfig!,
+                        ReviewRubric = ReviewRubric!,
+                        BuildingLayersConfig = BuildingLayersConfig!
                     });
                 }
                 else
                 {
                     // 创建新题目
                     await _mapDrawingService.CreateMapDrawingQuestionAsync(
-                        bankId: Question.BankId,
-                        title: Question.Title,
-                        content: Question.Content,
-                        config: MapConfig,
+                        bankId: Question!.BankId,
+                        title: Question!.Title,
+                        content: Question!.Content,
+                        config: MapConfig!,
                         guidanceOverlays: GuidanceOverlays?.ToList(),
                         referenceOverlays: ReferenceOverlays?.ToList(),
-                        reviewRubric: ReviewRubric,
-                        buildingLayersConfig: BuildingLayersConfig,
-                        timeLimitSeconds: Question.TimeLimitSeconds,
-                        score: Question.Score);
+                        reviewRubric: ReviewRubric!,
+                        buildingLayersConfig: BuildingLayersConfig!,
+                        timeLimitSeconds: Question!.TimeLimitSeconds,
+                        score: Question!.Score);
                 }
 
                 SaveCompleted?.Invoke(this, EventArgs.Empty);
@@ -384,13 +390,13 @@ namespace ExamSystem.WPF.ViewModels
                     type = "PreviewQuestion",
                     question = new
                     {
-                        title = Question.Title,
-                        content = Question.Content,
-                        score = Question.Score,
-                        timeLimit = Question.TimeLimitSeconds
+                        title = Question!.Title,
+                        content = Question!.Content,
+                        score = Question!.Score,
+                        timeLimit = Question!.TimeLimitSeconds
                     },
-                    config = MapConfig,
-                    buildingLayers = BuildingLayersConfig
+                    config = MapConfig!,
+                    buildingLayers = BuildingLayersConfig!
                 });
                 return Task.CompletedTask;
             }
@@ -403,6 +409,19 @@ namespace ExamSystem.WPF.ViewModels
 
         private void AddRubricCriterion()
         {
+            if (ReviewRubric == null)
+            {
+                ReviewRubric = new ReviewRubric
+                {
+                    Criteria = new List<RubricCriterion>()
+                };
+            }
+
+            if (ReviewRubric.Criteria == null)
+            {
+                ReviewRubric.Criteria = new List<RubricCriterion>();
+            }
+
             ReviewRubric.Criteria.Add(new RubricCriterion
             {
                 Name = "新评分项",
@@ -412,13 +431,15 @@ namespace ExamSystem.WPF.ViewModels
             ValidateForm();
         }
 
-        private void RemoveRubricCriterion(RubricCriterion criterion)
+        private void RemoveRubricCriterion(RubricCriterion? criterion)
         {
-            if (criterion != null)
+            if (criterion is null)
             {
-                ReviewRubric.Criteria.Remove(criterion);
-                ValidateForm();
+                return;
             }
+
+            ReviewRubric?.Criteria?.Remove(criterion);
+            ValidateForm();
         }
 
         private bool ValidateForm()
@@ -453,7 +474,7 @@ namespace ExamSystem.WPF.ViewModels
                 return false;
             }
 
-            if (ReviewRubric?.Criteria?.Count == 0)
+            if (ReviewRubric?.Criteria == null || ReviewRubric.Criteria.Count == 0)
             {
                 ValidationMessage = "至少需要一个评分项";
                 CanSave = false;

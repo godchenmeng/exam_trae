@@ -58,7 +58,7 @@ namespace ExamSystem.WPF.ViewModels
       AkMessage = msg;
     }
 
-    private async Task SaveAkAsync()
+    private Task SaveAkAsync()
     {
       // 不强制验证，直接保存
       try
@@ -72,6 +72,7 @@ namespace ExamSystem.WPF.ViewModels
         AkMessage = "保存失败: " + ex.Message;
         MessageBox.Show(AkMessage, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
       }
+      return Task.CompletedTask;
     }
 
     // 备份与导入

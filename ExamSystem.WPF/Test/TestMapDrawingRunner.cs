@@ -236,7 +236,8 @@ namespace ExamSystem.WPF.Test
     /// </summary>
     public class Program
     {
-        public static async Task Main(string[] args)
+        // 注意：为避免与 WPF 应用入口点冲突并产生 CS8892 警告，重命名为 RunAsync。
+        public static async Task RunAsync(string[] args)
         {
             var runner = new TestMapDrawingRunner();
 

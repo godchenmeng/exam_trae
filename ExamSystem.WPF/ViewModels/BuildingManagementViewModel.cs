@@ -220,6 +220,7 @@ namespace ExamSystem.WPF.ViewModels
             _buildingService = null!;
             _permissionService = null!;
             _logger = null!;
+            _serviceProvider = null!;
 
             // 初始化命令（设计时模式下使用空命令）
             LoadBuildingsCommand = new RelayCommand(() => { });
@@ -227,6 +228,8 @@ namespace ExamSystem.WPF.ViewModels
             AddBuildingCommand = new RelayCommand(() => { });
             EditBuildingCommand = new RelayCommand(() => { });
             DeleteBuildingCommand = new RelayCommand(() => { });
+            ViewOnMapCommand = new RelayCommand(() => { });
+            ViewDetailsCommand = new RelayCommand(() => { });
             BatchDeleteCommand = new RelayCommand(() => { });
             ImportBuildingsCommand = new RelayCommand(() => { });
             ExportBuildingsCommand = new RelayCommand(() => { });
@@ -256,8 +259,8 @@ namespace ExamSystem.WPF.ViewModels
             AddBuildingCommand = new RelayCommand(async () => await AddBuildingAsync(), () => CanAddBuilding);
             EditBuildingCommand = new RelayCommand(async () => await EditBuildingAsync(), () => CanEditBuilding && SelectedBuilding != null);
             DeleteBuildingCommand = new RelayCommand(async () => await DeleteBuildingAsync(), () => CanDeleteBuilding && SelectedBuilding != null);
-            ViewOnMapCommand = new RelayCommand<BuildingDisplayModel>(async (building) => await ViewOnMapAsync(building));
-            ViewDetailsCommand = new RelayCommand<BuildingDisplayModel>(async (building) => await ViewDetailsAsync(building));
+            ViewOnMapCommand = new RelayCommand<BuildingDisplayModel?>(async (building) => await ViewOnMapAsync(building));
+            ViewDetailsCommand = new RelayCommand<BuildingDisplayModel?>(async (building) => await ViewDetailsAsync(building));
             BatchDeleteCommand = new RelayCommand(async () => await BatchDeleteBuildingsAsync(), () => CanDeleteBuilding);
             ImportBuildingsCommand = new RelayCommand(async () => await ImportBuildingsAsync(), () => CanImportBuilding);
             ExportBuildingsCommand = new RelayCommand(async () => await ExportBuildingsAsync(), () => CanExportBuilding);
@@ -722,7 +725,7 @@ namespace ExamSystem.WPF.ViewModels
             await LoadBuildingsAsync();
         }
 
-        private async Task ViewOnMapAsync(BuildingDisplayModel building)
+        private async Task ViewOnMapAsync(BuildingDisplayModel? building)
         {
             try
             {
@@ -731,7 +734,7 @@ namespace ExamSystem.WPF.ViewModels
                 _logger?.LogInformation("在地图上查看建筑物: {BuildingName}", building.Name);
 
                 // 打开地图查看对话框，使用 WebView2 + 独立 HTML 页面展示
-                Application.Current.Dispatcher.Invoke(() =>
+                await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     var dialog = new Views.MapViewerDialog
                     {
@@ -754,7 +757,7 @@ namespace ExamSystem.WPF.ViewModels
             }
         }
 
-        private async Task ViewDetailsAsync(BuildingDisplayModel building)
+        private async Task ViewDetailsAsync(BuildingDisplayModel? building)
         {
             try
             {

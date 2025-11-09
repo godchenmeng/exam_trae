@@ -454,7 +454,7 @@ namespace ExamSystem.WPF.Views
         /// <summary>
         /// ViewModel属性变化事件处理
         /// </summary>
-        private async void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private async void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             // 过滤掉定时器相关的属性变化，避免频繁触发
             if (e.PropertyName == nameof(FullScreenExamViewModel.RemainingTimeText))
@@ -1215,7 +1215,7 @@ namespace ExamSystem.WPF.Views
         /// <summary>
         /// 加载地图题目配置
         /// </summary>
-        private async Task LoadMapQuestionConfig(WebView2 webView)
+        private Task LoadMapQuestionConfig(WebView2 webView)
         {
             try
             {
@@ -1243,7 +1243,8 @@ namespace ExamSystem.WPF.Views
 
                     if (webView.CoreWebView2 != null)
                     {
-                        
+                        // 将配置消息发送到 WebView 页面
+                        webView.CoreWebView2.PostWebMessageAsJson(messageJson);
                     }
                 }
             }
@@ -1251,6 +1252,9 @@ namespace ExamSystem.WPF.Views
             {
                 System.Diagnostics.Debug.WriteLine($"FullScreenExamWindow 加载地图题目配置失败: {ex.Message}");
             }
+
+            // 方法为同步逻辑，返回已完成的任务以供调用方等待
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -1560,7 +1564,7 @@ namespace ExamSystem.WPF.Views
                 Debug.WriteLine($"FullScreenExamWindow 查询到建筑数据数量: {buildings?.Count() ?? 0}");
 
                 // 转换为前端需要的格式
-                var buildingData = buildings.Select(b => new
+                var buildingData = (buildings ?? System.Linq.Enumerable.Empty<ExamSystem.Domain.Entities.Building>()).Select(b => new
                 {
                     id = b.Id,
                     name = b.OrgName,

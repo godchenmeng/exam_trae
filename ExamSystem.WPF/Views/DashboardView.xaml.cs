@@ -10,8 +10,8 @@ namespace ExamSystem.WPF.Views
 {
     public partial class DashboardView : UserControl
     {
-        private CartesianChart _adminChart;
-        private CartesianChart _teacherChart;
+        private CartesianChart? _adminChart;
+        private CartesianChart? _teacherChart;
 
         public DashboardView(DashboardViewModel viewModel)
         {
@@ -62,7 +62,7 @@ namespace ExamSystem.WPF.Views
                 {
                     if (AdminTrendChartHost != null)
                     {
-                        AdminTrendChartHost.Child = null;
+                        AdminTrendChartHost.Child = null!;
                     }
                     _adminChart = null;
                 }
@@ -72,7 +72,7 @@ namespace ExamSystem.WPF.Views
                 {
                     if (TeacherPerformanceChartHost != null)
                     {
-                        TeacherPerformanceChartHost.Child = null;
+                        TeacherPerformanceChartHost.Child = null!;
                     }
                     _teacherChart = null;
                 }

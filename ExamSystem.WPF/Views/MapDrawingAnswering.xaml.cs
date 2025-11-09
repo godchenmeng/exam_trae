@@ -181,7 +181,7 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private void ClearAnswerButton_Click(object? sender, RoutedEventArgs e)
+        private void ClearAnswerButton_Click(object? sender, RoutedEventArgs? e)
         {
             if (MapWebView.CoreWebView2 != null)
             {
@@ -196,7 +196,7 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private void SubmitAnswerButton_Click(object? sender, RoutedEventArgs e)
+        private void SubmitAnswerButton_Click(object? sender, RoutedEventArgs? e)
         {
             if (MapWebView.CoreWebView2 != null)
             {

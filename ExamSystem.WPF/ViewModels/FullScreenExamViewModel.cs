@@ -136,8 +136,8 @@ namespace ExamSystem.WPF.ViewModels
                                     var hasCenter = innerJsonDoc.RootElement.TryGetProperty("center", out var centerElement);
                                     var hasZoom = innerJsonDoc.RootElement.TryGetProperty("zoom", out var zoomElement);
 
-                                    // 构建包含完整信息的地图数据对象
-                                    var completeMapData = new Dictionary<string, object>();
+                                    // 构建包含完整信息的地图数据对象（允许值为可空类型）
+                                    var completeMapData = new Dictionary<string, object?>();
                                     
                                     // 转换前端overlays数据格式为后端MapDrawingDto格式
                                     var convertedOverlays = hasOverlays ? ConvertOverlaysToMapDrawingData(overlaysElement) : new List<MapDrawingDto>();

@@ -58,7 +58,7 @@ namespace ExamSystem.WPF.Views
         /// <summary>
         /// 自动保存定时器触发事件
         /// </summary>
-        private async void OnAutoSaveTick(object? sender, EventArgs e)
+        private void OnAutoSaveTick(object? sender, EventArgs e)
         {
             try
             {
@@ -124,7 +124,7 @@ namespace ExamSystem.WPF.Views
         /// <summary>
         /// 处理ViewModel属性变化事件
         /// </summary>
-        private void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             Debug.WriteLine($"OnViewModelPropertyChanged: PropertyName={e.PropertyName}, IsMapDrawing={_viewModel?.IsMapDrawing}, CurrentQuestion={_viewModel?.CurrentQuestion?.QuestionType}");
             
@@ -397,16 +397,22 @@ namespace ExamSystem.WPF.Views
                         };
                         
                         // 发送题目配置到前端
-                        await _viewModel.SendMessageToWebViewAsync(webView, "loadQuestion", configMessage);
+                        if (_viewModel != null)
+                        {
+                            await _viewModel.SendMessageToWebViewAsync(webView, "loadQuestion", configMessage);
+                        }
                         
                         // 如果有已保存的答案，也加载到前端
-                        var savedAnswer = currentAnswerRecord.UserAnswer;
+                        var savedAnswer = currentAnswerRecord?.UserAnswer;
                         if (!string.IsNullOrEmpty(savedAnswer))
                         {
                             try
                             {
                                 var answerData = System.Text.Json.JsonSerializer.Deserialize<object>(savedAnswer);
-                                await _viewModel.SendMessageToWebViewAsync(webView, "loadAnswer", answerData);
+                                if (_viewModel != null && answerData != null)
+                                {
+                                    await _viewModel.SendMessageToWebViewAsync(webView, "loadAnswer", answerData);
+                                }
                             }
                             catch (System.Text.Json.JsonException)
                             {
@@ -731,7 +737,7 @@ namespace ExamSystem.WPF.Views
                 var request = context.Request;
                 var response = context.Response;
                 
-                var urlPath = request.Url.AbsolutePath.TrimStart('/');
+                var urlPath = request?.Url?.AbsolutePath?.TrimStart('/') ?? string.Empty;
 
                 if (string.IsNullOrEmpty(urlPath))
                     urlPath = "index.html";
