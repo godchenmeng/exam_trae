@@ -555,37 +555,69 @@ const ReviewApp = {
 
   // 添加覆盖物标签
   addOverlayLabel(overlay, name, type) {
-    let labelPoint = null;
-
-    // 根据覆盖物类型获取标签位置
-    if (type === 'marker') {
-      labelPoint = overlay.getPosition();
-    } else if (type === 'circle') {
-      labelPoint = overlay.getCenter();
-    } else if (overlay.getPath) {
-      const path = overlay.getPath();
-      if (path && path.length > 0) {
-        labelPoint = path[0];
+    // 根据图形类型获取“中心点”用于放置标签
+    const getOverlayCenter = () => {
+      try {
+        if (type === 'marker' && overlay.getPosition) {
+          return overlay.getPosition();
+        }
+        if (type === 'circle' && overlay.getCenter) {
+          return overlay.getCenter();
+        }
+        if ((type === 'polygon' || type === 'rectangle') && overlay.getPath) {
+          const path = overlay.getPath();
+          if (path && path.length > 0) {
+            // 使用包围盒中心作为标签位置，稳定可靠
+            let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
+            path.forEach(p => {
+              if (p.lng < minLng) minLng = p.lng;
+              if (p.lng > maxLng) maxLng = p.lng;
+              if (p.lat < minLat) minLat = p.lat;
+              if (p.lat > maxLat) maxLat = p.lat;
+            });
+            const centerLng = (minLng + maxLng) / 2;
+            const centerLat = (minLat + maxLat) / 2;
+            return new BMapGL.Point(centerLng, centerLat);
+          }
+        }
+        // 其他类型或异常情况：回退到首点
+        if (overlay.getPath) {
+          const path = overlay.getPath();
+          if (path && path.length > 0) return path[0];
+        }
+      } catch (e) {
+        console.warn('计算标签中心点失败:', e);
       }
-    }
+      return null;
+    };
 
-    if (labelPoint) {
-      const label = new BMapGL.Label(name, {
-        position: labelPoint,
-        offset: new BMapGL.Size(10, -10)
-      });
-      
-      label.setStyle({
-        color: '#333',
-        fontSize: '12px',
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        border: '1px solid #ccc',
-        borderRadius: '3px',
-        padding: '2px 6px'
-      });
-      
-      this.map.addOverlay(label);
-    }
+    const labelPoint = getOverlayCenter();
+    if (!labelPoint) return;
+
+    const label = new BMapGL.Label(name, {
+      position: labelPoint,
+      offset: new BMapGL.Size(0, 0)
+    });
+
+    // 根据类型设置不同的背景色与字体颜色
+    const styleMap = {
+      polygon: { bg: 'rgba(204, 229, 255, 0.85)', color: '#1a73e8', border: '#99c2ff' }, // 轻蓝背景、蓝色文字
+      rectangle: { bg: 'rgba(216, 243, 220, 0.85)', color: '#2d6a4f', border: '#a7d7c5' }, // 轻绿背景、墨绿文字
+      circle: { bg: 'rgba(255, 250, 205, 0.85)', color: '#8a6d3b', border: '#e6d78d' } // 轻黄背景、棕色文字
+    };
+    const tStyle = styleMap[type] || { bg: 'rgba(255,255,255,0.85)', color: '#333', border: '#ccc' };
+
+    label.setStyle({
+      color: tStyle.color,
+      fontSize: '12px',
+      backgroundColor: tStyle.bg,
+      border: `1px solid ${tStyle.border}`,
+      borderRadius: '4px',
+      padding: '2px 6px',
+      whiteSpace: 'nowrap'
+    });
+
+    this.map.addOverlay(label);
   },
 
   // 获取默认名称

@@ -284,6 +284,12 @@ namespace ExamSystem.WPF.ViewModels
                 new("专职队", "2"),
                 new("重点建筑", "3")
             };
+
+            // 默认选中“全部类型”
+            if (SelectedBuildingType == null)
+            {
+                SelectedBuildingType = BuildingTypes.FirstOrDefault();
+            }
         }
 
         private async Task InitializeAsync()
@@ -385,6 +391,12 @@ namespace ExamSystem.WPF.ViewModels
                 foreach (var city in cities.OrderBy(c => c))
                 {
                     Cities.Add(city);
+                }
+
+                // 默认选中“全部城市”，或当当前选中项不在列表中时回退到“全部城市”
+                if (string.IsNullOrEmpty(SelectedCity) || !Cities.Contains(SelectedCity))
+                {
+                    SelectedCity = "全部城市";
                 }
             }
             catch (Exception ex)
@@ -532,7 +544,17 @@ namespace ExamSystem.WPF.ViewModels
 
             try
             {
-                // TODO: 显示确认对话框
+                // 删除前确认
+                var confirm = MessageBox.Show(
+                    $"确定要删除建筑 \"{SelectedBuilding.OrgName}\" 吗？此操作不可恢复！",
+                    "确认删除",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+                if (confirm != MessageBoxResult.Yes)
+                {
+                    StatusMessage = "已取消删除";
+                    return;
+                }
                 var operatorName = _currentUser?.RealName ?? _currentUser?.Username ?? "未知用户";
                 var result = await _buildingService.DeleteBuildingAsync(SelectedBuilding.Id, operatorName);
                 if (result.IsSuccess)
@@ -564,7 +586,17 @@ namespace ExamSystem.WPF.ViewModels
 
             try
             {
-                // TODO: 显示确认对话框
+                // 批量删除前确认
+                var confirm = MessageBox.Show(
+                    $"确定要删除选中的 {selectedIds.Count} 个建筑吗？此操作不可恢复！",
+                    "批量删除确认",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+                if (confirm != MessageBoxResult.Yes)
+                {
+                    StatusMessage = "已取消批量删除";
+                    return;
+                }
                 var operatorName = _currentUser?.RealName ?? _currentUser?.Username ?? "未知用户";
                 var result = await _buildingService.BatchDeleteBuildingsAsync(selectedIds, operatorName);
                 if (result.IsSuccess)
@@ -697,13 +729,23 @@ namespace ExamSystem.WPF.ViewModels
                 if (building == null) return;
 
                 _logger?.LogInformation("在地图上查看建筑物: {BuildingName}", building.Name);
-                
-                // TODO: 实现地图查看功能
-                // 这里应该打开地图窗口并定位到指定建筑物
-                StatusMessage = $"正在地图上显示 {building.Name}...";
-                
-                await Task.Delay(100); // 模拟异步操作
-                StatusMessage = "地图查看功能待实现";
+
+                // 打开地图查看对话框，使用 WebView2 + 独立 HTML 页面展示
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var dialog = new Views.MapViewerDialog
+                    {
+                        Owner = Application.Current?.MainWindow,
+                        BuildingName = building.Name,
+                        CityName = building.City,
+                        Latitude = building.Latitude,
+                        Longitude = building.Longitude,
+                        InitialZoom = 17
+                    };
+                    dialog.ShowDialog();
+                });
+
+                StatusMessage = $"已在地图上显示 {building.Name}";
             }
             catch (Exception ex)
             {
@@ -765,9 +807,17 @@ namespace ExamSystem.WPF.ViewModels
         {
             _currentUser = user;
             _logger.LogInformation("BuildingManagementViewModel 已接收当前用户: {Username} (ID={UserId})", user.Username, user.UserId);
+            _logger.LogInformation("权限检查: Role={Role}, building:add={CanAdd}, building:edit={CanEdit}, building:delete={CanDelete}", _currentUser.Role, CanAddBuilding, CanEditBuilding, CanDeleteBuilding);
             
             // 刷新权限相关的命令状态
             RefreshCommandStates();
+
+            // 主动通知权限相关属性变更，确保 UI 中的 IsEnabled 绑定立即更新
+            OnPropertyChanged(nameof(CanAddBuilding));
+            OnPropertyChanged(nameof(CanEditBuilding));
+            OnPropertyChanged(nameof(CanDeleteBuilding));
+            OnPropertyChanged(nameof(CanImportBuilding));
+            OnPropertyChanged(nameof(CanExportBuilding));
         }
 
         /// <summary>
@@ -782,7 +832,7 @@ namespace ExamSystem.WPF.ViewModels
         /// <summary>
         /// 刷新命令状态
         /// </summary>
-        private void RefreshCommandStates()
+        public void RefreshCommandStates()
         {
             (AddBuildingCommand as RelayCommand)?.RaiseCanExecuteChanged();
             (EditBuildingCommand as RelayCommand)?.RaiseCanExecuteChanged();

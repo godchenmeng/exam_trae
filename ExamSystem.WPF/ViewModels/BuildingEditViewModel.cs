@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using ExamSystem.Domain.Entities;
 using ExamSystem.Services.Interfaces;
@@ -350,8 +351,33 @@ namespace ExamSystem.WPF.ViewModels
 
         private void SelectLocation()
         {
-            // TODO: 打开地图选择位置对话框
-            StatusMessage = "地图选择功能待实现";
+            try
+            {
+                var dlg = new ExamSystem.WPF.Views.MapLocationPickerDialog
+                {
+                    Owner = Application.Current.MainWindow,
+                    InitialCityName = string.IsNullOrWhiteSpace(City) ? "贵阳市" : City
+                };
+
+                var result = dlg.ShowDialog();
+                if (result == true)
+                {
+                    if (dlg.SelectedLongitude.HasValue && dlg.SelectedLatitude.HasValue)
+                    {
+                        Longitude = dlg.SelectedLongitude;
+                        Latitude = dlg.SelectedLatitude;
+                        StatusMessage = $"已选位置: {Longitude:F6}, {Latitude:F6}";
+                    }
+                }
+                else
+                {
+                    StatusMessage = "已取消选点";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "打开地图选点失败: " + ex.Message;
+            }
         }
 
         private bool ValidateAllProperties()

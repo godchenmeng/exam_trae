@@ -37,23 +37,23 @@
         <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,15">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <!-- <ColumnDefinition Width="*"/> -->
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- 总数统计 -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                <!-- <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="▣" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <StackPanel>
                         <TextBlock Text="{Binding TotalCount}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
                         <TextBlock Text="总建筑数" FontSize="12" Foreground="{StaticResource SecondaryTextBrush}"/>
                     </StackPanel>
-                </StackPanel>
+                </StackPanel> -->
 
                 <!-- 消防队站统计 -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="♦" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <StackPanel>
                         <TextBlock Text="{Binding FireStationCount}" FontSize="24" FontWeight="Bold" Foreground="#E74C3C"/>
@@ -62,7 +62,7 @@
                 </StackPanel>
 
                 <!-- 专职队统计 -->
-                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="●" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <StackPanel>
                         <TextBlock Text="{Binding SpecialTeamCount}" FontSize="24" FontWeight="Bold" Foreground="#F39C12"/>
@@ -71,7 +71,7 @@
                 </StackPanel>
 
                 <!-- 重点建筑统计 -->
-                <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="★" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <StackPanel>
                         <TextBlock Text="{Binding KeyBuildingCount}" FontSize="24" FontWeight="Bold" Foreground="#9B59B6"/>
@@ -129,6 +129,7 @@
                 <!-- 操作按钮 -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Button Command="{Binding AddBuildingCommand}" 
+                            IsEnabled="{Binding CanAddBuilding}"
                             Style="{StaticResource PrimaryButtonStyle}"
                             Content="+ 添加建筑" 
                             Margin="0,0,10,0"/>
@@ -214,34 +215,34 @@
                                     IsReadOnly="True"/>
                 
                 <!-- 操作列 -->
-                <DataGridTemplateColumn Header="操作" Width="180">
+                <DataGridTemplateColumn Header="操作" Width="400">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <Button Content="查看地图" 
                                         Style="{StaticResource SecondaryButtonStyle}"
-                                        Width="60" Height="30" 
+                                        Width="150" Height="30" 
                                         Margin="2"
                                         ToolTip="在地图上查看"
                                         Command="{Binding DataContext.ViewOnMapCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}"/>
                                 <Button Content="编辑" 
                                         Style="{StaticResource SecondaryButtonStyle}"
-                                        Width="40" Height="30" 
+                                        Width="100" Height="30" 
                                         Margin="2"
                                         ToolTip="编辑建筑"
                                         Command="{Binding DataContext.EditBuildingCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}"/>
-                                <Button Content="详情" 
+                                <!-- <Button Content="详情" 
                                         Style="{StaticResource SecondaryButtonStyle}"
                                         Width="40" Height="30" 
                                         Margin="2"
                                         ToolTip="查看详情"
                                         Command="{Binding DataContext.ViewDetailsCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                        CommandParameter="{Binding}"/>
+                                        CommandParameter="{Binding}"/> -->
                                 <Button Content="删除" 
                                         Style="{StaticResource SecondaryButtonStyle}"
-                                        Width="40" Height="30" 
+                                        Width="100" Height="30" 
                                         Margin="2"
                                         ToolTip="删除建筑"
                                         Command="{Binding DataContext.DeleteBuildingCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
@@ -288,15 +289,17 @@
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
                     <Button Command="{Binding FirstPageCommand}" 
                             Style="{StaticResource SecondaryButtonStyle}"
-                            Content="&lt;&lt;" 
-                            Width="35" Height="35" 
+                            Content="首页" 
+                            Width="52" Height="35" 
                             Margin="2"
+                            Padding="8,0"
                             ToolTip="首页"/>
                     <Button Command="{Binding PreviousPageCommand}" 
                             Style="{StaticResource SecondaryButtonStyle}"
-                            Content="&lt;" 
-                            Width="35" Height="35" 
+                            Content="上一页" 
+                            Width="64" Height="35" 
                             Margin="2"
+                            Padding="8,0"
                             ToolTip="上一页"/>
                     <TextBox Text="{Binding CurrentPage, UpdateSourceTrigger=PropertyChanged}" 
                              Style="{StaticResource ModernTextBoxStyle}"
@@ -305,17 +308,19 @@
                              TextAlignment="Center"/>
                     <Button Command="{Binding NextPageCommand}" 
                             Style="{StaticResource SecondaryButtonStyle}"
-                            Content="&gt;" 
-                            Width="35" Height="35" 
+                            Content="下一页" 
+                            Width="64" Height="35" 
                             Margin="2"
+                            Padding="8,0"
                             ToolTip="下一页"/>
                     <Button Command="{Binding LastPageCommand}" 
                             Style="{StaticResource SecondaryButtonStyle}"
-                            Content="&gt;&gt;" 
-                            Width="35" Height="35" 
+                            Content="末页" 
+                            Width="52" Height="35" 
                             Margin="2"
+                            Padding="8,0"
                             ToolTip="末页"/>
-                    
+                
                     <ComboBox ItemsSource="{Binding PageSizeOptions}" 
                               SelectedItem="{Binding PageSize}"
                               Style="{StaticResource ModernComboBoxStyle}"

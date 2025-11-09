@@ -375,6 +375,8 @@
                                         <CheckBox Content="{Binding Text}" 
                                                   Style="{StaticResource OptionCheckBoxStyle}"
                                                   IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                  Checked="MultipleChoiceOption_Checked"
+                                                  Unchecked="MultipleChoiceOption_Unchecked"
                                                   Tag="{Binding}"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

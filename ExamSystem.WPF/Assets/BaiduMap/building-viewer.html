@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>建筑地图查看</title>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body, html { height: 100%; margin: 0; }
+    #viewer-root { height: 100%; display: flex; flex-direction: column; }
+    .top-bar { padding: 8px 12px; border-bottom: 1px solid #eee; background: #fafafa; }
+    .top-bar .row { align-items: center; }
+    .map-wrap { flex: 1; position: relative; }
+    #map { position: absolute; inset: 0; }
+    .hint { position: absolute; left: 12px; bottom: 12px; background: rgba(255,255,255,0.9); padding: 8px 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); font-size: 12px; }
+  </style>
+  <script src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=E4805d16520de693a3fe707cdc962045"></script>
+</head>
+<body>
+  <div id="viewer-root" class="container-fluid">
+    <div class="top-bar">
+      <div class="row g-2">
+        <div class="col-auto d-flex align-items-center">
+          <span id="lblTitle" class="fw-bold">建筑：-</span>
+          <span id="lblCity" class="ms-3">城市：-</span>
+          <span id="lblCoord" class="ms-3">坐标：-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="hint"><strong>提示：</strong>地图已定位到指定建筑位置。</div>
+    </div>
+  </div>
+
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="js/building-viewer.js"></script>
+</body>
+</html>

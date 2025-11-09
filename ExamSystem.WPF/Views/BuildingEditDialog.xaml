@@ -5,10 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ExamSystem.WPF.Views"
         mc:Ignorable="d"
-        Title="{Binding IsEditMode, Converter={StaticResource BooleanToStringConverter}, ConverterParameter='编辑建筑|添加建筑'}"
-        Height="600" Width="500"
+        Height="600" Width="900"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
+
+    <!-- 根元素上不能在解析时使用 StaticResource 引用同级 Window.Resources 中后定义的资源，
+         因此改为使用属性元素语法并内联创建转换器实例，避免 XamlParseException。 -->
+    <Window.Title>
+        <Binding Path="IsEditMode">
+            <Binding.Converter>
+                <local:BooleanToStringConverter />
+            </Binding.Converter>
+            <Binding.ConverterParameter>编辑建筑|添加建筑</Binding.ConverterParameter>
+        </Binding>
+    </Window.Title>
     
     <Window.Resources>
         <ResourceDictionary>
@@ -92,9 +102,19 @@
                         <!-- 城市 -->
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="城市*" Style="{StaticResource LabelTextStyle}" Margin="0,15,0,0"/>
                         <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,15,0,0">
-                            <TextBox Text="{Binding City, UpdateSourceTrigger=PropertyChanged}" 
-                                     Style="{StaticResource ValidationTextBoxStyle}"
-                                     MaxLength="50"/>
+                            <ComboBox SelectedValue="{Binding City, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValuePath="Content"
+                                      Style="{StaticResource ModernComboBoxStyle}">
+                                <ComboBoxItem Content="贵阳市"/>
+                                <ComboBoxItem Content="遵义市"/>
+                                <ComboBoxItem Content="六盘水市"/>
+                                <ComboBoxItem Content="安顺市"/>
+                                <ComboBoxItem Content="毕节市"/>
+                                <ComboBoxItem Content="铜仁市"/>
+                                <ComboBoxItem Content="黔南布依族苗族自治州"/>
+                                <ComboBoxItem Content="黔东南苗族侗族自治州"/>
+                                <ComboBoxItem Content="黔西南布依族苗族自治州"/>
+                            </ComboBox>
                             <TextBlock Text="{Binding ValidationErrors[City]}" 
                                        Style="{StaticResource ErrorTextStyle}"
                                        Visibility="{Binding ValidationErrors[City], Converter={StaticResource StringToVisibilityConverter}}"/>

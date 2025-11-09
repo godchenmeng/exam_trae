@@ -253,11 +253,19 @@ namespace ExamSystem.WPF.Views
                 var userManagementView = _serviceProvider.GetRequiredService<UserManagementView>();
                 UserManagementFrame.Content = userManagementView;
 
-                // 加载建筑物管理
+                // 加载建筑物管理（仅管理员可见）
                 if (_currentUser != null && _currentUser.Role == ExamSystem.Domain.Enums.UserRole.Admin)
                 {
-                    var buildingManagementView = _serviceProvider.GetRequiredService<BuildingManagementView>();
-                    BuildingManagementFrame.Content = buildingManagementView;
+                  var buildingManagementView = _serviceProvider.GetRequiredService<BuildingManagementView>();
+                  BuildingManagementFrame.Content = buildingManagementView;
+                  _logger.LogInformation($"在LoadPages中设置BuildingManagementFrame.Content，是否为null: {BuildingManagementFrame.Content == null}");
+                  // 立即为BuildingManagementViewModel设置当前用户并刷新命令状态，避免后续更新顺序问题
+                  if (buildingManagementView.DataContext is BuildingManagementViewModel buildingVm)
+                  {
+                    _logger.LogInformation("在LoadPages中为BuildingManagementViewModel设置用户信息并刷新命令状态");
+                    buildingVm.SetCurrentUser(_currentUser);
+                    buildingVm.RefreshCommandStates();
+                  }
                 }
 
                 _logger.LogInformation("所有页面加载完成");
@@ -431,9 +439,10 @@ namespace ExamSystem.WPF.Views
                         _logger.LogInformation("BuildingManagementFrame.Content是BuildingManagementView类型");
                         if (buildingManagementView.DataContext is BuildingManagementViewModel buildingVm)
                         {
-                            _logger.LogInformation("找到BuildingManagementViewModel，正在设置用户信息");
+                            _logger.LogInformation("找到BuildingManagementViewModel，正在设置用户信息并刷新命令状态");
                             buildingVm.SetCurrentUser(_currentUser);
-                            _logger.LogInformation("BuildingManagementViewModel用户信息设置完成");
+                            buildingVm.RefreshCommandStates();
+                            _logger.LogInformation("BuildingManagementViewModel用户信息设置完成并已刷新命令状态");
                         }
                         else
                         {
