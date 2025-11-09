@@ -22,6 +22,9 @@ namespace ExamSystem.Data
         public DbSet<NotificationRecipient> NotificationRecipients { get; set; } = null!;
         public DbSet<MapDrawingData> MapDrawingData { get; set; } = null!;
         public DbSet<Building> Buildings { get; set; } = null!;
+        public DbSet<ExamSystem.Domain.Entities.SystemConfig> SystemConfigs { get; set; } = null!;
+        public DbSet<ExamSystem.Domain.Entities.SystemConfigLog> SystemConfigLogs { get; set; } = null!;
+        public DbSet<ExamSystem.Domain.Entities.BackupLog> BackupLogs { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -211,6 +214,39 @@ namespace ExamSystem.Data
                 entity.HasIndex(e => e.OrgType);
                 entity.HasIndex(e => e.Deleted);
                 entity.HasIndex(e => new { e.CityCn, e.OrgType, e.Deleted });
+            });
+
+            // 配置系统配置表
+            modelBuilder.Entity<ExamSystem.Domain.Entities.SystemConfig>(entity =>
+            {
+                entity.HasKey(e => e.Key);
+                entity.Property(e => e.Value).HasColumnType("TEXT");
+                entity.Property(e => e.UpdatedAt).IsRequired();
+                entity.Property(e => e.UpdatedBy).HasMaxLength(100);
+            });
+
+            // 配置系统配置日志表
+            modelBuilder.Entity<ExamSystem.Domain.Entities.SystemConfigLog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Key).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.OldValueHash).HasMaxLength(200);
+                entity.Property(e => e.NewValueHash).HasMaxLength(200);
+                entity.Property(e => e.Operator).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.ChangedAt).IsRequired();
+                entity.Property(e => e.Detail).HasColumnType("TEXT");
+            });
+
+            // 配置备份日志表
+            modelBuilder.Entity<ExamSystem.Domain.Entities.BackupLog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.FileName).HasMaxLength(255).IsRequired();
+                entity.Property(e => e.Mode).HasMaxLength(50).IsRequired();
+                entity.Property(e => e.CreatedAt).IsRequired();
+                entity.Property(e => e.Operator).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.Status).HasMaxLength(50).IsRequired();
+                entity.Property(e => e.Message).HasColumnType("TEXT");
             });
 
             // 种子数据

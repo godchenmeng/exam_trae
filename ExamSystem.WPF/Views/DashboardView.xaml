@@ -177,8 +177,8 @@
                      <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
                          <Button Style="{StaticResource ActionButtonStyle}" Content="用户管理" Click="UserManagementButton_Click" Margin="0,0,10,0"/>
                          <Button Style="{StaticResource ActionButtonStyle}" Content="建筑物管理" Click="BuildingManagementButton_Click" Margin="0,0,10,0"/>
-                         <Button Style="{StaticResource ActionButtonStyle}" Content="系统设置" Click="SystemSettingsButton_Click" Margin="0,0,10,0"/>
-                         <Button Style="{StaticResource ActionButtonStyle}" Content="数据备份" Click="DataBackupButton_Click"/>
+                         <!--<Button Style="{StaticResource ActionButtonStyle}" Content="系统设置" Click="SystemSettingsButton_Click" Margin="0,0,10,0"/>
+                         <Button Style="{StaticResource ActionButtonStyle}" Content="数据备份" Click="DataBackupButton_Click"/>-->
                      </StackPanel>
                      
                      <UniformGrid Columns="4" Rows="2" Margin="0,5,0,10">

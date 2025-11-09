@@ -130,34 +130,34 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 
-                <DataGridTemplateColumn Header="操作" Width="200">
+                <DataGridTemplateColumn Header="操作" Width="500">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Content="✏️" 
+                                <Button Content="编辑用户" 
                                         Style="{StaticResource SecondaryButtonStyle}"
-                                        Width="30" Height="30" 
+                                        Width="120" Height="30" 
                                         Margin="2"
                                         ToolTip="编辑用户"
                                         Click="EditUserButton_Click"
                                         Tag="{Binding}"/>
-                                <Button Content="🔒" 
+                                <Button Content="重置密码" 
                                         Style="{StaticResource SecondaryButtonStyle}"
-                                        Width="30" Height="30" 
+                                        Width="120" Height="30" 
                                         Margin="2"
                                         ToolTip="重置密码"
                                         Click="ResetPasswordButton_Click"
                                         Tag="{Binding}"/>
-                                <Button Content="{Binding StatusToggleIcon}" 
+                                <Button Content="{Binding StatusToggleTooltip}" 
                                         Style="{StaticResource SecondaryButtonStyle}"
-                                        Width="30" Height="30" 
+                                        Width="120" Height="30" 
                                         Margin="2"
                                         ToolTip="{Binding StatusToggleTooltip}"
                                         Click="ToggleStatusButton_Click"
                                         Tag="{Binding}"/>
-                                <Button Content="🗑️" 
+                                <Button Content="删除用户" 
                                         Style="{StaticResource SecondaryButtonStyle}"
-                                        Width="30" Height="30" 
+                                        Width="120" Height="30" 
                                         Margin="2"
                                         ToolTip="删除用户"
                                         Click="DeleteUserButton_Click"
@@ -192,15 +192,15 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Button x:Name="FirstPageButton" 
                             Style="{StaticResource SecondaryButtonStyle}"
-                            Content="⏮️" 
-                            Width="35" Height="35" 
+                            Content="首页" 
+                            Width="52" Height="35" 
                             Margin="2"
                             ToolTip="首页"
                             Click="FirstPageButton_Click"/>
                     <Button x:Name="PreviousPageButton" 
                             Style="{StaticResource SecondaryButtonStyle}"
-                            Content="⏪" 
-                            Width="35" Height="35" 
+                            Content="上一页" 
+                            Width="64" Height="35" 
                             Margin="2"
                             ToolTip="上一页"
                             Click="PreviousPageButton_Click"/>
@@ -212,15 +212,15 @@
                              KeyDown="PageNumberTextBox_KeyDown"/>
                     <Button x:Name="NextPageButton" 
                             Style="{StaticResource SecondaryButtonStyle}"
-                            Content="⏩" 
-                            Width="35" Height="35" 
+                            Content="下一页" 
+                            Width="64" Height="35" 
                             Margin="2"
                             ToolTip="下一页"
                             Click="NextPageButton_Click"/>
                     <Button x:Name="LastPageButton" 
                             Style="{StaticResource SecondaryButtonStyle}"
-                            Content="⏭️" 
-                            Width="35" Height="35" 
+                            Content="末页" 
+                            Width="52" Height="35" 
                             Margin="2"
                             ToolTip="末页"
                             Click="LastPageButton_Click"/>

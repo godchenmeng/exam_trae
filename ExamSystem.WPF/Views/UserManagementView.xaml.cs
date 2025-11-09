@@ -9,15 +9,17 @@ using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
 using ExamSystem.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ExamSystem.WPF.Views
 {
     public partial class UserManagementView : UserControl
     {
-        private readonly IUserService? _userService;
-        private readonly ILogger<UserManagementView>? _logger;
+        private IUserService? _userService;
+        private ILogger<UserManagementView>? _logger;
+        private IAuthService? _authService;
 
-        public ObservableCollection<UserDisplayModel> Users { get; set; }
+        public ObservableCollection<UserDisplayModel> Users { get; set; } = new ObservableCollection<UserDisplayModel>();
         
         private int _currentPage = 1;
         private int _pageSize = 10;
@@ -31,8 +33,9 @@ namespace ExamSystem.WPF.Views
             
             _userService = null;
             _logger = null;
+            _authService = null;
 
-            Users = new ObservableCollection<UserDisplayModel>();
+            // 确保 Users 已初始化，并绑定到数据网格
             UsersDataGrid.ItemsSource = Users;
 
             Loaded += UserManagementView_Loaded;
@@ -44,8 +47,9 @@ namespace ExamSystem.WPF.Views
             
             _userService = userService;
             _logger = logger;
+            _authService = ((App)Application.Current).GetServices().GetService<IAuthService>();
 
-            Users = new ObservableCollection<UserDisplayModel>();
+            // 确保 Users 已初始化，并绑定到数据网格
             UsersDataGrid.ItemsSource = Users;
 
             Loaded += UserManagementView_Loaded;
@@ -60,6 +64,7 @@ namespace ExamSystem.WPF.Views
         {
             try
             {
+                EnsureServices();
                 if (_userService == null)
                 {
                     _logger?.LogWarning("UserService 未初始化，跳过加载用户列表");
@@ -67,7 +72,14 @@ namespace ExamSystem.WPF.Views
                 }
 
                 var users = await _userService.GetAllUsersAsync();
-                
+
+                // 防御性保护，确保 Users 不为 null
+                if (Users == null)
+                {
+                    Users = new ObservableCollection<UserDisplayModel>();
+                    UsersDataGrid.ItemsSource = Users;
+                }
+
                 Users.Clear();
                 foreach (var user in users)
                 {
@@ -83,6 +95,21 @@ namespace ExamSystem.WPF.Views
             {
                 _logger?.LogError(ex, "加载用户列表时发生错误");
                 MessageBox.Show("加载用户列表时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void EnsureServices()
+        {
+            try
+            {
+                var services = ((App)Application.Current).GetServices();
+                _userService ??= services.GetService<IUserService>();
+                _authService ??= services.GetService<IAuthService>();
+                _logger ??= services.GetService<ILogger<UserManagementView>>();
+            }
+            catch
+            {
+                // 忽略解析失败，使用空服务以避免设计时异常
             }
         }
 
@@ -122,10 +149,27 @@ namespace ExamSystem.WPF.Views
             }
         }
 
-        private void AddUserButton_Click(object sender, RoutedEventArgs e)
+        private async void AddUserButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: 打开添加用户对话框
-            MessageBox.Show("添加用户功能", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                var dialog = new AddUserDialog
+                {
+                    Owner = Window.GetWindow(this)
+                };
+
+                var result = dialog.ShowDialog();
+                if (result == true)
+                {
+                    // 新增成功后刷新列表
+                    await LoadUsersAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "添加用户对话框打开失败");
+                MessageBox.Show("打开添加用户对话框失败。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void ImportUsersButton_Click(object sender, RoutedEventArgs e)
@@ -140,12 +184,34 @@ namespace ExamSystem.WPF.Views
             MessageBox.Show("导出用户功能", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void EditUserButton_Click(object sender, RoutedEventArgs e)
+        private async void EditUserButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is UserDisplayModel user)
             {
-                // TODO: 打开编辑用户对话框
-                MessageBox.Show($"编辑用户：{user.Username}", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                try
+                {
+                    EnsureServices();
+                    if (_userService == null)
+                    {
+                        MessageBox.Show("服务未初始化，无法编辑用户。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+
+                    var dialog = new UserEditDialog(user.Id)
+                    {
+                        Owner = Window.GetWindow(this)
+                    };
+                    var result = dialog.ShowDialog();
+                    if (result == true)
+                    {
+                        await LoadUsersAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "打开编辑用户对话框时发生错误");
+                    MessageBox.Show($"打开编辑用户对话框时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -153,24 +219,30 @@ namespace ExamSystem.WPF.Views
         {
             if (sender is Button button && button.Tag is UserDisplayModel user)
             {
-                var result = MessageBox.Show($"确定要重置用户 {user.Username} 的密码吗？", "确认", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
+                try
                 {
-                    try
+                    EnsureServices();
+                    if (_authService == null)
                     {
-                        // TODO: 实现重置密码功能
-                        MessageBox.Show("密码重置成功！新密码已发送到用户邮箱。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("服务未初始化，无法重置密码。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
                     }
-                    catch (Exception ex)
-            {
-                _logger?.LogError(ex, "重置密码时发生错误");
-                MessageBox.Show("重置密码时发生错误，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+
+                    var dialog = new ResetPasswordDialog(user.Id)
+                    {
+                        Owner = Window.GetWindow(this)
+                    };
+                    dialog.ShowDialog();
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "重置密码时发生错误");
+                    MessageBox.Show($"重置密码时发生错误：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
-        private void ToggleStatusButton_Click(object sender, RoutedEventArgs e)
+        private async void ToggleStatusButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is UserDisplayModel user)
             {
@@ -180,9 +252,23 @@ namespace ExamSystem.WPF.Views
                 {
                     try
                     {
-                        // TODO: 实现启用/禁用用户功能
-                        user.IsActive = !user.IsActive;
-                        MessageBox.Show($"用户{action}成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                        EnsureServices();
+                        if (_userService == null)
+                        {
+                            MessageBox.Show("服务未初始化，无法切换状态。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                            return;
+                        }
+
+                        var ok = await _userService.ToggleUserStatusAsync(user.Id);
+                        if (ok)
+                        {
+                            MessageBox.Show($"用户{action}成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                            await LoadUsersAsync();
+                        }
+                        else
+                        {
+                            MessageBox.Show($"用户{action}失败，请稍后重试。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
                     catch (Exception ex)
                 {
@@ -202,6 +288,7 @@ namespace ExamSystem.WPF.Views
                 {
                     try
                     {
+                        EnsureServices();
                         if (_userService == null)
                         {
                             _logger?.LogWarning("UserService 未初始化，无法删除用户");
@@ -209,9 +296,16 @@ namespace ExamSystem.WPF.Views
                             return;
                         }
 
-                        await _userService.DeleteUserAsync(user.Id);
-                        Users.Remove(user);
-                        MessageBox.Show("用户删除成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                        var ok = await _userService.DeleteUserAsync(user.Id);
+                        if (ok)
+                        {
+                            MessageBox.Show("用户删除成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                            await LoadUsersAsync();
+                        }
+                        else
+                        {
+                            MessageBox.Show("用户删除失败，可能存在关联数据。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -304,7 +398,7 @@ namespace ExamSystem.WPF.Views
         public UserRole Role => _user.Role;
         public DateTime CreatedAt => _user.CreatedAt;
         public DateTime? LastLoginAt => _user.LastLoginAt;
-        public bool IsActive { get; set; } = true; // TODO: 从User实体获取
+        public bool IsActive => _user.IsActive;
 
         public string RoleDisplay => Role switch
         {

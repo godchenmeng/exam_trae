@@ -97,7 +97,7 @@ namespace ExamSystem.WPF.Views
                 TabStatistics.Visibility = Visibility.Collapsed;
                 TabUserManagement.Visibility = Visibility.Collapsed;
                 TabMessageCenter.Visibility = Visibility.Collapsed;
-                TabLearningResources.Visibility = Visibility.Collapsed;
+                //TabLearningResources.Visibility = Visibility.Collapsed;
                 TabBuildingManagement.Visibility = Visibility.Collapsed;
                 // 新增：成绩管理入口
                 if (TabGradeManagement != null)
@@ -124,10 +124,12 @@ namespace ExamSystem.WPF.Views
             TabStatistics.Visibility = _permissionService.HasModuleAccess(role, "StatisticsReports") ? Visibility.Visible : Visibility.Collapsed;
             TabUserManagement.Visibility = _permissionService.HasModuleAccess(role, "UserManagement") ? Visibility.Visible : Visibility.Collapsed;
             TabBuildingManagement.Visibility = _permissionService.HasModuleAccess(role, "BuildingManagement") ? Visibility.Visible : Visibility.Collapsed;
+            // 系统设置仅管理员可见
+            //TabSystemSettings.Visibility = _permissionService.HasModuleAccess(role, "SystemSettings") ? Visibility.Visible : Visibility.Collapsed;
             
             // 新增模块：使用常量类
             TabMessageCenter.Visibility = _permissionService.HasModuleAccess(role, ModuleKeys.MessageCenter) ? Visibility.Visible : Visibility.Collapsed;
-            TabLearningResources.Visibility = _permissionService.HasModuleAccess(role, ModuleKeys.LearningResources) ? Visibility.Visible : Visibility.Collapsed;
+            //TabLearningResources.Visibility = _permissionService.HasModuleAccess(role, ModuleKeys.LearningResources) ? Visibility.Visible : Visibility.Collapsed;
             
             // 新增：成绩管理入口仅教师/管理员可见
             if (TabGradeManagement != null)
@@ -232,7 +234,7 @@ namespace ExamSystem.WPF.Views
 
                 // 新增：学习资源
                 var learningResourcesView = _serviceProvider.GetRequiredService<LearningResourcesView>();
-                LearningResourcesFrame.Content = learningResourcesView;
+                //LearningResourcesFrame.Content = learningResourcesView;
 
                 // 加载统计报表
                 var statisticsView = _serviceProvider.GetRequiredService<StatisticsView>();

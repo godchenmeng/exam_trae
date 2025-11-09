@@ -282,3 +282,287 @@ Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 1: 'table "User
    at ExamSystem.WPF.App.OnStartup(StartupEventArgs e) in E:\Project\exam_trae\ExamSystem.WPF\App.xaml.cs:line 62
 2025-11-09 16:37:28.466 +08:00 [DBG] Entity Framework Core 8.0.8 initialized 'ExamDbContext' using provider 'Microsoft.EntityFrameworkCore.Sqlite:8.0.8' with options: MigrationsAssembly=ExamSystem.Infrastructure 
 2025-11-09 16:37:32.858 +08:00 [DBG] 'ExamDbContext' disposed.
+2025-11-09 20:55:55.156 +08:00 [DBG] Hosting starting
+2025-11-09 20:55:55.183 +08:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-11-09 20:55:55.186 +08:00 [INF] Hosting environment: Production
+2025-11-09 20:55:55.186 +08:00 [INF] Content root path: E:\Project\exam_trae
+2025-11-09 20:55:55.187 +08:00 [DBG] Hosting started
+2025-11-09 20:55:55.236 +08:00 [DBG] An 'IServiceProvider' was created for internal use by Entity Framework.
+2025-11-09 20:55:55.253 +08:00 [INF] SQLite 数据库路径: E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db
+2025-11-09 20:55:55.432 +08:00 [DBG] No relationship from 'ExamRecord' to 'User' has been configured by convention because there are multiple properties on one entity type - {'Grader', 'User'} that could be matched with the properties on the other entity type - {'ExamRecords'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-11-09 20:55:55.456 +08:00 [DBG] No relationship from 'User' to 'ExamRecord' has been configured by convention because there are multiple properties on one entity type - {'ExamRecords'} that could be matched with the properties on the other entity type - {'Grader', 'User'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-11-09 20:55:55.540 +08:00 [DBG] No relationship from 'ExamRecord' to 'User' has been configured by convention because there are multiple properties on one entity type - {'Grader', 'User'} that could be matched with the properties on the other entity type - {'ExamRecords'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-11-09 20:55:55.541 +08:00 [DBG] No relationship from 'User' to 'ExamRecord' has been configured by convention because there are multiple properties on one entity type - {'ExamRecords'} that could be matched with the properties on the other entity type - {'Grader', 'User'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-11-09 20:55:55.563 +08:00 [DBG] The index {'NotificationId'} was not created on entity type 'NotificationRecipient' as the properties are already covered by the index {'NotificationId', 'ReceiverId'}.
+2025-11-09 20:55:55.739 +08:00 [DBG] Entity Framework Core 8.0.8 initialized 'ExamDbContext' using provider 'Microsoft.EntityFrameworkCore.Sqlite:8.0.8' with options: MigrationsAssembly=ExamSystem.Infrastructure 
+2025-11-09 20:55:55.743 +08:00 [DBG] Creating DbConnection.
+2025-11-09 20:55:55.749 +08:00 [DBG] Created DbConnection. (3ms).
+2025-11-09 20:55:55.752 +08:00 [DBG] Migrating using database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.754 +08:00 [DBG] Creating DbConnection.
+2025-11-09 20:55:55.755 +08:00 [DBG] Created DbConnection. (1ms).
+2025-11-09 20:55:55.756 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.760 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.762 +08:00 [DBG] Disposing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.765 +08:00 [DBG] Disposed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.770 +08:00 [DBG] Creating DbCommand for 'ExecuteScalar'.
+2025-11-09 20:55:55.773 +08:00 [DBG] Created DbCommand for 'ExecuteScalar' (3ms).
+2025-11-09 20:55:55.773 +08:00 [DBG] Initialized DbCommand for 'ExecuteScalar' (5ms).
+2025-11-09 20:55:55.775 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.812 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.816 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-11-09 20:55:55.827 +08:00 [INF] Executed DbCommand (11ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-11-09 20:55:55.828 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.829 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.830 +08:00 [DBG] Creating DbConnection.
+2025-11-09 20:55:55.830 +08:00 [DBG] Created DbConnection. (0ms).
+2025-11-09 20:55:55.830 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.830 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.830 +08:00 [DBG] Disposing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.830 +08:00 [DBG] Disposed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.830 +08:00 [DBG] Creating DbCommand for 'ExecuteScalar'.
+2025-11-09 20:55:55.830 +08:00 [DBG] Created DbCommand for 'ExecuteScalar' (0ms).
+2025-11-09 20:55:55.830 +08:00 [DBG] Initialized DbCommand for 'ExecuteScalar' (0ms).
+2025-11-09 20:55:55.830 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.830 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.830 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-11-09 20:55:55.830 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-11-09 20:55:55.830 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.830 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.835 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.835 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.835 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-11-09 20:55:55.835 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-11-09 20:55:55.835 +08:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-11-09 20:55:55.835 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+2025-11-09 20:55:55.836 +08:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+2025-11-09 20:55:55.837 +08:00 [DBG] Closing data reader to 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.838 +08:00 [DBG] A data reader for 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' is being disposed after spending 1ms reading results.
+2025-11-09 20:55:55.838 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.838 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.843 +08:00 [INF] Applying migration '20251017032241_InitialCreate'.
+2025-11-09 20:55:55.873 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.873 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.875 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-11-09 20:55:55.876 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-11-09 20:55:55.877 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-11-09 20:55:55.877 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-11-09 20:55:55.877 +08:00 [DBG] Initialized DbCommand for 'ExecuteNonQuery' (0ms).
+2025-11-09 20:55:55.877 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Users" (
+    "UserId" INTEGER NOT NULL CONSTRAINT "PK_Users" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "RealName" TEXT NULL,
+    "Role" INTEGER NOT NULL,
+    "Email" TEXT NULL,
+    "Phone" TEXT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "LastLoginAt" TEXT NULL,
+    "LoginFailCount" INTEGER NOT NULL,
+    "LockoutEnd" TEXT NULL
+);
+2025-11-09 20:55:55.879 +08:00 [ERR] Failed executing DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Users" (
+    "UserId" INTEGER NOT NULL CONSTRAINT "PK_Users" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "RealName" TEXT NULL,
+    "Role" INTEGER NOT NULL,
+    "Email" TEXT NULL,
+    "Phone" TEXT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "LastLoginAt" TEXT NULL,
+    "LoginFailCount" INTEGER NOT NULL,
+    "LockoutEnd" TEXT NULL
+);
+2025-11-09 20:55:55.880 +08:00 [DBG] Disposing transaction.
+2025-11-09 20:55:55.880 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.881 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.881 +08:00 [WRN] 数据库迁移过程中出现警告，尝试确保数据库连接
+Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 1: 'table "Users" already exists'.
+   at Microsoft.Data.Sqlite.SqliteException.ThrowExceptionForRC(Int32 rc, sqlite3 db)
+   at Microsoft.Data.Sqlite.SqliteCommand.PrepareAndEnumerateStatements()+MoveNext()
+   at Microsoft.Data.Sqlite.SqliteCommand.GetStatements()+MoveNext()
+   at Microsoft.Data.Sqlite.SqliteDataReader.NextResult()
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(CommandBehavior behavior)
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader()
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteNonQuery()
+   at System.Data.Common.DbCommand.ExecuteNonQueryAsync(CancellationToken cancellationToken)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at ExamSystem.WPF.App.OnStartup(StartupEventArgs e) in E:\Project\exam_trae\ExamSystem.WPF\App.xaml.cs:line 51
+2025-11-09 20:55:55.887 +08:00 [DBG] Creating DbConnection.
+2025-11-09 20:55:55.887 +08:00 [DBG] Created DbConnection. (0ms).
+2025-11-09 20:55:55.887 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.887 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.887 +08:00 [DBG] Disposing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.887 +08:00 [DBG] Disposed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.888 +08:00 [DBG] Creating DbCommand for 'ExecuteScalar'.
+2025-11-09 20:55:55.888 +08:00 [DBG] Created DbCommand for 'ExecuteScalar' (0ms).
+2025-11-09 20:55:55.888 +08:00 [DBG] Initialized DbCommand for 'ExecuteScalar' (0ms).
+2025-11-09 20:55:55.888 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.888 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.888 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "type" = 'table' AND "rootpage" IS NOT NULL;
+2025-11-09 20:55:55.888 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "type" = 'table' AND "rootpage" IS NOT NULL;
+2025-11-09 20:55:55.888 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.888 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.890 +08:00 [DBG] Migrating using database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.890 +08:00 [DBG] Creating DbConnection.
+2025-11-09 20:55:55.890 +08:00 [DBG] Created DbConnection. (0ms).
+2025-11-09 20:55:55.890 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.890 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.890 +08:00 [DBG] Disposing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.890 +08:00 [DBG] Disposed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.890 +08:00 [DBG] Creating DbCommand for 'ExecuteScalar'.
+2025-11-09 20:55:55.890 +08:00 [DBG] Created DbCommand for 'ExecuteScalar' (0ms).
+2025-11-09 20:55:55.890 +08:00 [DBG] Initialized DbCommand for 'ExecuteScalar' (0ms).
+2025-11-09 20:55:55.890 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.890 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.890 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-11-09 20:55:55.890 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-11-09 20:55:55.890 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.890 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.890 +08:00 [DBG] Creating DbConnection.
+2025-11-09 20:55:55.890 +08:00 [DBG] Created DbConnection. (0ms).
+2025-11-09 20:55:55.890 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Disposing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Disposed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.891 +08:00 [DBG] Creating DbCommand for 'ExecuteScalar'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Created DbCommand for 'ExecuteScalar' (0ms).
+2025-11-09 20:55:55.891 +08:00 [DBG] Initialized DbCommand for 'ExecuteScalar' (0ms).
+2025-11-09 20:55:55.891 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-11-09 20:55:55.891 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "name" = '__EFMigrationsHistory' AND "type" = 'table';
+2025-11-09 20:55:55.891 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.891 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-11-09 20:55:55.891 +08:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-11-09 20:55:55.891 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+2025-11-09 20:55:55.891 +08:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+2025-11-09 20:55:55.891 +08:00 [DBG] Closing data reader to 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] A data reader for 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' is being disposed after spending 0ms reading results.
+2025-11-09 20:55:55.891 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.891 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.891 +08:00 [INF] Applying migration '20251017032241_InitialCreate'.
+2025-11-09 20:55:55.895 +08:00 [DBG] Opening connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.895 +08:00 [DBG] Opened connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.895 +08:00 [DBG] Beginning transaction with isolation level 'Unspecified'.
+2025-11-09 20:55:55.896 +08:00 [DBG] Began transaction with isolation level 'Serializable'.
+2025-11-09 20:55:55.896 +08:00 [DBG] Creating DbCommand for 'ExecuteNonQuery'.
+2025-11-09 20:55:55.896 +08:00 [DBG] Created DbCommand for 'ExecuteNonQuery' (0ms).
+2025-11-09 20:55:55.896 +08:00 [DBG] Initialized DbCommand for 'ExecuteNonQuery' (0ms).
+2025-11-09 20:55:55.896 +08:00 [DBG] Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Users" (
+    "UserId" INTEGER NOT NULL CONSTRAINT "PK_Users" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "RealName" TEXT NULL,
+    "Role" INTEGER NOT NULL,
+    "Email" TEXT NULL,
+    "Phone" TEXT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "LastLoginAt" TEXT NULL,
+    "LoginFailCount" INTEGER NOT NULL,
+    "LockoutEnd" TEXT NULL
+);
+2025-11-09 20:55:55.896 +08:00 [ERR] Failed executing DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "Users" (
+    "UserId" INTEGER NOT NULL CONSTRAINT "PK_Users" PRIMARY KEY AUTOINCREMENT,
+    "Username" TEXT NOT NULL,
+    "PasswordHash" TEXT NOT NULL,
+    "RealName" TEXT NULL,
+    "Role" INTEGER NOT NULL,
+    "Email" TEXT NULL,
+    "Phone" TEXT NULL,
+    "IsActive" INTEGER NOT NULL,
+    "CreatedAt" TEXT NOT NULL,
+    "LastLoginAt" TEXT NULL,
+    "LoginFailCount" INTEGER NOT NULL,
+    "LockoutEnd" TEXT NULL
+);
+2025-11-09 20:55:55.896 +08:00 [DBG] Disposing transaction.
+2025-11-09 20:55:55.896 +08:00 [DBG] Closing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.896 +08:00 [DBG] Closed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.896 +08:00 [ERR] 数据库种子数据初始化失败
+Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 1: 'table "Users" already exists'.
+   at Microsoft.Data.Sqlite.SqliteException.ThrowExceptionForRC(Int32 rc, sqlite3 db)
+   at Microsoft.Data.Sqlite.SqliteCommand.PrepareAndEnumerateStatements()+MoveNext()
+   at Microsoft.Data.Sqlite.SqliteCommand.GetStatements()+MoveNext()
+   at Microsoft.Data.Sqlite.SqliteDataReader.NextResult()
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(CommandBehavior behavior)
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader()
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteNonQuery()
+   at System.Data.Common.DbCommand.ExecuteNonQueryAsync(CancellationToken cancellationToken)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at ExamSystem.WPF.DatabaseSeeder.SeedAsync() in E:\Project\exam_trae\ExamSystem.WPF\DatabaseSeeder.cs:line 28
+2025-11-09 20:55:55.897 +08:00 [DBG] 'ExamDbContext' disposed.
+2025-11-09 20:55:55.897 +08:00 [DBG] Disposing connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db'.
+2025-11-09 20:55:55.897 +08:00 [DBG] Disposed connection to database 'main' on server 'E:\Project\exam_trae\ExamSystem.WPF\bin\Debug\net8.0-windows10.0.19041\exam_system.db' (0ms).
+2025-11-09 20:55:55.897 +08:00 [ERR] 数据库初始化失败
+Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 1: 'table "Users" already exists'.
+   at Microsoft.Data.Sqlite.SqliteException.ThrowExceptionForRC(Int32 rc, sqlite3 db)
+   at Microsoft.Data.Sqlite.SqliteCommand.PrepareAndEnumerateStatements()+MoveNext()
+   at Microsoft.Data.Sqlite.SqliteCommand.GetStatements()+MoveNext()
+   at Microsoft.Data.Sqlite.SqliteDataReader.NextResult()
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(CommandBehavior behavior)
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader()
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteNonQuery()
+   at System.Data.Common.DbCommand.ExecuteNonQueryAsync(CancellationToken cancellationToken)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQueryAsync(IEnumerable`1 migrationCommands, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.MigrateAsync(String targetMigration, CancellationToken cancellationToken)
+   at ExamSystem.WPF.DatabaseSeeder.SeedAsync() in E:\Project\exam_trae\ExamSystem.WPF\DatabaseSeeder.cs:line 28
+   at ExamSystem.WPF.App.OnStartup(StartupEventArgs e) in E:\Project\exam_trae\ExamSystem.WPF\App.xaml.cs:line 62
+2025-11-09 20:55:55.901 +08:00 [DBG] Entity Framework Core 8.0.8 initialized 'ExamDbContext' using provider 'Microsoft.EntityFrameworkCore.Sqlite:8.0.8' with options: MigrationsAssembly=ExamSystem.Infrastructure 
+2025-11-09 20:59:28.525 +08:00 [DBG] 'ExamDbContext' disposed.
