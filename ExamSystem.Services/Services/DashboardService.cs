@@ -96,6 +96,20 @@ namespace ExamSystem.Services.Services
                 })
                 .ToList();
 
+            // 管理员趋势区：近7天每日新增用户与已发布试卷数量
+            var endDate = DateTime.Today;
+            var startDate = endDate.AddDays(-6);
+            var newUsers7Days = new List<DailyCount>();
+            var publishedPapers7Days = new List<DailyCount>();
+            for (var day = startDate; day <= endDate; day = day.AddDays(1))
+            {
+                var usersCount = allUsers.Count(u => u.CreatedAt.Date == day.Date);
+                // 说明：由于目前模型未记录明确的“发布时间”，以 UpdatedAt 作为已发布状态的时间参考
+                var papersCount = allPapers.Count(p => p.IsPublished && p.UpdatedAt.Date == day.Date);
+                newUsers7Days.Add(new DailyCount { Date = day, Count = usersCount });
+                publishedPapers7Days.Add(new DailyCount { Date = day, Count = papersCount });
+            }
+
             return new AdminDashboardData
             {
                 Summary = summary,
@@ -107,7 +121,9 @@ namespace ExamSystem.Services.Services
                 StudentCount = studentCount,
                 PublishedPaperCount = publishedCount,
                 UnpublishedPaperCount = unpublishedCount,
-                RecentNotifications = recent
+                RecentNotifications = recent,
+                NewUsers7Days = newUsers7Days,
+                PublishedPapers7Days = publishedPapers7Days
             };
         }
 

@@ -12,6 +12,7 @@ using ExamSystem.WPF.Views;
 using ExamSystem.WPF.ViewModels;
 using Serilog;
 using System.IO;
+using System.Windows.Threading;
 
 namespace ExamSystem.WPF
 {
@@ -28,6 +29,9 @@ namespace ExamSystem.WPF
 
         protected override async void OnStartup(StartupEventArgs e)
         {
+            // 全局异常处理：避免第三方控件（如 LiveCharts）在控件卸载时抛出未处理异常导致应用崩溃
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+
             _host = CreateHostBuilder().Build();
             Services = _host.Services;
             await _host.StartAsync();
@@ -77,6 +81,37 @@ namespace ExamSystem.WPF
         {
             _host?.Dispose();
             base.OnExit(e);
+        }
+
+        /// <summary>
+        /// 全局 Dispatcher 未处理异常捕获。
+        /// 仅在 LiveChartsCore.SkiaSharpView.WPF 的 MotionCanvas 卸载过程中出现的 NullReferenceException 时进行忽略，
+        /// 以避免应用在关闭或视图卸载时崩溃。其他异常将继续抛出，便于发现真实问题。
+        /// </summary>
+        private void App_DispatcherUnhandledException(object? sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                var ex = e.Exception;
+                var source = ex.Source ?? string.Empty;
+                var stack = ex.StackTrace ?? string.Empty;
+
+                // 仅忽略 LiveChartsCore 在控件卸载时偶发的空引用异常（已知问题，后续考虑升级包版本解决）
+                if (ex is NullReferenceException && source.Contains("LiveChartsCore.SkiaSharpView.WPF")
+                    && (stack.Contains("CompositionTargetTicker.DisposeTicker") || stack.Contains("MotionCanvas.OnUnloaded")))
+                {
+                    // 记录并标记为已处理，避免应用崩溃
+                    var logger = Services?.GetService<ILogger<App>>();
+                    logger?.LogWarning(ex, "忽略 LiveCharts 卸载过程中的 NullReference 异常（不影响功能）");
+                    e.Handled = true;
+                    return;
+                }
+            }
+            catch
+            {
+                // 忽略日志记录中的非关键错误，确保不会引发新的异常
+            }
+            // 其他异常保持默认处理（未标记为处理），便于定位真实问题
         }
 
         private static IHostBuilder CreateHostBuilder()

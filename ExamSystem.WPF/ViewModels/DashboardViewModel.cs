@@ -11,6 +11,10 @@ using ExamSystem.Services.Models;
 using ExamSystem.Domain.Entities;
 using ExamSystem.Domain.Enums;
 using Microsoft.Extensions.Logging;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.Measure;
+using System.Linq;
 
 namespace ExamSystem.WPF.ViewModels
 {
@@ -51,6 +55,12 @@ namespace ExamSystem.WPF.ViewModels
             SystemSettingsCommand = new RelayCommand(SystemSettings);
             DataBackupCommand = new RelayCommand(DataBackup);
             HelpDocumentCommand = new RelayCommand(HelpDocument);
+
+            // 初始化图表绑定属性为空，避免XAML绑定Null异常
+            AdminTrendSeries = Array.Empty<ISeries>();
+            AdminTrendXAxes = Array.Empty<Axis>();
+            TeacherPerformanceSeries = Array.Empty<ISeries>();
+            TeacherPerformanceXAxes = Array.Empty<Axis>();
         }
 
         #region Properties
@@ -140,6 +150,35 @@ namespace ExamSystem.WPF.ViewModels
         public ObservableCollection<StudentExamResult> StudentRecentResults { get; }
         // 新增：教师待批阅队列集合
         public ObservableCollection<PendingGradingItem> TeacherPendingGradings { get; }
+
+        // 图表数据绑定属性
+        private ISeries[] _adminTrendSeries = Array.Empty<ISeries>();
+        public ISeries[] AdminTrendSeries
+        {
+            get => _adminTrendSeries;
+            set => SetProperty(ref _adminTrendSeries, value);
+        }
+
+        private Axis[] _adminTrendXAxes = Array.Empty<Axis>();
+        public Axis[] AdminTrendXAxes
+        {
+            get => _adminTrendXAxes;
+            set => SetProperty(ref _adminTrendXAxes, value);
+        }
+
+        private ISeries[] _teacherPerformanceSeries = Array.Empty<ISeries>();
+        public ISeries[] TeacherPerformanceSeries
+        {
+            get => _teacherPerformanceSeries;
+            set => SetProperty(ref _teacherPerformanceSeries, value);
+        }
+
+        private Axis[] _teacherPerformanceXAxes = Array.Empty<Axis>();
+        public Axis[] TeacherPerformanceXAxes
+        {
+            get => _teacherPerformanceXAxes;
+            set => SetProperty(ref _teacherPerformanceXAxes, value);
+        }
 
         #endregion
 
@@ -235,6 +274,34 @@ namespace ExamSystem.WPF.ViewModels
                                 Time = n.CreatedAt.ToString("yyyy-MM-dd HH:mm")
                             });
                         }
+
+                        // 管理员趋势区图表绑定（近7天）
+                        var dayLabels = adminData.NewUsers7Days.Select(d => d.Date.ToString("MM-dd")).ToArray();
+                        var newUsersValues = adminData.NewUsers7Days.Select(d => (double)d.Count).ToArray();
+                        var publishedValues = adminData.PublishedPapers7Days.Select(d => (double)d.Count).ToArray();
+                        AdminTrendSeries = new ISeries[]
+                        {
+                            new LineSeries<double>
+                            {
+                                Name = "新增用户",
+                                Values = newUsersValues,
+                                GeometrySize = 6
+                            },
+                            new ColumnSeries<double>
+                            {
+                                Name = "发布试卷",
+                                Values = publishedValues
+                            }
+                        };
+                        AdminTrendXAxes = new[]
+                        {
+                            new Axis
+                            {
+                                Labels = dayLabels,
+                                LabelsRotation = 0,
+                                Position = AxisPosition.Start
+                            }
+                        };
                         break;
                     case UserRole.Teacher:
                         var teacherData = await _dashboardService.GetTeacherDashboardAsync(_currentUser.UserId);
@@ -257,6 +324,26 @@ namespace ExamSystem.WPF.ViewModels
                                 Time = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
                             });
                         }
+                        // 教师试卷表现图表（Top5平均分）
+                        var labels = teacherData.TopPapers.Select(p => p.PaperName).ToArray();
+                        var avgValues = teacherData.TopPapers.Select(p => (double)p.AverageScore).ToArray();
+                        TeacherPerformanceSeries = new ISeries[]
+                        {
+                            new ColumnSeries<double>
+                            {
+                                Name = "平均分",
+                                Values = avgValues
+                            }
+                        };
+                        TeacherPerformanceXAxes = new[]
+                        {
+                            new Axis
+                            {
+                                Labels = labels,
+                                LabelsRotation = 15,
+                                Position = AxisPosition.Start
+                            }
+                        };
                         // 暂未接入待批阅队列数据源，保留空集合以支持UI占位
                         TeacherPendingGradings.Clear();
                         break;

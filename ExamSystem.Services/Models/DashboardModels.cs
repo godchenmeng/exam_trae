@@ -33,6 +33,12 @@ namespace ExamSystem.Services.Models
         public int UnpublishedPaperCount { get; set; }
         // 最近通知
         public List<DashboardNotificationItem> RecentNotifications { get; set; } = new();
+
+        // 管理员趋势区（近7天）
+        // 新增用户每日计数
+        public List<DailyCount> NewUsers7Days { get; set; } = new();
+        // 已发布试卷每日计数（以 UpdatedAt 为参考）
+        public List<DailyCount> PublishedPapers7Days { get; set; } = new();
     }
 
     /// <summary>
@@ -86,5 +92,14 @@ namespace ExamSystem.Services.Models
         public string PaperName { get; set; } = string.Empty;
         public decimal AverageScore { get; set; }
         public decimal PassRate { get; set; }
+    }
+
+    /// <summary>
+    /// 简单的每日计数模型，用于趋势图
+    /// </summary>
+    public class DailyCount
+    {
+        public DateTime Date { get; set; }
+        public int Count { get; set; }
     }
 }

@@ -10,8 +10,7 @@ namespace ExamSystem.WPF.Views
 {
     public partial class DashboardView : UserControl
     {
-        private CartesianChart? _adminChart;
-        private CartesianChart? _teacherChart;
+        // 图表在XAML中通过绑定实现，无需在代码隐藏中维护演示数据
 
         public DashboardView(DashboardViewModel viewModel)
         {
@@ -35,108 +34,15 @@ namespace ExamSystem.WPF.Views
             // 初始响应式布局调整
             UpdateResponsiveLayout(this.ActualWidth);
 
-            // 初始化图表演示数据（后续将绑定到 ViewModel 数据）
-            InitializeCharts();
+            // 图表在XAML中绑定到ViewModel的真实数据，无需初始化演示数据
         }
 
         private void DashboardView_Unloaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                // 清理图表资源
-                CleanupCharts();
-            }
-            catch (Exception ex)
-            {
-                // 记录错误但不抛出异常，避免影响应用程序关闭
-                System.Diagnostics.Debug.WriteLine($"清理图表资源时发生错误: {ex.Message}");
-            }
+            // 无需手动清理图表资源，WPF控件生命周期会自动释放绑定的资源
         }
 
-        private void CleanupCharts()
-        {
-            try
-            {
-                // 清理管理员图表
-                if (_adminChart != null)
-                {
-                    if (AdminTrendChartHost != null)
-                    {
-                        AdminTrendChartHost.Child = null!;
-                    }
-                    _adminChart = null;
-                }
-
-                // 清理教师图表
-                if (_teacherChart != null)
-                {
-                    if (TeacherPerformanceChartHost != null)
-                    {
-                        TeacherPerformanceChartHost.Child = null!;
-                    }
-                    _teacherChart = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"清理图表时发生错误: {ex.Message}");
-            }
-        }
-
-        private void InitializeCharts()
-        {
-            try
-            {
-                // 管理员趋势区：近7天用户增长（示例数据）
-                _adminChart = new CartesianChart
-                {
-                    Height = 220,
-                    Series = new ISeries[]
-                    {
-                        new LineSeries<double>
-                        {
-                            Values = new double[] { 12, 18, 15, 22, 28, 30, 35 },
-                            Name = "新增用户",
-                            GeometrySize = 6
-                        },
-                        new ColumnSeries<double>
-                        {
-                            Values = new double[] { 5, 8, 6, 10, 12, 9, 11 },
-                            Name = "发布试卷",
-                        }
-                    }
-                };
-                
-                if (AdminTrendChartHost != null)
-                {
-                    AdminTrendChartHost.Child = _adminChart;
-                }
-
-                // 教师试卷表现：Top5试卷平均分（示例数据）
-                _teacherChart = new CartesianChart
-                {
-                    Height = 220,
-                    Series = new ISeries[]
-                    {
-                        new ColumnSeries<double>
-                        {
-                            Values = new double[] { 82, 75, 90, 68, 88 },
-                            Name = "平均分"
-                        }
-                    }
-                };
-                
-                if (TeacherPerformanceChartHost != null)
-                {
-                    TeacherPerformanceChartHost.Child = _teacherChart;
-                }
-            }
-            catch (Exception ex)
-            {
-                // 非关键路径，记录错误但不影响应用程序运行
-                System.Diagnostics.Debug.WriteLine($"图表初始化失败: {ex.Message}");
-            }
-        }
+        // 移除演示图表初始化，改用XAML与ViewModel绑定的真实数据
 
         private void DashboardView_SizeChanged(object sender, SizeChangedEventArgs e)
         {

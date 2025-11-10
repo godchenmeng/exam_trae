@@ -152,8 +152,8 @@
                     </Style.Triggers>
                 </Style>
             </StackPanel.Style>
-            <Button Style="{StaticResource ActionButtonStyle}" Content="查看统计" Click="ViewStatisticsButton_Click"/>
-            <Button Style="{StaticResource ActionButtonStyle}" Content="帮助文档" Click="HelpDocumentButton_Click"/>
+            <!--<Button Style="{StaticResource ActionButtonStyle}" Content="查看统计" Click="ViewStatisticsButton_Click"/>
+            <Button Style="{StaticResource ActionButtonStyle}" Content="帮助文档" Click="HelpDocumentButton_Click"/>-->
         </StackPanel>
 
         <!-- 角色专属模块 -->
@@ -217,7 +217,11 @@
                      </UniformGrid>
                      <!-- 管理员趋势区图表（近7天） -->
                      <TextBlock Text="趋势区（近7天）" FontWeight="Bold" FontSize="16" Margin="0,10,0,8"/>
-                      <Border x:Name="AdminTrendChartHost" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Height="220"/>
+                      <Border x:Name="AdminTrendChartHost" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                          <lvcwpf:CartesianChart Height="220"
+                                                Series="{Binding AdminTrendSeries}"
+                                                XAxes="{Binding AdminTrendXAxes}"/>
+                      </Border>
                  </StackPanel>
 
                  <!-- 教师模块：试卷排行榜 + 表现图表 + 待批阅队列 -->
@@ -243,7 +247,11 @@
                      </ListView>
                      <!-- 教师试卷表现图表（平均分） -->
                      <TextBlock Text="试卷表现图表（平均分）" FontWeight="Bold" FontSize="16" Margin="0,10,0,8"/>
-                      <Border x:Name="TeacherPerformanceChartHost" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Height="220"/>
+                      <Border x:Name="TeacherPerformanceChartHost" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                          <lvcwpf:CartesianChart Height="220"
+                                                Series="{Binding TeacherPerformanceSeries}"
+                                                XAxes="{Binding TeacherPerformanceXAxes}"/>
+                      </Border>
 
                      <!-- 待批阅队列（占位） -->
                      <TextBlock Text="待批阅队列" FontWeight="Bold" FontSize="16" Margin="0,10,0,8"/>
