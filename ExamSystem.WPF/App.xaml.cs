@@ -74,6 +74,30 @@ namespace ExamSystem.WPF
             var loginWindow = Services.GetRequiredService<LoginWindow>();
             loginWindow.Show();
 
+            // 应用启动后异步执行客户端更新检查，并在发现新版本时提示用户
+            try
+            {
+                var updateChecker = Services.GetService<ExamSystem.WPF.Services.IUpdateCheckService>();
+                _ = updateChecker?.CheckAndPromptAsync();
+            }
+            catch (Exception ex)
+            {
+                var logger = Services.GetRequiredService<ILogger<App>>();
+                logger.LogWarning(ex, "启动时更新检查初始化失败（忽略，不影响主流程）");
+            }
+
+            // 后台执行远程数据库更新（拉取服务器 SQL 补丁并应用）
+            try
+            {
+                var dbUpdater = Services.GetService<ExamSystem.WPF.Services.IDatabaseUpdateService>();
+                _ = dbUpdater?.FetchAndApplyAsync();
+            }
+            catch (Exception ex)
+            {
+                var logger = Services.GetRequiredService<ILogger<App>>();
+                logger.LogWarning(ex, "启动时数据库更新初始化失败（忽略，不影响主流程）");
+            }
+
             base.OnStartup(e);
         }
 
@@ -283,6 +307,11 @@ namespace ExamSystem.WPF
                         builder.AddSerilog();
                         builder.SetMinimumLevel(LogLevel.Debug);
                     });
+
+                    // 客户端更新检查服务（启动后异步检查并提示）
+                    services.AddSingleton<ExamSystem.WPF.Services.IUpdateCheckService, ExamSystem.WPF.Services.UpdateCheckService>();
+                    // 远程数据库更新服务（后台拉取服务器 SQL 补丁并应用）
+                    services.AddSingleton<ExamSystem.WPF.Services.IDatabaseUpdateService, ExamSystem.WPF.Services.DatabaseUpdateService>();
                 });
         }
     }

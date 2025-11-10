@@ -49,6 +49,14 @@
     </None>
   </ItemGroup>
 
+  <!-- 将 Updater.exe（由 ExamSystem.Updater 项目生成）复制到 WPF 输出目录，供自更新使用 -->
+  <ItemGroup>
+    <None Include="..\ExamSystem.Updater\bin\$(Configuration)\net8.0\ExamSystem.Updater.exe">
+      <Link>Updater.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <!-- 将 Assets/Map 目录下的文件复制到输出目录，供 WebView2 本地加载 -->
   <ItemGroup>
     <None Include="Assets\BaiduMap\**\*">

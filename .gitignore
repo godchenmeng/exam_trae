@@ -4,6 +4,7 @@
 /ExamSystem.Domain/obj
 /ExamSystem.Domain/obj
 /ExamSystem.Services/obj
+/ExamSystem.Updater/obj
 /ExamSystem.UI/obj
 =======
 ﻿################################################################################
@@ -28,9 +29,11 @@ errors.txt
 /ExamSystem.Infrastructure/obj
 /ExamSystem.Services/bin
 /ExamSystem.WPF/bin
+/ExamSystem.Updater/bin
 /ExamSystem.WPF/obj
 /ExamSystem.WPF/obj
 /ExamSystem.WPF/obj/Debug
 ExamSystem.WPF/obj/Debug/net5.0-windows/ExamSystem.WPF.AssemblyInfo.cs
 /ExamSystem.WPF/obj/Debug
 /ExamSystem.WPF/obj
+ExamSystem.Updater/bin/Debug/net8.0/runtimes/linux-armel/native/libe_sqlite3.so
